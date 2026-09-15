@@ -65,14 +65,20 @@ public static class Wave1Services
             .AddSingleton<ICatalogService, InMemoryCatalogService>()
             .AddSingleton<IBookletMappingService, InMemoryBookletMappingService>()
             .AddSingleton<IVocabularyService, InMemoryVocabularyService>()
-            // BL-6.6: catalog store switches to Postgres when configured (Edam:CatalogStore=postgres
-            // or a "catalog" connection string), else stays in-memory for the Wave-1 baseline.
+            // BL-6.6/BL-7.5: catalog store is DI-selected by config.
+            //   - postgres  (or a "catalog" connection string) -> PostgresCatalogStore
+            //   - filesystem (or an Edam:CatalogRoot / DefaultRootFileFolder) -> FileSystemCatalogStore (FileSystem target)
+            //   - otherwise -> in-memory (Wave-1 baseline / dev stand-in)
             .AddSingleton<ICatalogStore>(sp =>
             {
                 var config = sp.GetRequiredService<Microsoft.Extensions.Configuration.IConfiguration>();
                 var mode = config["Edam:CatalogStore"]?.ToLowerInvariant();
-                return mode == "postgres" || !string.IsNullOrEmpty(config["ConnectionStrings:catalog"])
-                    ? ActivatorUtilities.CreateInstance<PostgresCatalogStore>(sp)
+                var hasRoot = !string.IsNullOrWhiteSpace(config["Edam:CatalogRoot"])
+                           || !string.IsNullOrWhiteSpace(config["DefaultRootFileFolder"]);
+                if (mode == "postgres" || !string.IsNullOrEmpty(config["ConnectionStrings:catalog"]))
+                    return ActivatorUtilities.CreateInstance<PostgresCatalogStore>(sp);
+                return hasRoot || mode == "filesystem"
+                    ? ActivatorUtilities.CreateInstance<FileSystemCatalogStore>(sp)
                     : ActivatorUtilities.CreateInstance<InMemoryCatalogStore>(sp);
             })
         // BL-4.3: governance runtime (engine + approval gate + immutable audit log + conformance registry).
