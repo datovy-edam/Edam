@@ -7,7 +7,7 @@
 | **Type** | Migration / refactor |
 | **Priority** | **High** |
 | **Effort** | L |
-| **Status** | In Progress — moved as-is + all references resolved; **compile pending user online build** (EF/OpenApi packages not offline-cached) |
+| **Status** | **Done/verified** — moved as-is, refs validated, compiled clean on user online build (2026-09-15) |
 
 ## Description
 Move the reusable catalog code out of the **`src\Edam.Data.Catalog.WinUI\`** solution folder (which also hosts WinUI apps — `Edam.CatalogExplorer`, `Edam.UI.CatalogExplorer`, `CommunityToolkit.WinUI.Controls.Sizers`, `Monaco`) into a **headless, net10 `Edam.Data.Catalog`** platform under `Edam.Libraries`, alongside the other headless libraries. The catalog core is **UI-independent** and must not depend on (or live beside) UI projects.
@@ -23,7 +23,7 @@ Move the reusable catalog code out of the **`src\Edam.Data.Catalog.WinUI\`** sol
 - [ ] No `Edam.Data.Catalog*` project references a WinUI/AppSDK package.
 - [ ] WinUI apps (Explorer/Sizers/Monaco) remain in the UI area; the catalog portion is gone from the `Edam.Data.Catalog.WinUI` folder (only UI + testing remains).
 - [x] **Relocate as-is in one move** (namespaces preserved); no re-abstraction during relocation — this is the foundational de-risk step (`Relocate`).
-- [ ] `Edam.slnx` (or the Wave-1 solution + a catalog sln) builds 0-error — **pending user online build** (offline restore blocked on EF/OpenApi/System.Private.Uri).
+- [x] `Edam.slnx` (or the Wave-1 solution + a catalog sln) builds 0-error — **verified on user online build (2026-09-15)**.
 
 ## Progress
 - (2026-09-15) Moved the 4 catalog projects **as-is** (namespaces preserved) from `src\Edam.Data.Catalog.WinUI\` → `src\Edam.Data.Catalog\` — `CatalogModel`, `CatalogDb`, `CatalogService` (host), `CatalogServiceClient`.
