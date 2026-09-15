@@ -1,0 +1,34 @@
+{
+  "App": {
+    "Defaults": {
+      "OrganizationId": "Datovy"
+    },
+    "ConsolePath": "C:\\Users\\esobr\\Documents/Edam.Studio/Edam.App.Data/",
+    "UriList": [
+      {
+        "Name": "Default",
+        "Type": 1,
+        "UriText": ""
+      },
+      {
+        "Name": "Edam.Studio",
+        "Type": 1,
+        "UriText": "C:\\prjs\\Datovy.Edam/Edam.App.Data/"
+      },
+      {
+        "Name": "Other",
+        "Type": 1,
+        "UriText": "C:\\Users\\esobr\\Documents/Edam.Studio/Edam.App.Other/"
+      }
+    ]
+  },
+  "Schema": {
+    "Defaults": {
+      "TypePostfix": "_",
+      "DocumentPostfix": "_Document"
+    }
+  },
+  "DataSource": {
+    "DefaultConnectionString": "Data Source=.;Initial Catalog=Edam.Database;Integrated Security=True"
+  }
+}

@@ -1,0 +1,11 @@
+{
+  "name": "SourceSchemaA",
+  "namespaceUri": "http://edam.example/source-a",
+  "elements": [
+    { "name": "CustomerId", "dataType": "string", "description": "Unique customer identifier" },
+    { "name": "CustomerName", "dataType": "string", "description": "Full name of the customer" },
+    { "name": "EmailAddress", "dataType": "string", "description": "Customer email address" },
+    { "name": "OrderDate", "dataType": "date", "description": "Date the order was placed" },
+    { "name": "OrderTotal", "dataType": "decimal", "description": "Total amount of the order" }
+  ]
+}

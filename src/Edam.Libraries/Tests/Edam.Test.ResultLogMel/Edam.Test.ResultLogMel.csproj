@@ -1,0 +1,20 @@
+<Project Sdk="Microsoft.NET.Sdk">
+
+  <!--
+    BL-4.1 runtime verification harness (in-workspace, offline):
+    proves the additive MEL bridge on ResultLog forwards entries to an injected
+    Microsoft.Extensions.Logging logger. net10 console; no external test SDK needed.
+  -->
+  <PropertyGroup>
+    <OutputType>Exe</OutputType>
+    <TargetFramework>net10.0</TargetFramework>
+    <Nullable>enable</Nullable>
+    <ImplicitUsings>enable</ImplicitUsings>
+    <RootNamespace>Edam.Test.ResultLogMel</RootNamespace>
+  </PropertyGroup>
+
+  <ItemGroup>
+    <ProjectReference Include="..\..\System\Edam.System\Edam.System.csproj" />
+  </ItemGroup>
+
+</Project>

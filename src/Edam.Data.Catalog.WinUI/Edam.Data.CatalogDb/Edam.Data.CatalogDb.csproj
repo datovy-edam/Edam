@@ -1,0 +1,18 @@
+﻿<Project Sdk="Microsoft.NET.Sdk">
+
+  <PropertyGroup>
+    <TargetFramework>net10.0</TargetFramework>
+    <ImplicitUsings>enable</ImplicitUsings>
+    <Nullable>enable</Nullable>
+  </PropertyGroup>
+
+  <ItemGroup>
+    <ProjectReference Include="..\Edam.Data.CatalogModel\Edam.Data.CatalogModel.csproj" />
+  </ItemGroup>
+
+  <ItemGroup>
+    <ProjectReference Include="..\..\Edam.Libraries\System\Edam.System\Edam.System.csproj" />
+    <ProjectReference Include="..\..\Edam.Libraries\System\Edam.Net\Edam.Net.csproj" />
+  </ItemGroup>
+
+</Project>

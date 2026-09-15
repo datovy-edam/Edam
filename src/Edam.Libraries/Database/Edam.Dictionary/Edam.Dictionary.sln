@@ -1,0 +1,27 @@
+﻿
+Microsoft Visual Studio Solution File, Format Version 12.00
+# Visual Studio Version 17
+VisualStudioVersion = 17.8.34511.84
+MinimumVisualStudioVersion = 10.0.40219.1
+Project("{00D1A9C2-B5F0-4AF3-8072-F6C62B433612}") = "Edam.Dictionary", "Edam.Dictionary.sqlproj", "{697DD8FD-D227-4F61-AD01-D06C77174F49}"
+EndProject
+Global
+	GlobalSection(SolutionConfigurationPlatforms) = preSolution
+		Debug|Any CPU = Debug|Any CPU
+		Release|Any CPU = Release|Any CPU
+	EndGlobalSection
+	GlobalSection(ProjectConfigurationPlatforms) = postSolution
+		{697DD8FD-D227-4F61-AD01-D06C77174F49}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{697DD8FD-D227-4F61-AD01-D06C77174F49}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{697DD8FD-D227-4F61-AD01-D06C77174F49}.Debug|Any CPU.Deploy.0 = Debug|Any CPU
+		{697DD8FD-D227-4F61-AD01-D06C77174F49}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{697DD8FD-D227-4F61-AD01-D06C77174F49}.Release|Any CPU.Build.0 = Release|Any CPU
+		{697DD8FD-D227-4F61-AD01-D06C77174F49}.Release|Any CPU.Deploy.0 = Release|Any CPU
+	EndGlobalSection
+	GlobalSection(SolutionProperties) = preSolution
+		HideSolutionNode = FALSE
+	EndGlobalSection
+	GlobalSection(ExtensibilityGlobals) = postSolution
+		SolutionGuid = {AFA36A27-A89C-4DDF-928C-A2BD8F30856A}
+	EndGlobalSection
+EndGlobal

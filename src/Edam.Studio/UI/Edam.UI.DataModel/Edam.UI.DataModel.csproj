@@ -1,0 +1,25 @@
+<Project Sdk="Microsoft.NET.Sdk">
+  <PropertyGroup>
+    <TargetFramework>net10.0-windows10.0.26100.0</TargetFramework>
+    <TargetPlatformMinVersion>10.0.17763.0</TargetPlatformMinVersion>
+    <RootNamespace>Edam.UI.DataModel</RootNamespace>
+    <RuntimeIdentifiers>win-x86;win-x64</RuntimeIdentifiers>
+    <UseWinUI>true</UseWinUI>
+    <PlatformTarget>x64</PlatformTarget>
+    <AppxGeneratePriEnabled>false</AppxGeneratePriEnabled>
+    <AppxGeneratePrisForPortableLibrariesEnabled>false</AppxGeneratePrisForPortableLibrariesEnabled>
+    <WindowsPackageType>None</WindowsPackageType>
+  </PropertyGroup>
+  <ItemGroup>
+    <PackageReference Include="Edam.Data.Templates" Version="1.0.0" />
+    <PackageReference Include="Edam.DataObjects" Version="1.0.1" />
+    <PackageReference Include="Edam.System" Version="1.0.0" />
+    <PackageReference Include="Microsoft.Windows.SDK.BuildTools" Version="10.0.22621.756" />
+    <PackageReference Include="Microsoft.WindowsAppSDK" Version="1.6.250205002" />
+    <PackageReference Include="sqlite-net-pcl" Version="1.8.116" />
+  </ItemGroup>
+
+  <ItemGroup>
+    <ProjectReference Include="..\Edam.UI\Edam.UI.csproj" />
+  </ItemGroup>
+</Project>

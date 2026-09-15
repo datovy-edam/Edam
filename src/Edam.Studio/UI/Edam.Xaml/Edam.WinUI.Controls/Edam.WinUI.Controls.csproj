@@ -1,0 +1,303 @@
+<Project Sdk="Microsoft.NET.Sdk">
+  <PropertyGroup>
+    <TargetFramework>net10.0-windows10.0.26100.0</TargetFramework>
+    <TargetPlatformMinVersion>10.0.17763.0</TargetPlatformMinVersion>
+    <RootNamespace>Edam.WinUI.Controls</RootNamespace>
+    <RuntimeIdentifiers>win-x86;win-x64</RuntimeIdentifiers>
+    <UseWinUI>true</UseWinUI>
+    <PlatformTarget>x64</PlatformTarget>
+    <SupportedOSPlatformVersion>10.0.17763.0</SupportedOSPlatformVersion>
+    <AppxGeneratePriEnabled>false</AppxGeneratePriEnabled>
+    <AppxGeneratePrisForPortableLibrariesEnabled>false</AppxGeneratePrisForPortableLibrariesEnabled>
+    <WindowsPackageType>None</WindowsPackageType>
+  </PropertyGroup>
+  <ItemGroup>
+    <None Remove="Controls\Activities\ActivityPeriodRatingGridControl.xaml" />
+    <None Remove="Controls\Activities\ParticipantListViewControl.xaml" />
+    <None Remove="Controls\Activities\ParticipantRatingControl.xaml" />
+    <None Remove="Controls\Activities\PeriodControl.xaml" />
+    <None Remove="Controls\Activities\ProgramControl.xaml" />
+    <None Remove="Controls\Assets\AssetDataElementGridControl.xaml" />
+    <None Remove="Controls\Assets\AssetDataTreeControl.xaml" />
+    <None Remove="Controls\Assets\AssetDataTreeViewerControl.xaml" />
+    <None Remove="Controls\Assets\AssetMapItemControl.xaml" />
+    <None Remove="Controls\Assets\AssetMapPanelControl.xaml" />
+    <None Remove="Controls\Assets\AssetMapPlayControl.xaml" />
+    <None Remove="Controls\Assets\AssetMapSidePanelControl.xaml" />
+    <None Remove="Controls\Assets\AssetMapViewerControl.xaml" />
+    <None Remove="Controls\Assets\AssetSidePanelControl.xaml" />
+    <None Remove="Controls\Assets\AssetUseCaseGridControl.xaml" />
+    <None Remove="Controls\Assets\AssetViewerControl.xaml" />
+    <None Remove="Controls\Booklets\BookletPanelControl.xaml" />
+    <None Remove="Controls\Booklets\BookletTextCellControl.xaml" />
+    <None Remove="Controls\Editors\CodeEditorControl.xaml" />
+    <None Remove="Controls\Entities\EntityGroupControl.xaml" />
+    <None Remove="Controls\Booklets\BookletCodeCellControl.xaml" />
+    <None Remove="Controls\Booklets\FramePanelControl.xaml" />
+    <None Remove="Controls\Lexicon\TextSimilarityScoreViewerControl.xaml" />
+    <None Remove="Controls\Projects\ProjectFileEditorControl.xaml" />
+    <None Remove="Controls\Projects\ProjectSidePanelControl.xaml" />
+    <None Remove="Controls\Projects\ProjectViewerControl.xaml" />
+    <None Remove="Controls\ReferenceData\ReferenceDataDomainControl.xaml" />
+    <None Remove="Controls\ReferenceData\ReferenceDataDomainEditorControl.xaml" />
+    <None Remove="Controls\ReferenceData\ReferenceDataDomainGridControl.xaml" />
+    <None Remove="Controls\Utilities\DiagnosticsLogControl.xaml" />
+    <None Remove="Controls\Utilities\FolderViewControl.xaml" />
+    <None Remove="Controls\Utilities\TextEditorControl.xaml" />
+    <None Remove="Controls\Viewers\ExcelViewerControl.xaml" />
+    <None Remove="DataTemplates\DataSource.Dialog.json" />
+    <None Remove="DataTemplates\Domain.Record.Form.json" />
+    <None Remove="DataTemplates\Project.NewProject.Dialog.json" />
+  </ItemGroup>
+  <ItemGroup>
+    <Content Include="DataTemplates\Domain.Record.Form.json">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </Content>
+    <Content Include="DataTemplates\DataSource.Dialog.json">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </Content>
+    <Content Include="DataTemplates\Project.NewProject.Dialog.json">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </Content>
+  </ItemGroup>
+
+  <ItemGroup>
+      <PackageReference Include="CommunityToolkit.WinUI.UI.Controls" Version="7.1.2" />
+      <PackageReference Include="DocumentFormat.OpenXml" Version="2.19.0" />
+      <PackageReference Include="Edam.Application" Version="1.0.0" />
+      <PackageReference Include="Edam.B2b" Version="1.0.0" />
+      <PackageReference Include="Edam.Data.Asset.Services" Version="1.0.0" />
+      <PackageReference Include="Edam.Data.AssetDb" Version="1.0.0" />
+      <PackageReference Include="Edam.Data.AssetMapping" Version="1.0.0" />
+      <PackageReference Include="Edam.Data.Assets" Version="1.0.1" />
+      <PackageReference Include="Edam.Data.Dictionary" Version="1.0.0" />
+      <PackageReference Include="Edam.Data.Lexicon" Version="1.0.0" />
+      <PackageReference Include="Edam.Data.Schema" Version="1.0.0" />
+      <PackageReference Include="Edam.Data.Templates" Version="1.0.0" />
+      <PackageReference Include="Edam.DataObjects" Version="1.0.1" />
+      <PackageReference Include="Edam.Json" Version="1.0.0" />
+      <PackageReference Include="Edam.Language.Python" Version="1.0.0" />
+      <PackageReference Include="Edam.System" Version="1.0.0" />
+      <PackageReference Include="Edam.Xml" Version="1.0.0" />
+      <PackageReference Include="Jsonata.Net.Native" Version="2.4.1" />
+      <PackageReference Include="Microsoft.EntityFrameworkCore" Version="6.0.25" />
+      <PackageReference Include="Microsoft.Extensions.DependencyInjection" Version="8.0.0" />
+      <PackageReference Include="Microsoft.Extensions.Logging.Abstractions" Version="8.0.0" />
+      <PackageReference Include="Microsoft.WindowsAppSDK" Version="1.6.250205002" />
+      <PackageReference Include="Microsoft.Windows.SDK.BuildTools" Version="10.0.22621.756" />
+      <PackageReference Include="Newtonsoft.Json" Version="13.0.3" />
+      <PackageReference Include="Newtonsoft.Json.Schema" Version="4.0.1" />
+      <PackageReference Include="pythonnet" Version="3.0.3" />
+  </ItemGroup>
+
+  <ItemGroup>
+    <ProjectReference Include="..\..\Edam.UI.DataModel\Edam.UI.DataModel.csproj" />
+    <ProjectReference Include="..\..\Edam.UI\Edam.UI.csproj" />
+  </ItemGroup>
+
+  <ItemGroup>
+    <Page Update="Controls\ReferenceData\ReferenceDataDomainControl.xaml">
+      <Generator>MSBuild:Compile</Generator>
+    </Page>
+  </ItemGroup>
+
+  <ItemGroup>
+    <Page Update="Controls\ReferenceData\ReferenceDataDomainEditorControl.xaml">
+      <Generator>MSBuild:Compile</Generator>
+    </Page>
+  </ItemGroup>
+
+  <ItemGroup>
+    <Page Update="Controls\ReferenceData\ReferenceDataDomainGridControl.xaml">
+      <Generator>MSBuild:Compile</Generator>
+    </Page>
+  </ItemGroup>
+
+  <ItemGroup>
+    <Page Update="Controls\Entities\EntityGroupControl.xaml">
+      <Generator>MSBuild:Compile</Generator>
+    </Page>
+  </ItemGroup>
+
+  <ItemGroup>
+    <Page Update="Controls\Entities\ParticipantListViewControl.xaml">
+      <Generator>MSBuild:Compile</Generator>
+    </Page>
+  </ItemGroup>
+
+  <ItemGroup>
+    <Page Update="Controls\Activities\ParticipantRatingControl.xaml">
+      <Generator>MSBuild:Compile</Generator>
+    </Page>
+  </ItemGroup>
+
+  <ItemGroup>
+    <Page Update="Controls\Activities\ActivityPeriodRatingGridControl.xaml">
+      <Generator>MSBuild:Compile</Generator>
+    </Page>
+  </ItemGroup>
+
+  <ItemGroup>
+    <Page Update="Controls\Activities\ProgramControl.xaml">
+      <Generator>MSBuild:Compile</Generator>
+    </Page>
+  </ItemGroup>
+
+  <ItemGroup>
+    <Page Update="Controls\Assets\AssetUseCaseGridControl.xaml">
+      <Generator>MSBuild:Compile</Generator>
+    </Page>
+  </ItemGroup>
+
+  <ItemGroup>
+    <Page Update="Controls\Projects\ProjectSidePanelControl.xaml">
+      <Generator>MSBuild:Compile</Generator>
+    </Page>
+  </ItemGroup>
+
+  <ItemGroup>
+    <Page Update="Controls\Assets\AssetSidePanelControl.xaml">
+      <Generator>MSBuild:Compile</Generator>
+    </Page>
+  </ItemGroup>
+
+  <ItemGroup>
+    <Page Update="Controls\Assets\AssetDataElementGridControl.xaml">
+      <Generator>MSBuild:Compile</Generator>
+    </Page>
+  </ItemGroup>
+
+  <ItemGroup>
+    <Page Update="Controls\Utilities\TextEditorControl.xaml">
+      <Generator>MSBuild:Compile</Generator>
+    </Page>
+  </ItemGroup>
+
+  <ItemGroup>
+    <Page Update="Controls\Assets\AssetViewerControl.xaml">
+      <Generator>MSBuild:Compile</Generator>
+    </Page>
+  </ItemGroup>
+
+  <ItemGroup>
+    <Page Update="Controls\Activities\PeriodControl.xaml">
+      <Generator>MSBuild:Compile</Generator>
+    </Page>
+  </ItemGroup>
+
+  <ItemGroup>
+    <Page Update="Controls\Editors\CodeEditorControl.xaml">
+      <Generator>MSBuild:Compile</Generator>
+    </Page>
+  </ItemGroup>
+
+  <ItemGroup>
+    <CustomAdditionalCompileInputs Remove="Controls\Assets\AssetDataTreeControl.xaml" />
+  </ItemGroup>
+
+  <ItemGroup>
+    <Resource Remove="Controls\Assets\AssetDataTreeControl.xaml" />
+  </ItemGroup>
+
+  <ItemGroup>
+    <Page Update="Controls\Projects\ProjectFileEditorControl.xaml">
+      <Generator>MSBuild:Compile</Generator>
+    </Page>
+  </ItemGroup>
+
+  <ItemGroup>
+    <Page Update="Controls\Projects\ProjectViewerControl.xaml">
+      <Generator>MSBuild:Compile</Generator>
+    </Page>
+  </ItemGroup>
+
+  <ItemGroup>
+    <Page Update="Controls\Assets\AssetMapSidePanelControl.xaml">
+      <Generator>MSBuild:Compile</Generator>
+    </Page>
+  </ItemGroup>
+
+  <ItemGroup>
+    <Page Update="Controls\Utilities\FolderViewControl.xaml">
+      <Generator>MSBuild:Compile</Generator>
+    </Page>
+  </ItemGroup>
+
+  <ItemGroup>
+    <Page Update="Controls\Booklets\BookletTextCellControl.xaml">
+      <Generator>MSBuild:Compile</Generator>
+    </Page>
+  </ItemGroup>
+
+  <ItemGroup>
+    <Page Update="Controls\Booklets\BookletCodeCellControl.xaml">
+      <Generator>MSBuild:Compile</Generator>
+    </Page>
+  </ItemGroup>
+
+  <ItemGroup>
+    <Page Update="Controls\Booklets\FramePanelControl.xaml">
+      <Generator>MSBuild:Compile</Generator>
+    </Page>
+  </ItemGroup>
+
+  <ItemGroup>
+    <Page Update="Controls\Assets\AssetMapItemControl.xaml">
+      <Generator>MSBuild:Compile</Generator>
+    </Page>
+  </ItemGroup>
+
+  <ItemGroup>
+    <Page Update="Controls\Assets\AssetMapPlayControl.xaml">
+      <Generator>MSBuild:Compile</Generator>
+    </Page>
+  </ItemGroup>
+
+  <ItemGroup>
+    <Page Update="Controls\Assets\AssetMapPanelControl.xaml">
+      <Generator>MSBuild:Compile</Generator>
+    </Page>
+  </ItemGroup>
+
+  <ItemGroup>
+    <Page Update="Controls\Assets\AssetDataTreeViewerControl.xaml">
+      <Generator>MSBuild:Compile</Generator>
+    </Page>
+  </ItemGroup>
+
+  <ItemGroup>
+    <Page Update="Controls\Assets\AssetMapViewerControl.xaml">
+      <Generator>MSBuild:Compile</Generator>
+    </Page>
+  </ItemGroup>
+
+  <ItemGroup>
+    <Page Update="Controls\Booklets\BookletPanelControl.xaml">
+      <Generator>MSBuild:Compile</Generator>
+    </Page>
+  </ItemGroup>
+
+  <ItemGroup>
+    <Page Update="Controls\Viewers\ExcelViewerControl.xaml">
+      <Generator>MSBuild:Compile</Generator>
+    </Page>
+  </ItemGroup>
+
+  <ItemGroup>
+    <Folder Include="Controls\ContentDialogs\" />
+  </ItemGroup>
+
+  <ItemGroup>
+    <CustomAdditionalCompileInputs Remove="Controls\Utilities\DiagnosticsLogControl.xaml" />
+  </ItemGroup>
+
+  <ItemGroup>
+    <Resource Remove="Controls\Utilities\DiagnosticsLogControl.xaml" />
+  </ItemGroup>
+
+  <ItemGroup>
+    <Page Update="Controls\Lexicon\TextSimilarityScoreViewerControl.xaml">
+      <Generator>MSBuild:Compile</Generator>
+    </Page>
+  </ItemGroup>
+</Project>

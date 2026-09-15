@@ -1,0 +1,13 @@
+<Solution>
+  <Folder Name="/src/">
+    <Project Path="src/Edam.Cli/Edam.Cli.csproj" />
+    <Project Path="src/Edam.Mcp.Shell/Edam.Mcp.Shell.csproj" />
+  </Folder>
+  <Folder Name="/src/Edam.Services/">
+    <Project Path="src/Edam.Services/Edam.Services.Contracts/Edam.Services.Contracts.csproj" />
+    <Project Path="src/Edam.Services/Edam.Services.Core/Edam.Services.Core.csproj" />
+  </Folder>
+  <Project Path="src\Edam.AppHost\Edam.AppHost.csproj" />
+  <Project Path="src\Edam.ServiceDefaults\Edam.ServiceDefaults.csproj" />
+  <Project Path="src\Edam.WebApi\Edam.WebApi.csproj" />
+</Solution>

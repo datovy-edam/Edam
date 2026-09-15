@@ -1,0 +1,11 @@
+{
+  "name": "TargetSchemaB",
+  "namespaceUri": "http://edam.example/target-b",
+  "elements": [
+    { "name": "Id", "dataType": "string", "description": "Customer identifier" },
+    { "name": "Name", "dataType": "string", "description": "Customer name" },
+    { "name": "Email", "dataType": "string", "description": "Customer email" },
+    { "name": "Date", "dataType": "date", "description": "Order date" },
+    { "name": "Amount", "dataType": "decimal", "description": "Order amount" }
+  ]
+}
