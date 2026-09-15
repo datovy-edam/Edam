@@ -1,17 +1,17 @@
-﻿
+
 Microsoft Visual Studio Solution File, Format Version 12.00
 # Visual Studio Version 17
 VisualStudioVersion = 17.13.35818.85
 MinimumVisualStudioVersion = 10.0.40219.1
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Edam.CatalogExplorer", "Edam.CatalogExplorer\Edam.CatalogExplorer.csproj", "{DBA92A0C-EF62-4B90-910D-18EC5CB2C3B3}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Edam.Data.CatalogModel", "Edam.Data.CatalogModel\Edam.Data.CatalogModel.csproj", "{4C4EA5F4-7154-424F-2F97-93C81EB9D422}"
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Edam.Data.CatalogModel", "..\Edam.Data.Catalog\Edam.Data.CatalogModel\Edam.Data.CatalogModel.csproj", "{4C4EA5F4-7154-424F-2F97-93C81EB9D422}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Edam.Data.CatalogDb", "Edam.Data.CatalogDb\Edam.Data.CatalogDb.csproj", "{A7D23F2C-D31F-42AB-8168-99F2CB90F631}"
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Edam.Data.CatalogDb", "..\Edam.Data.Catalog\Edam.Data.CatalogDb\Edam.Data.CatalogDb.csproj", "{A7D23F2C-D31F-42AB-8168-99F2CB90F631}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Edam.Data.CatalogService", "Edam.Data.CatalogService\Edam.Data.CatalogService.csproj", "{94CD7C8E-61B1-4107-8C2D-25AE57DD8E8B}"
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Edam.Data.CatalogService", "..\Edam.Data.Catalog\Edam.Data.CatalogService\Edam.Data.CatalogService.csproj", "{94CD7C8E-61B1-4107-8C2D-25AE57DD8E8B}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Edam.Data.CatalogServiceClient", "Edam.Data.CatalogServiceClient\Edam.Data.CatalogServiceClient.csproj", "{04A9C8EF-113E-4C4F-8141-4DA450FA54F0}"
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Edam.Data.CatalogServiceClient", "..\Edam.Data.Catalog\Edam.Data.CatalogServiceClient\Edam.Data.CatalogServiceClient.csproj", "{04A9C8EF-113E-4C4F-8141-4DA450FA54F0}"
 EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Edam.UI.CatalogExplorer", "Edam.UI.CatalogExplorer\Edam.UI.CatalogExplorer.csproj", "{BECF4160-BA62-4FDC-AE75-2210D11C31F4}"
 EndProject

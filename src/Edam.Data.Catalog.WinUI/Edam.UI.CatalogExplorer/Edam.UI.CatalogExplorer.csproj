@@ -1,4 +1,4 @@
-﻿<Project Sdk="Microsoft.NET.Sdk">
+<Project Sdk="Microsoft.NET.Sdk">
   <PropertyGroup>
     <TargetFramework>net10.0-windows10.0.26100.0</TargetFramework>
     <TargetPlatformMinVersion>10.0.22621.0</TargetPlatformMinVersion>
@@ -15,9 +15,9 @@
     <PackageReference Include="System.Private.Uri" Version="4.3.2" />
   </ItemGroup>
   <ItemGroup>
-    <ProjectReference Include="..\Edam.Data.CatalogDb\Edam.Data.CatalogDb.csproj" />
-    <ProjectReference Include="..\Edam.Data.CatalogModel\Edam.Data.CatalogModel.csproj" />
-    <ProjectReference Include="..\Edam.Data.CatalogServiceClient\Edam.Data.CatalogServiceClient.csproj" />
+    <ProjectReference Include="..\..\Edam.Data.Catalog\Edam.Data.CatalogDb\Edam.Data.CatalogDb.csproj" />
+    <ProjectReference Include="..\..\Edam.Data.Catalog\Edam.Data.CatalogModel\Edam.Data.CatalogModel.csproj" />
+    <ProjectReference Include="..\..\Edam.Data.Catalog\Edam.Data.CatalogServiceClient\Edam.Data.CatalogServiceClient.csproj" />
     <ProjectReference Include="..\Monaco\Monaco.csproj" />
   </ItemGroup>
   <ItemGroup>
