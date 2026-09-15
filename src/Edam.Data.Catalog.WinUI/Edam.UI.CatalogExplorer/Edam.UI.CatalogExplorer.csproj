@@ -18,7 +18,7 @@
     <ProjectReference Include="..\..\Edam.Data.Catalog\Edam.Data.CatalogDb\Edam.Data.CatalogDb.csproj" />
     <ProjectReference Include="..\..\Edam.Data.Catalog\Edam.Data.CatalogModel\Edam.Data.CatalogModel.csproj" />
     <ProjectReference Include="..\..\Edam.Data.Catalog\Edam.Data.CatalogServiceClient\Edam.Data.CatalogServiceClient.csproj" />
-    <ProjectReference Include="..\Monaco\Monaco.csproj" />
+    <ProjectReference Include="..\..\Edam.Monaco\Monaco.csproj" />
   </ItemGroup>
   <ItemGroup>
     <ProjectReference Include="..\..\Edam.Libraries\System\Edam.System\Edam.System.csproj" />

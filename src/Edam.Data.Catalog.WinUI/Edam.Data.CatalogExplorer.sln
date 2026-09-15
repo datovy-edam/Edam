@@ -15,7 +15,7 @@ Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Edam.Data.CatalogServiceCli
 EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Edam.UI.CatalogExplorer", "Edam.UI.CatalogExplorer\Edam.UI.CatalogExplorer.csproj", "{BECF4160-BA62-4FDC-AE75-2210D11C31F4}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Monaco", "Monaco\Monaco.csproj", "{BA344BBD-60BE-49CC-B1CE-0DE17D4C2BA4}"
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Monaco", "..\Edam.Monaco\Monaco.csproj", "{BA344BBD-60BE-49CC-B1CE-0DE17D4C2BA4}"
 EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Edam.Test.TestBuilder", "Testing\Edam.Test.TestBuilder\Edam.Test.TestBuilder.csproj", "{C794F1F8-ED54-486A-AEB8-E36F04376502}"
 EndProject
