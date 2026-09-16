@@ -132,10 +132,15 @@ public sealed class PostgreSqlCatalogStore : ICatalogStore
         var id = Guid.NewGuid();
         using var conn = await OpenAsync(ct);
         using var cmd = conn.CreateCommand();
+        // Upsert by container_id; RETURNING yields the ACTUAL row so the returned Id always matches
+        // the persisted row (works both on first insert and on idempotent re-enlist of an existing
+        // container — previously the method returned a new random id that diverged from the row,
+        // so GetContainer(returned.Id) came back null once the container already existed).
         cmd.CommandText = """
             INSERT INTO edam_container (id, container_id, description, container_type, container_uri, content_type)
             VALUES (@id, @cid, @desc, @cty, @uri, @ctype)
-            ON CONFLICT (container_id) DO UPDATE SET description = @desc, container_type = @cty, container_uri = @uri;
+            ON CONFLICT (container_id) DO UPDATE SET description = @desc, container_type = @cty, container_uri = @uri
+            RETURNING id, container_id, description, container_type, container_uri, content_type;
             """;
         cmd.Parameters.AddWithValue("id", id);
         cmd.Parameters.AddWithValue("cid", containerId);
@@ -143,8 +148,9 @@ public sealed class PostgreSqlCatalogStore : ICatalogStore
         cmd.Parameters.AddWithValue("cty", (int)type);
         cmd.Parameters.AddWithValue("uri", baseUri ?? string.Empty);
         cmd.Parameters.AddWithValue("ctype", "application/json");
-        await cmd.ExecuteNonQueryAsync(ct);
-        return new ContainerInfo(id, containerId, description, type, baseUri ?? string.Empty);
+        using var r = await cmd.ExecuteReaderAsync(ct);
+        return await r.ReadAsync(ct) ? ReadContainer(r)
+               : throw new InvalidOperationException($"Enlist container '{containerId}' failed.");
     }
 
     public ContainerInfo EnlistContainer(string containerId, string description, string? baseUri = null, ContainerType type = ContainerType.DataContext)

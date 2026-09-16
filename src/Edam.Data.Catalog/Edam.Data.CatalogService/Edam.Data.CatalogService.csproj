@@ -21,10 +21,11 @@
   </ItemGroup>
 
   <ItemGroup>
-    <!-- BL-7.2: EF CatalogDb retired from the service host — the provider is Npgsql. -->
+    <!-- BL-7.2/BL-7.4: provider hidden behind DI — the host resolves by contract and never names
+         a provider (the consolidated AddCatalogServices composition root wires PostgreSQL). -->
+    <ProjectReference Include="..\Edam.Data.Catalog.DependencyInjection\Edam.Data.Catalog.DependencyInjection.csproj" />
     <ProjectReference Include="..\Edam.Data.CatalogModel\Edam.Data.CatalogModel.csproj" />
     <ProjectReference Include="..\Edam.Data.CatalogServiceClient\Edam.Data.CatalogServiceClient.csproj" />
-    <ProjectReference Include="..\Edam.Data.Catalog.PostgreSql\Edam.Data.Catalog.PostgreSql.csproj" />
   </ItemGroup>
 
   <ItemGroup>
