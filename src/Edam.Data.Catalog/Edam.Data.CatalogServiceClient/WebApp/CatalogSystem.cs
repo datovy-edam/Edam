@@ -1,9 +1,6 @@
-﻿using Edam.Application;
-using Edam.Data.CatalogDb;
+using Edam.Application;
 using Edam.Data.CatalogModel;
 using Edam.DataObjects.Trees;
-using Microsoft.EntityFrameworkCore;
-using Microsoft.EntityFrameworkCore.Migrations.Operations;
 
 // -----------------------------------------------------------------------------
 namespace Edam.Data.CatalogService;

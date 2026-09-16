@@ -1,4 +1,3 @@
-﻿using Edam.Data.CatalogDb;
 using Edam.Data.CatalogModel;
 using Edam.DataObjects;
 using Edam.DataObjects.Requests;

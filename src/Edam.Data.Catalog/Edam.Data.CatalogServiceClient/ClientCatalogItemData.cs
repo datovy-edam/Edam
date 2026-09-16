@@ -1,4 +1,4 @@
-﻿using Edam.Data.CatalogModel;
+using Edam.Data.CatalogModel;
 using Edam.DataObjects.Requests;
 using Edam.Text;
 using System;
@@ -8,8 +8,6 @@ using System.Text;
 using System.Threading.Tasks;
 
 // -----------------------------------------------------------------------------
-using Edam.Data.CatalogDb;
-
 namespace Edam.Data.CatalogService;
 
 public class ClientCatalogItemData : ICatalogItemData

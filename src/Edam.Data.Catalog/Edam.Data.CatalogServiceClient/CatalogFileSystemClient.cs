@@ -3,7 +3,6 @@ using Edam.Data.CatalogModel;
 using Edam.InOut;
 
 // -----------------------------------------------------------------------------
-using Edam.Data.CatalogDb;
 using Edam.Data.CatalogServiceClient;
 
 namespace Edam.Data.CatalogService;
@@ -97,7 +96,7 @@ public class CatalogFileSystemClient : CatalogBaseClient, ICatalogClient,
       var containerService = catalogContainer;
       if (containerService == null)
       {
-         containerService = CatalogServiceInstance.DefaultInstance.Container;
+         containerService = ModelCatalogService.Default.Container;
       }
 
       // try to find a container based on this base URI...
@@ -164,7 +163,7 @@ public class CatalogFileSystemClient : CatalogBaseClient, ICatalogClient,
    public async Task InitializeFileItems(string baseUri)
    {
       _catalog = new CatalogInfo(
-         CatalogServiceInstance.DefaultInstance, this, String.Empty);
+         ModelCatalogService.Default, this, String.Empty);
       _catalog.RootPathItem = _rootItem;
       CatalogTreeBuilder builder = new CatalogTreeBuilder(this, _catalog);
       builder.RegisterRootItem(_rootItem);

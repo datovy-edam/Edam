@@ -16,8 +16,6 @@ using System.Threading.Tasks;
 using System.Xml.Linq;
 
 // -----------------------------------------------------------------------------
-using Edam.Data.CatalogDb;
-
 namespace Edam.Data.CatalogService;
 
 public partial class CatalogClient : CatalogBaseClient, ICatalogClient

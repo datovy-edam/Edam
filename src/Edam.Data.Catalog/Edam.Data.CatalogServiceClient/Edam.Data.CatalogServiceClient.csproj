@@ -15,7 +15,9 @@
 
   <ItemGroup>
     <ProjectReference Include="..\Edam.Data.Catalog.Contracts\Edam.Data.Catalog.Contracts.csproj" />
-    <ProjectReference Include="..\Edam.Data.CatalogDb\Edam.Data.CatalogDb.csproj" />
+    <!-- Edam.Data.CatalogDb removed (BL-7.2 step 4): the catalog HTTP clients now
+         deserialize Contracts value records and the file-system client uses the
+         pure-Model ModelCatalogService default. No CatalogDb reference remains. -->
     <ProjectReference Include="..\Edam.Data.CatalogModel\Edam.Data.CatalogModel.csproj" />
   </ItemGroup>
 

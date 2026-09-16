@@ -1,4 +1,4 @@
-﻿using Edam.Data.CatalogModel;
+using Edam.Data.CatalogModel;
 using Edam.Text;
 using System;
 using System.Collections.Generic;
@@ -7,8 +7,6 @@ using System.Text;
 using System.Threading.Tasks;
 
 // -----------------------------------------------------------------------------
-using Edam.Data.CatalogDb;
-
 namespace Edam.Data.CatalogService;
 
 public class ClientCatalogContainer : ICatalogContainer
