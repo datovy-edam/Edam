@@ -33,6 +33,10 @@ public static class CatalogServices
             .AddSingleton<PostgreSqlCatalogStore>(sp => new PostgreSqlCatalogStore(connection))
             .AddSingleton<PostgreSqlContentStore>(sp => new PostgreSqlContentStore(connection))
             .AddSingleton<ICatalogStore>(sp => sp.GetRequiredService<PostgreSqlCatalogStore>())
-            .AddSingleton<IContentStore>(sp => sp.GetRequiredService<PostgreSqlContentStore>());
+            .AddSingleton<IContentStore>(sp => sp.GetRequiredService<PostgreSqlContentStore>())
+            // BL-7.4 seed: Container -> provider resolution (PostgreSql target maps to the
+            // store above; other targets resolve null). Callers depend on the contract only.
+            .AddSingleton<ICatalogProviderResolver<ICatalogStore>, CatalogProviderResolver>()
+            .AddSingleton<ICatalogProviderResolver<IContentStore>, CatalogProviderResolver>();
     }
 }
