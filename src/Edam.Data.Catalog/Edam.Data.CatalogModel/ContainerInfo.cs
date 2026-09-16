@@ -1,4 +1,3 @@
-﻿using Microsoft.EntityFrameworkCore;
 using System;
 using System.Collections.Generic;
 using System.ComponentModel.DataAnnotations;
@@ -16,7 +15,7 @@ namespace Edam.Data.CatalogModel;
 /// <summary>
 /// Similar to a FileSystem drive.
 /// </summary>
-[Table("Container"), Index(nameof(ContainerId),IsUnique = true)]
+[Table("Container")]
 public class ContainerInfo: ITreeContainer
 {
    public const string CONTAINER_ID_DEFAULT = "default";
