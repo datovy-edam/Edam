@@ -11,6 +11,7 @@
   </ItemGroup>
 
   <ItemGroup>
+    <ProjectReference Include="..\Edam.Data.Catalog.Contracts\Edam.Data.Catalog.Contracts.csproj" />
     <ProjectReference Include="..\Edam.Data.CatalogDb\Edam.Data.CatalogDb.csproj" />
     <ProjectReference Include="..\Edam.Data.CatalogModel\Edam.Data.CatalogModel.csproj" />
   </ItemGroup>

@@ -9,6 +9,7 @@ using Edam.Data.CatalogModel;
 using Edam.Data.CatalogServiceClient;
 using szer = Edam.Serialization;
 using Edam.Data.Catalog.PostgreSql;
+using Edam.Data.Catalog.Contracts;
 
 var builder = WebApplication.CreateBuilder(args);
 
@@ -35,7 +36,9 @@ var app = builder.Build();
 app.UseExceptionHandler();
 
 // setup service container 
-CatalogServiceMap map = new(app);
+CatalogServiceMap map = new(
+   app,
+   app.Services.GetRequiredService<ICatalogStore>());
 
 /*
 #region -- 1.50 - Initialization and Session Management
