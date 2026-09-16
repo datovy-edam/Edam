@@ -123,7 +123,7 @@
 | [BL-7.1](BL-7.1.md) | Relocate catalog core to headless `Edam.Data.Catalog` **as-is** (1st — de-risk) | Migration / refactor | **High** | L | **Done/verified** (2026-09-15) | **Ready** (Wave 1.1) |
 | [BL-7.5](BL-7.5.md) | Surface the real catalog behind the Wave-1 boundary (**FileSystem first**) | Capability / integration | **High** | M | **Done** (2026-09-15) | **Ready** (Wave 1.1) |
 | [BL-7.3](BL-7.3.md) | Catalog interface/base-code platform — **derive from relocated types** (draft scaffold validated/discarded) | Architecture / contracts | **High** | M | **Done** (2026-09-15) | **Ready** (Wave 1.1) |
-| [BL-7.2](BL-7.2.md) | EF-independence + **PostgreSQL (Npgsql)** back-end behind `ICatalogStore`/`IContentStore`; **MS-SQL/EF deferred** | Refactor / architecture | **High** | L | **In Progress** (2026-09-15) | **Ready** (Wave 1.1) |
+| [BL-7.2](BL-7.2.md) | EF-independence + **PostgreSQL (Npgsql)** back-end behind `ICatalogStore`/`IContentStore`; **MS-SQL/EF deferred** | Refactor / architecture | **High** | L | **In Progress** (Npgsql provider + conformance verified offline; EF tear-down pending) | **Ready** (Wave 1.1) |
 | [BL-7.4](BL-7.4.md) | DI seam + per-**Container** provider resolution (`ContainerBinding`/`ICatalogProviderResolver`); drop factory `switch` | Refactor / infrastructure | Medium | M | New | **Ready** (Wave 1.1) |
 
 > **Wave 1.1 overview + definition-of-complete:** `Wave-1.1-Catalog-Decoupling.md` (ADR-0007). Azure/blob content targets deferred to **Wave 2** (seam reserved in `IContentStore`).
