@@ -3,7 +3,6 @@ using Edam.DataObjects.Objects;
 using Newtonsoft;
 
 // -----------------------------------------------------------------------------
-using Edam.Data.CatalogDb;
 using Edam.Data.CatalogService;
 using Edam.Data.CatalogModel;
 using Edam.Data.CatalogServiceClient;

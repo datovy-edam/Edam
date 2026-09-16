@@ -6,7 +6,8 @@ using System.Linq;
 // -----------------------------------------------------------------------------
 using Edam.Application;
 using Edam.Data.CatalogModel;
-using catDb = Edam.Data.CatalogDb;
+using catPg = Edam.Data.Catalog.PostgreSql;
+using catSvcClient = Edam.Data.CatalogServiceClient;
 using catSrv = Edam.Data.CatalogService;
 using Edam.Diagnostics;
 
@@ -14,6 +15,9 @@ namespace Edam.UI.CatalogExplorer;
 
 public class CatalogServiceHelper
 {
+   private const string INVARIANT_CATALOG_DB = "edam";
+   private const string CATALOG_DEFAULT_DSN =
+      "Server=localhost;Port=5432;Database=edam;User Id=edam;Password=edam";
 
    /// <summary>
    /// Get HTTP based Catalog API Service instance...
@@ -49,25 +53,21 @@ public class CatalogServiceHelper
    /// <returns>Catalog Service instance is returned</returns>
    public static ICatalogService GetLocalInstance(
        string? connectionString = null,
-       string invariantName = catDb.CatalogInstance.EDAM_CATALOG_DB)
+       string invariantName = INVARIANT_CATALOG_DB)
    {
-      ResultsLog<ICatalogService?> results = null;
+      // Local catalog back-end = PostgreSQL (Npgsql) behind the ICatalogStore seam
+      // (BL-7.2/BL-7.4). The retired EF Edam.Data.CatalogDb back-end is no longer
+      // referenced here; the catalog stays persistent across runs via the Npgsql
+      // provider (the back-end is a variable, ADR-0007).
       var _conString = String.IsNullOrWhiteSpace(connectionString) ?
-          AppSettings.GetConnectionString("catalogDb") :
+          (AppSettings.GetConnectionString("catalog") ?? CATALOG_DEFAULT_DSN) :
           connectionString;
 
-      // initialize repository
-      catDb.CatalogInstance instance = new catDb.CatalogInstance();
-      results = instance.GetCatalog(CatalogBaseClient.SessionId,
-         invariantName, connectionString);
-
-      if (results.Success)
-      {
-         results.Instance.Container.SetContainer(
-            CatalogBaseClient.SessionId, "");
-         return results.Instance;
-      }
-      return null;
+      var store = new catPg.PostgreSqlCatalogStore(_conString);
+      var instance = new catSvcClient.StoreBackedCatalogService(
+         store, CatalogBaseClient.SessionId);
+      instance.Container.SetContainer(CatalogBaseClient.SessionId, "");
+      return instance;
    }
 
    /// <summary>
@@ -80,7 +80,7 @@ public class CatalogServiceHelper
    /// <returns>Catalog Service instance is returned</returns>
    public static async Task<ICatalogService> GetInstanceAsync(
        string? connectionUri = null,
-       string invariantName = catDb.CatalogInstance.EDAM_CATALOG_DB)
+       string invariantName = INVARIANT_CATALOG_DB)
    {
       ICatalogService result = null;
 
@@ -122,7 +122,7 @@ public class CatalogServiceHelper
    /// <returns>instance of catalog is returned</returns>
    public static async Task<CatalogInfo?> GetCatalogAsync(
        string? connectionUri = null, 
-       string invariantName = catDb.CatalogInstance.EDAM_CATALOG_DB)
+       string invariantName = INVARIANT_CATALOG_DB)
    {
       CatalogInfo catalog = null;
       try

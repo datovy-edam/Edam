@@ -15,7 +15,10 @@
     <PackageReference Include="System.Private.Uri" Version="4.3.2" />
   </ItemGroup>
   <ItemGroup>
-    <ProjectReference Include="..\..\Edam.Data.Catalog\Edam.Data.CatalogDb\Edam.Data.CatalogDb.csproj" />
+    <!-- BL-7.2/BL-7.4: EF CatalogDb retired from the desktop local path; the local
+         back-end is the Npgsql ICatalogStore provider instead. -->
+    <ProjectReference Include="..\..\Edam.Data.Catalog\Edam.Data.Catalog.PostgreSql\Edam.Data.Catalog.PostgreSql.csproj" />
+    <ProjectReference Include="..\..\Edam.Data.Catalog\Edam.Data.Catalog.Contracts\Edam.Data.Catalog.Contracts.csproj" />
     <ProjectReference Include="..\..\Edam.Data.Catalog\Edam.Data.CatalogModel\Edam.Data.CatalogModel.csproj" />
     <ProjectReference Include="..\..\Edam.Data.Catalog\Edam.Data.CatalogServiceClient\Edam.Data.CatalogServiceClient.csproj" />
     <ProjectReference Include="..\..\Edam.Monaco\Monaco.csproj" />
