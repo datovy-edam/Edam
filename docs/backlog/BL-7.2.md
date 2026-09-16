@@ -7,7 +7,7 @@
 | **Type** | Refactor / architecture |
 | **Priority** | **High** |
 | **Effort** | L |
-| **Status** | New |
+| **Status** | **In Progress** — store/content seam added to Contracts; **EF→Npgsql data-layer rewrite gated on live Postgres + online build (user shell)** |
 
 ## Description
 Make the catalog core **DB-independent** and supply a **cost-free relational back-end** so Wave 1.1 delivers "a service that in the back uses a database," while keeping the storage provider hidden from the end-user (they consume an instance via DI and never see the DB/EF).
@@ -32,7 +32,8 @@ Make the catalog core **DB-independent** and supply a **cost-free relational bac
 - [ ] **Provider-conformance suite** (ADR-0006 purity): the same catalog-behavior tests pass against FileSystem and PostgreSQL providers, proving back-ends swap without changing callers. (Testhost = user-shell; the suite is written now.)
 
 ## Progress
-(planned)
+- (2026-09-15) Started. Added the catalog **`ICatalogStore`** metadata seam to `src\Edam.Data.Catalog\Edam.Data.Catalog.Contracts\` (aggregates `ICatalogContainer`/`ICatalogItem`/`ICatalogItemData`, plus `DescribeStore()`), completing the **`ICatalogStore`/`IContentStore`** store+content seam pair BL-7.2 names. **Verified offline: Contracts builds net10, 0-error.**
+- **Gate found (recorded):** the whole catalog graph references `Edam.Data.CatalogModel`, which still carries the **uncached `Microsoft.EntityFrameworkCore.SqlServer`** package — so **no catalog project builds offline until EF is removed**. Removing EF from Model requires simultaneously rewriting `CatalogDb`'s EF data layer (`CatalogContext`/`CatalogContainer`/`CatalogItem`/`CatalogItemData`) onto **Npgsql** — a large data-layer rewrite whose **runtime verification needs a live PostgreSQL (Docker, user shell)**. Remaining BL-7.2 chunks: (1) Model EF removal + `CatalogDb` → Npgsql; (2) `CatalogServiceClient` decouple (drop `CatalogDb` + `Microsoft.AspNetCore.OpenApi`); (3) DI registration (`AddCatalogServices()`); (4) provider-conformance suite (ADR-0006, testhost = user shell).
 
 ## Why
 Delivers the Wave-1.1 goal of a **service backed by a database at no cost** (PostgreSQL), consistent with Wave-1 persistence; keeps Microsoft SQL/EF as an optional future target; honors the hidden-provider/instancing mandate (ADR-0007, ADR-0006).
