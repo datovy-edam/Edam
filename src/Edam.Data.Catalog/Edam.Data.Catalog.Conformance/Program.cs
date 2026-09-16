@@ -1,10 +1,12 @@
 using Edam.Data.Catalog.Conformance;
 using Edam.Data.Catalog.Contracts;
+using Edam.Data.Catalog.FileSystem;
 using Edam.Data.Catalog.PostgreSql;
 
 // Provider-conformance runner (ADR-0006). Same scenario, swappable providers:
 //   Edam.Data.Catalog.Conformance                          -> in-memory (offline, reference)
 //   Edam.Data.Catalog.Conformance postgres "<connection>" -> PostgreSQL (live DB)
+//   Edam.Data.Catalog.Conformance filesystem "<root dir>" -> file-system (durable, offline)
 var mode = args.Length > 0 ? args[0] : "memory";
 
 object store;
@@ -18,6 +20,13 @@ if (mode.Equals("postgres", StringComparison.OrdinalIgnoreCase))
     store = pg;
     content = new PostgreSqlContentStore(args[1]);
     providerName = "postgres";
+}
+else if (mode.Equals("filesystem", StringComparison.OrdinalIgnoreCase))
+{
+    if (args.Length < 2) { Console.Error.WriteLine("filesystem requires a root directory"); return 2; }
+    store = new FileSystemCatalogStore(args[1]);
+    content = new FileSystemContentStore(args[1]);
+    providerName = "filesystem";
 }
 else
 {
