@@ -1,20 +1,26 @@
-﻿
+
 
 // -----------------------------------------------------------------------------
-using Edam.Application;
-using Edam.Data.CatalogDb;
+using Edam.Data.CatalogModel;
 
 namespace Edam.Test.TestCatalogLibrary;
 
 public class AppHelper
 {
 
-   private static CatalogServiceInstance _catalogInstance;
-   public static CatalogServiceInstance CatalogInstance
+   private static ModelCatalogService? _catalogInstance;
+   public static ModelCatalogService? CatalogInstance
    {
       get { return _catalogInstance; }
    }
 
+   /// <summary>
+   /// Initialize the test harness against the pure-Model (EF-free) in-memory
+   /// catalog service (BL-7.2 step 5). Replaces the former EF-backed
+   /// <c>CatalogBuilderServiceInstance</c> from <c>Edam.Data.CatalogDb</c> so the
+   /// test library no longer references the retired CatalogDb layer. The tests
+   /// exercise <c>CatalogFileSystemClient</c>, which is unchanged.
+   /// </summary>
    public static void InitializeTest()
    {
       if (_catalogInstance != null)
@@ -22,8 +28,7 @@ public class AppHelper
          return;
       }
 
-      _catalogInstance = new CatalogBuilderServiceInstance(null);
+      _catalogInstance = ModelCatalogService.Default;
    }
 
 }
-

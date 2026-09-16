@@ -11,7 +11,8 @@
   </ItemGroup>
 
   <ItemGroup>
-    <ProjectReference Include="..\..\..\Edam.Data.Catalog\Edam.Data.CatalogDb\Edam.Data.CatalogDb.csproj" />
+    <!-- Edam.Data.CatalogDb removed (BL-7.2 step 5): test harness now uses the
+         pure-Model ModelCatalogService; no CatalogDb dependency remains. -->
     <ProjectReference Include="..\..\..\Edam.Data.Catalog\Edam.Data.CatalogModel\Edam.Data.CatalogModel.csproj" />
     <ProjectReference Include="..\..\..\Edam.Data.Catalog\Edam.Data.CatalogServiceClient\Edam.Data.CatalogServiceClient.csproj" />
   </ItemGroup>

@@ -6,7 +6,6 @@ using System.Threading.Tasks;
 
 // -----------------------------------------------------------------------------
 using Edam.Data.CatalogModel;
-using Edam.Data.CatalogDb;
 using Edam.UI.Catalog.Models;
 using Edam.UI.CatalogExplorer;
 using Edam.Data.CatalogService;

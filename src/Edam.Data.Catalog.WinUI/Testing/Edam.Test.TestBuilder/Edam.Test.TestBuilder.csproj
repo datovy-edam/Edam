@@ -13,7 +13,8 @@
   </ItemGroup>
 
   <ItemGroup>
-    <ProjectReference Include="..\..\..\Edam.Data.Catalog\Edam.Data.CatalogDb\Edam.Data.CatalogDb.csproj" />
+    <!-- Edam.Data.CatalogDb removed (BL-7.2 step 5): tests exercise the Model
+         CatalogFileSystemClient, which no longer depends on CatalogDb. -->
     <ProjectReference Include="..\..\..\Edam.Data.Catalog\Edam.Data.CatalogModel\Edam.Data.CatalogModel.csproj" />
     <ProjectReference Include="..\..\..\Edam.Data.Catalog\Edam.Data.CatalogServiceClient\Edam.Data.CatalogServiceClient.csproj" />
     <ProjectReference Include="..\Edam.Test.TestCatalogLibrary\Edam.Test.TestCatalogLibrary.csproj" />

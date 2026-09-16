@@ -9,7 +9,6 @@ using Edam.Data.CatalogModel;
 using catDb = Edam.Data.CatalogDb;
 using catSrv = Edam.Data.CatalogService;
 using Edam.Diagnostics;
-using Edam.Data.CatalogDb;
 
 namespace Edam.UI.CatalogExplorer;
 
