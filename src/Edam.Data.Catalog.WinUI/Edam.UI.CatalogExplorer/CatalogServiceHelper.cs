@@ -6,7 +6,9 @@ using System.Linq;
 // -----------------------------------------------------------------------------
 using Edam.Application;
 using Edam.Data.CatalogModel;
-using catPg = Edam.Data.Catalog.PostgreSql;
+using Edam.Data.Catalog.DependencyInjection;
+using Microsoft.Extensions.DependencyInjection;
+using catContracts = Edam.Data.Catalog.Contracts;
 using catSvcClient = Edam.Data.CatalogServiceClient;
 using catSrv = Edam.Data.CatalogService;
 using Edam.Diagnostics;
@@ -55,19 +57,43 @@ public class CatalogServiceHelper
        string? connectionString = null,
        string invariantName = INVARIANT_CATALOG_DB)
    {
-      // Local catalog back-end = PostgreSQL (Npgsql) behind the ICatalogStore seam
-      // (BL-7.2/BL-7.4). The retired EF Edam.Data.CatalogDb back-end is no longer
-      // referenced here; the catalog stays persistent across runs via the Npgsql
-      // provider (the back-end is a variable, ADR-0007).
+      // Local catalog back-end is resolved via the DI composition root (BL-7.4 / ADR-0006/0007):
+      // the provider is hidden behind the ICatalogStore seam and selected by configuration
+      // (Edam:Catalog:Target = postgres; ConnectionStrings:catalog). The consumer never names a
+      // provider implementation; the retired EF Edam.Data.CatalogDb back-end is gone (BL-7.2).
       var _conString = String.IsNullOrWhiteSpace(connectionString) ?
           (AppSettings.GetConnectionString("catalog") ?? CATALOG_DEFAULT_DSN) :
           connectionString;
 
-      var store = new catPg.PostgreSqlCatalogStore(_conString);
+      var store = GetProvider(_conString).GetRequiredService<catContracts.ICatalogStore>();
       var instance = new catSvcClient.StoreBackedCatalogService(
          store, CatalogBaseClient.SessionId);
       instance.Container.SetContainer(CatalogBaseClient.SessionId, "");
       return instance;
+   }
+
+   /// <summary>Built-once-per-connection-string DI container for the local catalog back-end.</summary>
+   private static readonly Dictionary<string, IServiceProvider> _providers =
+      new(StringComparer.OrdinalIgnoreCase);
+   private static readonly object _providerGate = new();
+
+   private static IServiceProvider GetProvider(string conString)
+   {
+      lock (_providerGate)
+      {
+         if (_providers.TryGetValue(conString, out var existing)) return existing;
+
+         var services = new ServiceCollection();
+         var config = new Dictionary<string, string>(StringComparer.OrdinalIgnoreCase)
+         {
+            ["Edam:Catalog:Target"] = "postgres",
+            ["ConnectionStrings:catalog"] = conString,
+         };
+         services.AddCatalogServices(config);
+         var provider = services.BuildServiceProvider();
+         _providers[conString] = provider;
+         return provider;
+      }
    }
 
    /// <summary>
@@ -99,21 +125,6 @@ public class CatalogServiceHelper
    }
 
    /// <summary>
-   /// Get Instance Async...
-   /// </summary>
-   /// <param name="connectionString">connection string</param>
-   /// <returns>instance is returned</returns>
-   //public static async Task<ICatalogService> GetInstanceAsync(
-   //    string? connectionString = null)
-   //{
-   //    ICatalogService instance = null;
-   //    await Task.Run(() => {
-   //        instance = GetInstance(connectionString);
-   //    });
-   //    return instance;
-   //}
-
-   /// <summary>
    /// Get Catalog to build its tree and access data.
    /// </summary>
    /// <param name="connectionUri">connection string (default: null </param>
@@ -139,19 +150,4 @@ public class CatalogServiceHelper
       }
       return catalog;
    }
-
-   /// <summary>
-   /// Get Catalog Async...
-   /// </summary>
-   /// <param name="connectionUri">connection string</param>
-   /// <returns>instance of catalog is returned</returns>
-   //public static async Task<CatalogInfo> GetCatalogAsync(
-   //    string? connectionUri = null)
-   //{
-   //    CatalogInfo catalog = null;
-   //    await Task.Run(() => {
-   //        catalog = GetCatalog(connectionUri);
-   //    });
-   //    return catalog;
-   //}
 }

@@ -8,7 +8,6 @@ using Windows.Storage.Pickers;
 using Windows.Storage;
 using Microsoft.UI.Xaml;
 using Edam.Application;
-using Microsoft.EntityFrameworkCore.Metadata.Internal;
 using Windows.ApplicationModel;
 using Microsoft.Extensions.Localization;
 using Microsoft.Extensions.Options;

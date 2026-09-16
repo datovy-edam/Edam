@@ -25,6 +25,16 @@ namespace Edam.Data.Catalog.DependencyInjection;
 /// </summary>
 public static class CatalogServices
 {
+   /// <summary>
+   /// Registers the full catalog surface from a flat key/value configuration map — for desktop/UI
+   /// hosts (notably the WinUI shell) that don't load appsettings.json. The keys are the same as the
+   /// <see cref="IConfiguration"/> overload (e.g. <c>Edam:Catalog:Target</c>, <c>ConnectionStrings:catalog</c>,
+   /// <c>Edam:Catalog:FileSystemRoot</c>, <c>Edam:Catalog:ServiceBaseUri</c>).
+   /// </summary>
+   public static IServiceCollection AddCatalogServices(
+       this IServiceCollection services, IReadOnlyDictionary<string, string> config)
+       => AddCatalogServices(services, new MapConfiguration(config));
+
    public static IServiceCollection AddCatalogServices(this IServiceCollection services, IConfiguration config)
    {
       var defaultTarget = ParseTarget(config["Edam:Catalog:Target"]);
