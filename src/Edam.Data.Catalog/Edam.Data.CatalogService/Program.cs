@@ -8,12 +8,18 @@ using Edam.Data.CatalogService;
 using Edam.Data.CatalogModel;
 using Edam.Data.CatalogServiceClient;
 using szer = Edam.Serialization;
+using Edam.Data.Catalog.PostgreSql;
 
 var builder = WebApplication.CreateBuilder(args);
 
 // Add services to the container.
 builder.Services.AddProblemDetails();
 builder.Services.AddCors();
+
+// Wire the PostgreSQL (Npgsql) catalog provider behind the ICatalogStore/IContentStore
+// seams (BL-7.2 / ADR-0007). Registered from Configuration["ConnectionStrings:catalog"]
+// (see appsettings.json); if unconfigured, no relational provider is registered.
+builder.Services.AddCatalogServices(builder.Configuration);
 
 //builder.Services.AddControllersWithViews()
 //    .AddNewtonsoftJson(options =>
