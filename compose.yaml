@@ -1,0 +1,39 @@
+# EDAM PostgreSQL for the Wave-1.1 catalog back-end (BL-7.2).
+# Run from this directory:  docker compose up -d --pull always
+#   - creates container `edam-postgres` (image postgres:17-alpine)
+#   - persistent volume `edam_pgdata` (survives container/engine restarts)
+#   - listens on localhost:5432  -> Npgsql DSN below (also used by the conformance runner)
+#
+# Connection string (Npgsql) used by the catalog provider / conformance suite:
+#   Server=localhost;Port=5432;Database=edam;User Id=edam;Password=edam
+#   Edam.Data.Catalog.Conformance postgres "Server=localhost;Port=5432;Database=edam;User Id=edam;Password=edam"
+name: edam
+
+services:
+  postgres:
+    image: postgres:17-alpine
+    container_name: edam-postgres
+    restart: unless-stopped
+    environment:
+      POSTGRES_USER: edam
+      POSTGRES_PASSWORD: edam
+      POSTGRES_DB: edam
+    ports:
+      - "5432:5432"
+    volumes:
+      - edam_pgdata:/var/lib/postgresql/data
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U edam -d edam"]
+      interval: 5s
+      timeout: 3s
+      retries: 10
+      start_period: 5s
+    networks:
+      - edam
+
+networks:
+  edam:
+    driver: bridge
+
+volumes:
+  edam_pgdata:

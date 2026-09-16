@@ -1,4 +1,4 @@
-﻿using Edam.Data.CatalogModel;
+using Edam.Data.CatalogModel;
 using Edam.Diagnostics;
 using Edam.Net.Web;
 using Edam.Net;
@@ -10,8 +10,14 @@ using System.Threading.Tasks;
 using Edam.Text;
 
 // -----------------------------------------------------------------------------
+// RELOCATED from Edam.Data.CatalogDb as part of BL-7.2 "retire the EF CatalogDb"
+// layer. CatalogBaseClient is a pure client base (WebApiClient + catalog model
+// contracts) with NO dependency on EF or the database - it lived in the DB
+// project only by historical accident. It now lives beside ICatalogBaseClient
+// and the catalog model it consumes. The EF CatalogDb classes that extended it
+// (CatalogServiceInstance) are being retired in the same refactor.
 
-namespace Edam.Data.CatalogDb;
+namespace Edam.Data.CatalogModel;
 
 public partial class CatalogBaseClient : ICatalogBaseClient
 {
