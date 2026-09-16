@@ -10,6 +10,9 @@
   </PropertyGroup>
 
   <ItemGroup>
+    <!-- BL-7.x/AppHost: the catalog REST service is orchestrated here (BL-7.x made it a
+         DI-resolved ASP.NET Core minimal-API host over ICatalogStore). -->
+    <ProjectReference Include="..\Edam.Data.Catalog\Edam.Data.CatalogService\Edam.Data.CatalogService.csproj" />
     <ProjectReference Include="..\Edam.WebApi\Edam.WebApi.csproj" />
   </ItemGroup>
 
