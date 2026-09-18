@@ -88,52 +88,6 @@ public class CatalogServiceHelper
       return instance;
    }
 
-   /// <summary>
-   /// BL-7.4 per-Container provider resolution: the platform store for a specific Container (e.g. a
-   /// FileSystem Container addressed by its container URI) — replaces the Model
-   /// <c>CatalogFileSystemClient</c>. The caller never names a provider.
-   /// </summary>
-   /// <param name="container">Model container (id, type, container URI)</param>
-   /// <returns>the Container's <see cref="catContracts.ICatalogStore"/> provider</returns>
-   public static catContracts.ICatalogStore GetContainerStore(
-       ContainerInfo container)
-   {
-      var root = container.ContainerURI ?? String.Empty;
-      var target = (catContracts.ContainerType)container.ContainerType;
-
-      var services = new ServiceCollection();
-      var config = new Dictionary<string, string>(
-         StringComparer.OrdinalIgnoreCase)
-      {
-         ["Edam:Catalog:Target"] = TargetName(target),
-      };
-      if (target == catContracts.ContainerType.FileSystem)
-         config["Edam:Catalog:FileSystemRoot"] = root;
-      services.AddCatalogServices(config);
-
-      var sp = services.BuildServiceProvider();
-      var resolver = sp.GetRequiredService<
-         catContracts.ICatalogProviderResolver<catContracts.ICatalogStore>>();
-      var store = resolver.Resolve(new catContracts.ContainerBinding(
-         container.ContainerId, target, root));
-
-      if (store is null)
-      {
-         throw new InvalidOperationException(
-            "No catalog provider resolved for container '" +
-            container.ContainerId + "' (type " + target + ", uri '" + root + "').");
-      }
-      return store;
-   }
-
-   private static string TargetName(catContracts.ContainerType type) => type switch
-   {
-      catContracts.ContainerType.FileSystem => "filesystem",
-      catContracts.ContainerType.PostgreSql => "postgres",
-      catContracts.ContainerType.Service => "service",
-      _ => "postgres",
-   };
-
    /// <summary>True when the value is an HTTP(S) catalog service base URI (vs a DB connection string).</summary>
    public static bool IsServiceBaseUri(string? value) =>
       !String.IsNullOrWhiteSpace(value) &&

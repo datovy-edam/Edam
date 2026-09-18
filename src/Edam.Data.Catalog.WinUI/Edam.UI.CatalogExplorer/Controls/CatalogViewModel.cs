@@ -7,7 +7,6 @@ using System.Threading.Tasks;
 // -----------------------------------------------------------------------------
 using Edam.Data.CatalogModel;
 using Edam.Data.CatalogService;
-using Edam.Data.CatalogServiceClient;
 using Edam.UI.Catalog.Models;
 using Edam.UI.CatalogExplorer;
 
@@ -110,16 +109,21 @@ public class CatalogViewModel
    /// </summary>
    /// <param name="container">container</param>
    /// <returns>instance (client) of ICatalogService is returned</returns>
-   public Task<ICatalogService> GetFileSystemProviderAsync(
+   public async Task<ICatalogService> GetFileSystemProviderAsync(
       ContainerInfo container)
    {
-      // BL-7.5: the FileSystem provider is resolved per-Container from the platform DI registry
-      // (BL-7.4) and adapted to the Model surface the catalog tree consumes — replacing the retired
-      // Model CatalogFileSystemClient (the consumer never names a provider).
-      var store = CatalogServiceHelper.GetContainerStore(container);
-      ICatalogService client = new StoreBackedCatalogService(
-         store, CatalogBaseClient.SessionId);
-      return Task.FromResult(client);
+      // A FileSystem Container's URI is a real folder that is ENUMERATED into catalog items
+      // (CatalogFileSystem.FileSystemToCatalogAsync). The platform's FileSystemCatalogStore is a
+      // metadata-only store and does NOT provide folder enumeration, so this feature stays on the
+      // Model file client until that capability is ported behind the Contracts seam (see HANDOFF
+      // item 24). Do not "migrate" this to ICatalogProviderResolver<ICatalogStore> — it would
+      // silently swap a folder catalog for an empty metadata store.
+      var client = new CatalogFileSystemClient(
+         Guid.NewGuid().ToString(), container.ContainerId,
+         container.ContainerURI);
+      await client.InitializeClientAsync(
+         Catalog.CatalogService.Container);
+      return client;
    }
 
    /// <summary>
