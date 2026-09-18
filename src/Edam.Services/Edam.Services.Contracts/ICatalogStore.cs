@@ -9,7 +9,7 @@ public sealed record CatalogAsset(
 
 /// <summary>
 /// BL-6.6: catalog/asset persistence boundary. In-memory today (BL-6.2 baseline);
-/// a <c>PostgresCatalogStore</c> takes over when the catalog DB is configured/present.
+/// BL-7.5: backed by the <b>real catalog platform</b> (<c>Edam.Data.Catalog</c> behind DI) when a target is configured; the in-memory store is the registered fallback.
 /// The store name is exposed so the environment overview (/health/report, BL-6.4) can show
 /// which backing store is live.
 /// </summary>

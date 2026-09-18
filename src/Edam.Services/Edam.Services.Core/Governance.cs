@@ -114,7 +114,9 @@ public sealed class InMemoryAuditLog : IAuditLog
     {
         var raw = $"{prevHash}|{ts:o}|{principal}|{role}|{action}|{outcome}|{rationale}|{resource}|{priorState}|{newState}|{evidence}";
         var bytes = SHA256.HashData(Encoding.UTF8.GetBytes(raw));
-        return Convert.ToHexString(bytes);
+        // NOTE: fully qualified — the catalog platform drags in Edam.System, which declares
+        // Edam.Convert; for code in an Edam.* namespace that shadows the BCL System.Convert.
+        return System.Convert.ToHexString(bytes);
     }
 }
 

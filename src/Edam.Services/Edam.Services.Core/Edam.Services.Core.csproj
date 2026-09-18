@@ -8,10 +8,13 @@
 
   <ItemGroup>
     <ProjectReference Include="..\Edam.Services.Contracts\Edam.Services.Contracts.csproj" />
+    <!-- BL-7.5 seam swap: the catalog/asset boundary resolves the real catalog platform
+         (Contracts + the BL-7.4 DI composition root) instead of a self-contained stand-in. -->
+    <ProjectReference Include="..\..\Edam.Data.Catalog\Edam.Data.Catalog.Contracts\Edam.Data.Catalog.Contracts.csproj" />
+    <ProjectReference Include="..\..\Edam.Data.Catalog\Edam.Data.Catalog.dependencyInjection\Edam.Data.Catalog.DependencyInjection.csproj" />
     <PackageReference Include="Microsoft.Extensions.DependencyInjection.Abstractions" Version="10.0.0" />
     <PackageReference Include="Microsoft.Extensions.Logging.Abstractions" Version="10.0.0" />
     <PackageReference Include="Microsoft.Extensions.Configuration.Abstractions" Version="10.0.0" />
-    <PackageReference Include="Npgsql" Version="10.0.0" />
   </ItemGroup>
 
 </Project>

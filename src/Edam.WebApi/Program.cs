@@ -9,7 +9,9 @@ var builder = WebApplication.CreateBuilder(args);
 builder.AddServiceDefaults();
 
 // BL-6.2: onboarded Wave-1 surfaces, DI-composed behind interfaces.
-builder.Services.AddWave1Services();
+// BL-7.5: with configuration, the catalog/asset boundary resolves the real catalog platform
+// store (PostgreSQL/FileSystem behind DI) instead of the in-memory stand-in.
+builder.Services.AddWave1Services(builder.Configuration);
 builder.Services.AddHttpContextAccessor();
 
 // BL-6.4: per-service health checks (aggregated into the /health ready probe + Aspire dashboard).
