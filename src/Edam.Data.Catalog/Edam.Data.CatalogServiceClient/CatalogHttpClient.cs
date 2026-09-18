@@ -52,6 +52,7 @@ public sealed class CatalogHttpClient : ICatalogClient
    public const string URI_BRANCH_ITEMS = "catalog/branch/items";
    public const string URI_ITEM_DATA_ITEM_ID = "catalog/data/item/id";
    public const string URI_ITEM_DATA_ITEM_NAME = "catalog/data/item/name";
+   public const string URI_ITEM_DATA_ADD = "catalog/data/item";
    public const string URI_DATA_ID = "catalog/data/id";
    public const string URI_CONTENT_TYPE_ID = "catalog/content/type/id";
 
@@ -104,7 +105,7 @@ public sealed class CatalogHttpClient : ICatalogClient
       _sessionId = sessionId;
       var req = new HttpRequestInfo();
       req.BaseUri = String.IsNullOrWhiteSpace(baseUri)
-         ? "https://localhost:7069/catalogservice/"
+         ? "http://localhost:5194/catalogservice/"
          : baseUri;
       req.ContentType = WebApiContentType.ApplicationJson;
       _httpRequestInfo = req;

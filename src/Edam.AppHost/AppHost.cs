@@ -17,6 +17,7 @@ var catalogDb = builder.AddContainer("catalogdb", "postgres", "17-alpine")
 // (double-underscore maps to ':' in .NET config).
 builder.AddProject<Projects.Edam_Data_CatalogService>("edam-catalog-service")
     .WaitFor(catalogDb)
+    .WithEnvironment("Edam__Catalog__Target", "postgres")
     .WithEnvironment("ConnectionStrings__catalog",
         "Server=localhost;Port=5432;Database=edam;User Id=edam;Password=edam");
 

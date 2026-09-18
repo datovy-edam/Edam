@@ -47,7 +47,7 @@ public class CatalogServiceMap
       app.MapGet("/catalogservice/container/id", (
          string sessionId, string id) =>
       {
-         return store.GetContainer(id);
+         return Guid.TryParse(id, out var guid) ? store.GetContainer(guid) : store.GetContainer(id);
       });
 
       // get container items
@@ -161,9 +161,9 @@ public class CatalogServiceMap
 
       // get catalog data item by name
       app.MapGet("/catalogservice/catalog/data/item/name", (
-         string sessionId, Guid itemId, string name) =>
+         string sessionId, Guid id, string name) =>
       {
-         return store.GetDataByName(itemId, name);
+         return store.GetDataByName(id, name);
       });
 
       // get catalog data items by id

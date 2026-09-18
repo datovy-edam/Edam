@@ -49,10 +49,25 @@ public sealed class CatalogHttpContainer : ICatalogContainer
       return GetContainerAsync(containerId, checkId).Result;
    }
 
-   public ContainerInfo? GetContainer(Guid containerId)
-   {
-      return GetContainerAsync(containerId.ToString()).Result;
-   }
+       public ContainerInfo? GetContainer(Guid containerId)
+    {
+       _client.ResultsLog.Clear();
+       ContainerInfo? container = null;
+       var pars = new QueryStringBuilder();
+       pars.Add(QueryStringTag.SessionId, _client.LastSessionId);
+       pars.Add(CatalogHttpClient.TAG_CONTAINER_GUID, containerId.ToString());
+       var endpoint = CatalogHttpClient.URI_CONTAINER_ID + pars.ToString();
+       try
+       {
+          container = _client.Client!
+             .GetDataFromJsonAsync<ContainerInfo?>(endpoint).ConfigureAwait(false).GetAwaiter().GetResult();
+       }
+       catch (Exception ex)
+       {
+          _client.ResultsLog.Failed(ex);
+       }
+       return container;
+    }
 
    public ContainerInfo SetContainer(string sessionId, string containerId)
    {

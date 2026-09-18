@@ -29,7 +29,7 @@ public sealed class CatalogHttpItem : ICatalogItem
    {
       var container = containerId ?? _client.CurrentContainer?.Id ?? Guid.Empty;
       var item = new ItemInfo(Guid.NewGuid(), container, path, path,
-         description, ItemType.Branch, DateTimeOffset.Now, DateTimeOffset.Now);
+         description, ItemType.Branch, DateTimeOffset.UtcNow, DateTimeOffset.UtcNow);
       return await AddItemAsync(item, ct).ConfigureAwait(false);
    }
 

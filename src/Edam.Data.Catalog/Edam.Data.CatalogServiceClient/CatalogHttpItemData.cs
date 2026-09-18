@@ -85,7 +85,7 @@ public sealed class CatalogHttpItemData : ICatalogItemData
       ItemDataInfo? result = null;
       var pars = new QueryStringBuilder();
       pars.Add(QueryStringTag.SessionId, _client.LastSessionId);
-      var endpoint = CatalogHttpClient.URI_ITEM_ADD + pars.ToString();
+      var endpoint = CatalogHttpClient.URI_ITEM_DATA_ADD + pars.ToString();
       try
       {
          result = await _client.Client!

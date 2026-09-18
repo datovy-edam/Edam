@@ -231,10 +231,15 @@ public sealed class PostgreSqlCatalogStore : ICatalogStore
 
     public async Task<IReadOnlyList<ItemInfo>> GetBranchAsync(string? path = null, CancellationToken ct = default)
     {
-        var items = await GetContainerItemsAsync(Guid.Empty, ct);
-        if (string.IsNullOrWhiteSpace(path)) return items;
+        using var conn = await OpenAsync(ct);
+        using var cmd = conn.CreateCommand();
+        cmd.CommandText = ItemSelect + " ORDER BY full_path";
+        using var r = await cmd.ExecuteReaderAsync(ct);
+        var list = new List<ItemInfo>();
+        while (await r.ReadAsync(ct)) list.Add(ReadItem(r));
+        if (string.IsNullOrWhiteSpace(path)) return list;
         var prefix = path.EndsWith("/") ? path : path + "/";
-        return items.Where(i => i.FullPath.StartsWith(prefix, StringComparison.OrdinalIgnoreCase)).ToList();
+        return list.Where(i => i.FullPath.StartsWith(prefix, StringComparison.OrdinalIgnoreCase)).ToList();
     }
 
     public IReadOnlyList<ItemInfo> GetBranch(string? path = null) => GetBranchAsync(path).GetAwaiter().GetResult();
@@ -254,8 +259,8 @@ public sealed class PostgreSqlCatalogStore : ICatalogStore
         cmd.Parameters.AddWithValue("name", item.Name);
         cmd.Parameters.AddWithValue("desc", (object?)item.Description ?? DBNull.Value);
         cmd.Parameters.AddWithValue("ty", (int)item.Type);
-        cmd.Parameters.AddWithValue("cd", item.CreatedDate);
-        cmd.Parameters.AddWithValue("ud", item.UpdatedDate);
+        cmd.Parameters.AddWithValue("cd", item.CreatedDate.ToUniversalTime());
+        cmd.Parameters.AddWithValue("ud", item.UpdatedDate.ToUniversalTime());
         await cmd.ExecuteNonQueryAsync(ct);
         return item;
     }
@@ -364,7 +369,7 @@ public sealed class PostgreSqlCatalogStore : ICatalogStore
         cmd.CommandText = "SELECT type_id, description FROM edam_content_type WHERE type_id = @tid";
         cmd.Parameters.AddWithValue("tid", contentTypeId);
         using var r = await cmd.ExecuteReaderAsync(ct);
-        return await r.ReadAsync(ct) ? new ContentTypeInfo(r.GetString(0), r.IsDBNull(1) ? null : r.GetString(1)) : null;
+        return await r.ReadAsync(ct) ? new ContentTypeInfo(r.GetString(0), r.IsDBNull(1) ? null : r.GetString(1)) : new ContentTypeInfo(contentTypeId);
     }
 
     public ContentTypeInfo? GetContentType(string contentTypeId) => GetContentTypeAsync(contentTypeId).GetAwaiter().GetResult();
