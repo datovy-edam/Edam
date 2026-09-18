@@ -6,9 +6,10 @@ using System.Threading.Tasks;
 
 // -----------------------------------------------------------------------------
 using Edam.Data.CatalogModel;
+using Edam.Data.CatalogService;
+using Edam.Data.CatalogServiceClient;
 using Edam.UI.Catalog.Models;
 using Edam.UI.CatalogExplorer;
-using Edam.Data.CatalogService;
 
 namespace Edam.UI.Catalog.Controls;
 
@@ -109,15 +110,16 @@ public class CatalogViewModel
    /// </summary>
    /// <param name="container">container</param>
    /// <returns>instance (client) of ICatalogService is returned</returns>
-   public async Task<ICatalogService> GetFileSystemProviderAsync(
+   public Task<ICatalogService> GetFileSystemProviderAsync(
       ContainerInfo container)
    {
-      var client = new CatalogFileSystemClient(
-         Guid.NewGuid().ToString(), container.ContainerId, 
-         container.ContainerURI);
-      await client.InitializeClientAsync(
-         Catalog.CatalogService.Container);
-      return client;
+      // BL-7.5: the FileSystem provider is resolved per-Container from the platform DI registry
+      // (BL-7.4) and adapted to the Model surface the catalog tree consumes — replacing the retired
+      // Model CatalogFileSystemClient (the consumer never names a provider).
+      var store = CatalogServiceHelper.GetContainerStore(container);
+      ICatalogService client = new StoreBackedCatalogService(
+         store, CatalogBaseClient.SessionId);
+      return Task.FromResult(client);
    }
 
    /// <summary>

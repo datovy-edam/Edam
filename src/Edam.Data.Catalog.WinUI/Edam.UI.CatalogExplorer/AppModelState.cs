@@ -31,13 +31,11 @@ public class AppModelState
 
    public string? GetConnectionUri()
    {
-      if (Environment.OSVersion.Platform == PlatformID.Other)
-      {
-         return GetCatalogServiceBaseUri();
-      }
-      else
-      {
-         return GetDefaultConnectionString();
-      }
+      // BL-7.5: configuration-driven — a configured catalog service base URI selects the remote
+      // catalog API; otherwise the local back-end connection string. (This was PlatformID.Other
+      // driven, which made the remote HTTP path unreachable on Windows.)
+      return !string.IsNullOrWhiteSpace(GetCatalogServiceBaseUri())
+         ? GetCatalogServiceBaseUri()
+         : GetDefaultConnectionString();
    }
 }

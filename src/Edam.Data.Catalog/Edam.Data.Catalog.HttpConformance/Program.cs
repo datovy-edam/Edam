@@ -110,6 +110,29 @@ static async Task<IReadOnlyList<(string Name, bool Passed, string Detail)>> RunC
    var branchItems = client.Item.GetBranch(branchRoot);
    Add("Get branch items (catalog/branch/items)", branchItems.Any(i => i.FullPath == branchPath), string.Join(",", branchItems.Select(i => i.FullPath)));
 
+   // 13-15 BL-7.5: the WinUI consumer path — the Model facade (StoreBackedCatalogService) adapted
+   // over this SAME remote Contracts client, exercising the Model ICatalogService surface end-to-end.
+   // This is what guarantees the desktop's local/remote swap works over the wire.
+   var modelPath = branchRoot + "/model";
+   var model = new StoreBackedCatalogService(client, "httpCon");
+
+   var mBranch = model.Item.CreateBranch(modelPath, "model branch", c.Id);
+   Add("Model facade: create branch", mBranch?.FullPath == modelPath, mBranch?.FullPath);
+
+   var mLeaf = model.ItemData.AddItem(new Edam.Data.CatalogModel.ItemDataInfo
+   {
+      Id = Guid.NewGuid(),
+      ItemId = mBranch!.Id,
+      Name = "mleaf",
+      ContentTypeId = "text/plain",
+      PartitionId = "default",
+      DataText = "hello-model"
+   });
+   Add("Model facade: add data leaf", mLeaf?.ItemId == mBranch.Id, mLeaf?.Id.ToString());
+
+   var mRead = model.ItemData.GetDataByName(mBranch.Id, "mleaf");
+   Add("Model facade: get data by name", mRead?.DataText == "hello-model", mRead?.DataText);
+
    return checks;
 }
 
