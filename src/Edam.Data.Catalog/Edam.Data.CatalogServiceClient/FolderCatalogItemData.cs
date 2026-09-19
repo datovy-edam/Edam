@@ -13,7 +13,7 @@ using System.Threading.Tasks;
 
 namespace Edam.Data.CatalogServiceClient;
 
-public class CatalogFileSystemItemData: ICatalogItemData
+public class FolderCatalogItemData: ICatalogItemData
 {
 
    #region -- 4.00 - Properties and Definitions
@@ -24,7 +24,7 @@ public class CatalogFileSystemItemData: ICatalogItemData
       get { return _Client; }
    }
 
-   public CatalogFileSystemItemData(ICatalogBaseClient client)
+   public FolderCatalogItemData(ICatalogBaseClient client)
    {
       _Client = client;
    }

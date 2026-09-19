@@ -19,7 +19,7 @@ public class AppHelper
    /// catalog service (BL-7.2 step 5). Replaces the former EF-backed
    /// <c>CatalogBuilderServiceInstance</c> from <c>Edam.Data.CatalogDb</c> so the
    /// test library no longer references the retired CatalogDb layer. The tests
-   /// exercise <c>CatalogFileSystemClient</c>, which is unchanged.
+   /// exercise <c>FolderCatalogClient</c>, which is unchanged.
    /// </summary>
    public static void InitializeTest()
    {

@@ -6,7 +6,7 @@ using System.Threading.Tasks;
 
 // -----------------------------------------------------------------------------
 using Edam.Data.CatalogModel;
-using Edam.Data.CatalogService;
+using Edam.Data.CatalogServiceClient;
 using Edam.UI.Catalog.Models;
 using Edam.UI.CatalogExplorer;
 
@@ -118,7 +118,7 @@ public class CatalogViewModel
       // Model file client until that capability is ported behind the Contracts seam (see HANDOFF
       // item 24). Do not "migrate" this to ICatalogProviderResolver<ICatalogStore> — it would
       // silently swap a folder catalog for an empty metadata store.
-      var client = new CatalogFileSystemClient(
+      var client = new FolderCatalogClient(
          Guid.NewGuid().ToString(), container.ContainerId,
          container.ContainerURI);
       await client.InitializeClientAsync(

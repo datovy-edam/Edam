@@ -1,5 +1,5 @@
-﻿using Edam.Data.CatalogModel;
-using Edam.Data.CatalogService;
+using Edam.Data.CatalogModel;
+using Edam.Data.CatalogServiceClient;
 using Edam.Test.TestCatalogLibrary;
 using System;
 using System.Collections.Generic;
@@ -28,7 +28,7 @@ public sealed class TestCatalogClone
       // the one specified in the appsettings file (see DefaultRootFileFolder).
       // it could be something like:
       //    "C:/Users/esobr/Documents/Edam.Studio/Edam.App.Other/Projects/"
-      var client = CatalogFileSystemClient.GetClient(
+      var client = FolderCatalogClient.GetClient(
          defaultContainerId: "remote-projects", 
          fileSystemPath: null); // fileSystemPath);
 

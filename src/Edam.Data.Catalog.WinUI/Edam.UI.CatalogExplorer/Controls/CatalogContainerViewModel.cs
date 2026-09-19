@@ -10,7 +10,6 @@ using Microsoft.UI.Xaml;
 using Edam.Data.CatalogModel;
 using Edam.Diagnostics;
 using Edam.UI.Catalog.Models;
-using Edam.Data.CatalogService;
 using Windows.Media.Protection.PlayReady;
 
 // -----------------------------------------------------------------------------

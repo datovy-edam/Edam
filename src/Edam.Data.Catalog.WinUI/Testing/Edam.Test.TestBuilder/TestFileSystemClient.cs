@@ -1,7 +1,7 @@
 using System.Threading.Tasks;
 
 using Edam.Data.CatalogModel;
-using Edam.Data.CatalogService;
+using Edam.Data.CatalogServiceClient;
 using Edam.Test.TestCatalogLibrary;
 
 // -----------------------------------------------------------------------------
@@ -26,7 +26,7 @@ public sealed class TestFileSystemClient
    {
       string fileSystemPath = TEMP_TEST_FOLDER;
 
-      var client = CatalogFileSystemClient.GetClient(fileSystemPath);
+      var client = FolderCatalogClient.GetClient(fileSystemPath);
 
       Assert.IsNotNull(client);
    }
@@ -36,7 +36,7 @@ public sealed class TestFileSystemClient
    {
       string fileSystemPath = TEMP_TEST_FOLDER;
 
-      var client = CatalogFileSystemClient.GetClient(fileSystemPath);
+      var client = FolderCatalogClient.GetClient(fileSystemPath);
 
       // create branch
       var itm1 = client.Item.CreateBranch(FOLDER_NEW_BRANCH);
@@ -56,7 +56,7 @@ public sealed class TestFileSystemClient
    {
       string fileSystemPath = TEMP_TEST_FOLDER;
 
-      var client = CatalogFileSystemClient.GetClient(fileSystemPath);
+      var client = FolderCatalogClient.GetClient(fileSystemPath);
 
       var itm1 = client.Item.CreateBranch(
          FOLDER_NEW_BRANCH + "/testSample.txt");

@@ -12,7 +12,7 @@ using System.Text.RegularExpressions;
 
 namespace Edam.Data.CatalogServiceClient;
 
-public class CatalogFileSystemItem : ICatalogItem
+public class FolderCatalogItem : ICatalogItem
 {
 
    #region -- 4.00 - Properties and Definitions
@@ -23,7 +23,7 @@ public class CatalogFileSystemItem : ICatalogItem
       get { return _Client; }
    }
 
-   public CatalogFileSystemItem(ICatalogBaseClient client)
+   public FolderCatalogItem(ICatalogBaseClient client)
    {
       _Client = client;
    }

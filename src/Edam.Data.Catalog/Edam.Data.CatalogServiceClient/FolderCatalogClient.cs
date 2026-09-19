@@ -3,11 +3,10 @@ using Edam.Data.CatalogModel;
 using Edam.InOut;
 
 // -----------------------------------------------------------------------------
-using Edam.Data.CatalogServiceClient;
 
-namespace Edam.Data.CatalogService;
+namespace Edam.Data.CatalogServiceClient;
 
-public class CatalogFileSystemClient : CatalogBaseClient, ICatalogClient, 
+public class FolderCatalogClient : CatalogBaseClient, ICatalogClient, 
    ICatalogService, ICatalogBaseClient
 {
 
@@ -49,7 +48,7 @@ public class CatalogFileSystemClient : CatalogBaseClient, ICatalogClient,
    /// <param name="sessionId"></param>
    /// <param name="defaultContainerId">(required) default container id</param>
    /// <param name="baseUri">base uri for given default container</param>
-   public CatalogFileSystemClient(
+   public FolderCatalogClient(
       string sessionId, string defaultContainerId, string? baseUri = null) :
       base(sessionId, baseUri)
    {
@@ -128,7 +127,7 @@ public class CatalogFileSystemClient : CatalogBaseClient, ICatalogClient,
 
       // use given container management instance...
       Container = containerService;
-      Item = new CatalogFileSystemItem(this);
+      Item = new FolderCatalogItem(this);
 
       // get/create root item
       ItemInfo rootItem = new()
@@ -150,7 +149,7 @@ public class CatalogFileSystemClient : CatalogBaseClient, ICatalogClient,
       _rootItem.TreeItem.Type = DataObjects.Trees.TreeItemType.Branch;
 
       // finally, setup Item Data
-      ItemData = new CatalogFileSystemItemData(this);
+      ItemData = new FolderCatalogItemData(this);
 
       await InitializeFileItems(_defaultRootFileFolder);
    }
@@ -180,12 +179,12 @@ public class CatalogFileSystemClient : CatalogBaseClient, ICatalogClient,
    /// </summary>
    /// <param name="defaultContainerId">default container-id</param>
    /// <param name="path">if null the base URI should be defined in the </param>
-   /// <returns>instance of CatalogFileSystemClient is returned</returns>
-   public static async Task<CatalogFileSystemClient> GetClientAsync(
+   /// <returns>instance of FolderCatalogClient is returned</returns>
+   public static async Task<FolderCatalogClient> GetClientAsync(
       string defaultContainerId, string? path = null)
    {
       ICatalogContainer? container = null; // AppHelper.CatalogInstance.Container;
-      var client = new CatalogFileSystemClient(
+      var client = new FolderCatalogClient(
          sessionId: Guid.NewGuid().ToString(),
          defaultContainerId: defaultContainerId,
          baseUri: path);
@@ -199,8 +198,8 @@ public class CatalogFileSystemClient : CatalogBaseClient, ICatalogClient,
    /// <param name="defaultContainerId">default container-id</param>
    /// <param name="fileSystemPath">if null the base URI should be defined 
    /// in the app-settings file.</param>
-   /// <returns>instance of CatalogFileSystemClient is returned</returns>
-   public static CatalogFileSystemClient GetClient(
+   /// <returns>instance of FolderCatalogClient is returned</returns>
+   public static FolderCatalogClient GetClient(
       string defaultContainerId, string? fileSystemPath = null)
    {
       var task = GetClientAsync(
