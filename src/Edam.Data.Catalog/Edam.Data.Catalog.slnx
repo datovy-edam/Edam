@@ -9,7 +9,6 @@
     <Project Path="Edam.Data.Catalog.Conformance\Edam.Data.Catalog.Conformance.csproj" />
     <Project Path="Edam.Data.Catalog.HttpConformance\Edam.Data.Catalog.HttpConformance.csproj" />
     <Project Path="Edam.Data.Catalog.Tests\Edam.Data.Catalog.Tests.csproj" />
-    <Project Path="Edam.Data.CatalogDb\Edam.Data.CatalogDb.csproj" />
     <Project Path="Edam.Data.CatalogServiceClient\Edam.Data.CatalogServiceClient.csproj" />
     <Project Path="Edam.Data.CatalogService\Edam.Data.CatalogService.csproj" />
   </Folder>

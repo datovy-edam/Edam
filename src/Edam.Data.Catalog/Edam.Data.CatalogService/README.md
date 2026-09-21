@@ -31,10 +31,14 @@ Operational endpoints (from `Edam.ServiceDefaults`):
 | `GET /health` | readiness (all checks; mapped in Development) |
 | `GET /alive` | liveness (`live`-tagged checks) |
 
-> **Known follow-up — OpenAPI:** the service used to map `/openapi/v1.json`, but the
-> only `Microsoft.AspNetCore.OpenApi` package available offline is **9.0.5** (net9),
-> which faults on the net10 runtime. Re-add `AddOpenApi()`/`MapOpenApi()` together with
-> the **10.x** package once it can be restored online.
+> **Known follow-up — OpenAPI:** the service used to map `/openapi/v1.json`, but it needs the
+> **`Microsoft.AspNetCore.OpenApi` 10.x** package, which cannot be restored from this build
+> environment (the NuGet service index is unreachable — TLS/schannel — and a network probe shows the
+> package is *not* part of the .NET 10 shared framework/ref pack: `Microsoft.AspNetCore.App` 10.0.12
+> ships no `Microsoft.AspNetCore.OpenApi.dll`). The only cached version is **9.0.5 (net9)**, which
+> faults on the net10 runtime. Once online: add the 10.x package, then re-add `AddOpenApi()` /
+> `MapOpenApi()` in `Program.cs` (the 500-faulting mapping was deliberately removed rather than
+> shipped).
 
 ## Run it standalone
 
@@ -54,6 +58,16 @@ dotnet run --project src/Edam.Data.Catalog/Edam.Data.CatalogService
 
 ```powershell
 dotnet run --project src/Edam.AppHost
+```
+
+The AppHost provisions its **own** PostgreSQL container on host port **5433** (so it never collides
+with `compose.yaml`'s `edam-postgres` on 5432 — both can run at once) and injects
+`ConnectionStrings__catalog` + `Edam__Catalog__Target=postgres` into both the catalog service and
+`edam-web-api`. To point the services at a different database (e.g. compose's, for one shared
+catalog), override the DSN:
+
+```powershell
+dotnet run --project src/Edam.AppHost -- --CatalogConnectionString "Server=localhost;Port=5432;Database=edam;User Id=edam;Password=edam"
 ```
 
 The AppHost starts `edam-catalog-service` next to the `catalogdb` PostgreSQL

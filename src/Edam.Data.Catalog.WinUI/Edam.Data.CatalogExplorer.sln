@@ -7,7 +7,6 @@ Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Edam.CatalogExplorer", "Eda
 EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Edam.Data.CatalogModel", "..\Edam.Data.Catalog\Edam.Data.CatalogModel\Edam.Data.CatalogModel.csproj", "{4C4EA5F4-7154-424F-2F97-93C81EB9D422}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Edam.Data.CatalogDb", "..\Edam.Data.Catalog\Edam.Data.CatalogDb\Edam.Data.CatalogDb.csproj", "{A7D23F2C-D31F-42AB-8168-99F2CB90F631}"
 EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Edam.Data.CatalogService", "..\Edam.Data.Catalog\Edam.Data.CatalogService\Edam.Data.CatalogService.csproj", "{94CD7C8E-61B1-4107-8C2D-25AE57DD8E8B}"
 EndProject
@@ -75,22 +74,6 @@ Global
 		{4C4EA5F4-7154-424F-2F97-93C81EB9D422}.Release|x86.Build.0 = Release|Any CPU
 		{4C4EA5F4-7154-424F-2F97-93C81EB9D422}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{4C4EA5F4-7154-424F-2F97-93C81EB9D422}.Release|Any CPU.Build.0 = Release|Any CPU
-		{A7D23F2C-D31F-42AB-8168-99F2CB90F631}.Debug|ARM64.ActiveCfg = Debug|Any CPU
-		{A7D23F2C-D31F-42AB-8168-99F2CB90F631}.Debug|ARM64.Build.0 = Debug|Any CPU
-		{A7D23F2C-D31F-42AB-8168-99F2CB90F631}.Debug|x64.ActiveCfg = Debug|Any CPU
-		{A7D23F2C-D31F-42AB-8168-99F2CB90F631}.Debug|x64.Build.0 = Debug|Any CPU
-		{A7D23F2C-D31F-42AB-8168-99F2CB90F631}.Debug|x86.ActiveCfg = Debug|Any CPU
-		{A7D23F2C-D31F-42AB-8168-99F2CB90F631}.Debug|x86.Build.0 = Debug|Any CPU
-		{A7D23F2C-D31F-42AB-8168-99F2CB90F631}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
-		{A7D23F2C-D31F-42AB-8168-99F2CB90F631}.Debug|Any CPU.Build.0 = Debug|Any CPU
-		{A7D23F2C-D31F-42AB-8168-99F2CB90F631}.Release|ARM64.ActiveCfg = Release|Any CPU
-		{A7D23F2C-D31F-42AB-8168-99F2CB90F631}.Release|ARM64.Build.0 = Release|Any CPU
-		{A7D23F2C-D31F-42AB-8168-99F2CB90F631}.Release|x64.ActiveCfg = Release|Any CPU
-		{A7D23F2C-D31F-42AB-8168-99F2CB90F631}.Release|x64.Build.0 = Release|Any CPU
-		{A7D23F2C-D31F-42AB-8168-99F2CB90F631}.Release|x86.ActiveCfg = Release|Any CPU
-		{A7D23F2C-D31F-42AB-8168-99F2CB90F631}.Release|x86.Build.0 = Release|Any CPU
-		{A7D23F2C-D31F-42AB-8168-99F2CB90F631}.Release|Any CPU.ActiveCfg = Release|Any CPU
-		{A7D23F2C-D31F-42AB-8168-99F2CB90F631}.Release|Any CPU.Build.0 = Release|Any CPU
 		{94CD7C8E-61B1-4107-8C2D-25AE57DD8E8B}.Debug|ARM64.ActiveCfg = Debug|Any CPU
 		{94CD7C8E-61B1-4107-8C2D-25AE57DD8E8B}.Debug|ARM64.Build.0 = Debug|Any CPU
 		{94CD7C8E-61B1-4107-8C2D-25AE57DD8E8B}.Debug|x64.ActiveCfg = Debug|Any CPU

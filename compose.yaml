@@ -4,6 +4,11 @@
 #   - persistent volume `edam_pgdata` (survives container/engine restarts)
 #   - listens on localhost:5432  -> Npgsql DSN below (also used by the conformance runner)
 #
+# NOTE: this instance and the Aspire AppHost do NOT collide. The AppHost provisions its own
+# PostgreSQL container on host port **5433** (separate `catalogdb-data` volume), so both can run at
+# once. Use 5432 (this file) for the standalone service / CLI / conformance runners; the AppHost's
+# services use 5433 unless overridden with --CatalogConnectionString.
+#
 # Connection string (Npgsql) used by the catalog provider / conformance suite:
 #   Server=localhost;Port=5432;Database=edam;User Id=edam;Password=edam
 #   Edam.Data.Catalog.Conformance postgres "Server=localhost;Port=5432;Database=edam;User Id=edam;Password=edam"

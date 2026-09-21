@@ -3,17 +3,25 @@ var builder = DistributedApplication.CreateBuilder(args);
 // BL-6.1: orchestrate the Wave-1 services as Aspire resources. The generated
 // Projects.* types are produced at build time from the AppHost project references.
 
-// The catalog DSN is shared by both consumers of the real catalog back-end (the catalog REST
-// service and the WebApi's catalog/asset boundary, which resolves the same platform store via DI).
-const string catalogConnection = "Server=localhost;Port=5432;Database=edam;User Id=edam;Password=edam";
+// The AppHost provisions its OWN PostgreSQL on host port 5433 so it can never collide with
+// compose.yaml's `edam-postgres` (host 5432 — the instance the standalone service, the CLI and the
+// conformance runners use). Before this both bound 5432, so `docker compose up -d` plus the AppHost
+// fought over the port and the catalog services blocked on WaitFor(catalogDb).
+//
+// (5433 is a SEPARATE database from compose's — its data lives in the `catalogdb-data` volume.)
+// To point the services at a different database instead (e.g. the compose instance, for one shared
+// catalog), override the DSN:
+//   dotnet run --project src/Edam.AppHost -- --CatalogConnectionString "Server=localhost;Port=5432;Database=edam;User Id=edam;Password=edam"
+const string defaultCatalogConnection =
+    "Server=localhost;Port=5433;Database=edam;User Id=edam;Password=edam";
+var catalogConnection = builder.Configuration["CatalogConnectionString"] ?? defaultCatalogConnection;
 
-// PostgreSQL backing the catalog service (mirrors compose.yaml's edam-postgres so the
-// AppHost can either reuse that container or run its own).
+// The AppHost's own PostgreSQL container (host 5433 -> container 5432).
 var catalogDb = builder.AddContainer("catalogdb", "postgres", "17-alpine")
     .WithEnvironment("POSTGRES_USER", "edam")
     .WithEnvironment("POSTGRES_PASSWORD", "edam")
     .WithEnvironment("POSTGRES_DB", "edam")
-    .WithEndpoint("tcp", ep => { ep.Port = 5432; ep.TargetPort = 5432; })
+    .WithEndpoint("tcp", ep => { ep.Port = 5433; ep.TargetPort = 5432; })
     .WithVolume("catalogdb-data", "/var/lib/postgresql/data");
 
 // Wave-1 catalog REST service (BL-7.x). The consolidated AddCatalogServices composition root

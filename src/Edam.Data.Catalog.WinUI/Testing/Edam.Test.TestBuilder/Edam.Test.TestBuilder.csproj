@@ -13,8 +13,9 @@
   </ItemGroup>
 
   <ItemGroup>
-    <!-- Edam.Data.CatalogDb removed (BL-7.2 step 5): tests exercise the Model
-         CatalogFileSystemClient, which no longer depends on CatalogDb. -->
+    <!-- Edam.Data.CatalogDb removed (BL-7.2 step 5); the retired Model folder-client harnesses
+         were deleted too (BL-7.5) — catalog behavior is covered by the provider/HTTP conformance
+         runners and Edam.Data.Catalog.Tests. -->
     <ProjectReference Include="..\..\..\Edam.Data.Catalog\Edam.Data.CatalogModel\Edam.Data.CatalogModel.csproj" />
     <ProjectReference Include="..\..\..\Edam.Data.Catalog\Edam.Data.CatalogServiceClient\Edam.Data.CatalogServiceClient.csproj" />
     <ProjectReference Include="..\Edam.Test.TestCatalogLibrary\Edam.Test.TestCatalogLibrary.csproj" />
