@@ -45,10 +45,12 @@ public static class Program
       // Aspire health probes (/health readiness, /alive liveness) for the AppHost dashboard.
       app.MapDefaultEndpoints();
 
-      // setup service container
+      // setup service container (content is optional — its routes are mapped only when a
+      // content provider resolved for the configured target)
       CatalogServiceMap map = new(
          app,
-         app.Services.GetRequiredService<ICatalogStore>());
+         app.Services.GetRequiredService<ICatalogStore>(),
+         app.Services.GetService<IContentStore>());
 
       return app;
    }

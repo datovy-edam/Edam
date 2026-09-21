@@ -7,6 +7,7 @@
 // -----------------------------------------------------------------------------
 using System.Net;
 using System.Net.Sockets;
+using System.Text;
 using Edam.Data.Catalog.Contracts;
 using Edam.Data.CatalogServiceClient;
 
@@ -132,6 +133,33 @@ static async Task<IReadOnlyList<(string Name, bool Passed, string Detail)>> RunC
 
    var mRead = model.ItemData.GetDataByName(mBranch.Id, "mleaf");
    Add("Model facade: get data by name", mRead?.DataText == "hello-model", mRead?.DataText);
+
+   // 16-19 BL-7.x / ADR-0007: content (IContentStore) over the wire — path-addressed, binary-safe
+   // blob content on the same session. This is the piece that had no REST surface before.
+   var contentPath = branchRoot + "/content/blob.bin";
+   using (var payload = new MemoryStream(Encoding.UTF8.GetBytes("hello-content-http")))
+      await client.Content.WriteAsync(contentPath, payload);
+
+   var cExists = await client.Content.ExistsAsync(contentPath);
+   Add("Content: write + exists (content/info)", cExists, contentPath);
+
+   var readBack = await client.Content.OpenReadAsync(contentPath);
+   string? readText = null;
+   if (readBack is not null)
+   {
+      using var rms = new MemoryStream();
+      await readBack.CopyToAsync(rms);
+      readText = Encoding.UTF8.GetString(rms.ToArray());
+      readBack.Dispose();
+   }
+   Add("Content: read round-trip (content/item GET)", readText == "hello-content-http", readText);
+
+   var cDeleted = await client.Content.DeleteAsync(contentPath);
+   var cGone = !await client.Content.ExistsAsync(contentPath);
+   Add("Content: delete (content/item DELETE)", cDeleted && cGone, $"deleted={cDeleted} gone={cGone}");
+
+   var missing = await client.Content.OpenReadAsync(branchRoot + "/content/absent.bin");
+   Add("Content: missing returns null", missing is null, missing is null ? "(null)" : "(unexpected content)");
 
    return checks;
 }

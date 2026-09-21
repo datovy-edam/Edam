@@ -37,6 +37,7 @@ public sealed class CatalogHttpClient : ICatalogClient
    public const string TAG_ITEM_NAME = "name";
    public const string TAG_DATA_ID = "id";
    public const string TAG_CONTENT_TYPE_ID = "contentTypeId";
+   public const string TAG_RESOURCE_PATH = "resourcePath";
 
    public const string URI_SESSION_INFO = "session/info";
    public const string URI_CONTAINER_ID = "container/id";
@@ -55,6 +56,8 @@ public sealed class CatalogHttpClient : ICatalogClient
    public const string URI_ITEM_DATA_ADD = "catalog/data/item";
    public const string URI_DATA_ID = "catalog/data/id";
    public const string URI_CONTENT_TYPE_ID = "catalog/content/type/id";
+   public const string URI_CONTENT_INFO = "content/info";
+   public const string URI_CONTENT_ITEM = "content/item";
 
    private readonly HttpRequestInfo _httpRequestInfo;
    private string _sessionId;
@@ -69,6 +72,7 @@ public sealed class CatalogHttpClient : ICatalogClient
    private readonly ICatalogContainer _container;
    private readonly ICatalogItem _item;
    private readonly ICatalogItemData _itemData;
+   private readonly IContentStore _content;
 
    /// <summary>A public, stable identifier for the catalog this client serves.</summary>
    public CatalogInfo? Catalog => _catalog;
@@ -91,6 +95,9 @@ public sealed class CatalogHttpClient : ICatalogClient
    /// <summary>Item-data-leaf management surface (REST-backed).</summary>
    public ICatalogItemData ItemData => _itemData;
 
+   /// <summary>Path-addressed content (blob/binary) surface (REST-backed, ADR-0007).</summary>
+   public IContentStore Content => _content;
+
    /// <summary>Underlying Web API client (exposed for the sibling REST surfaces).</summary>
    public WebApiClient? Client => _client;
 
@@ -112,6 +119,7 @@ public sealed class CatalogHttpClient : ICatalogClient
       _container = new CatalogHttpContainer(this);
       _item = new CatalogHttpItem(this);
       _itemData = new CatalogHttpItemData(this);
+      _content = new CatalogHttpContent(this);
    }
 
    public CatalogHttpClient(string sessionId, HttpRequestInfo connectionInfo)
@@ -121,6 +129,7 @@ public sealed class CatalogHttpClient : ICatalogClient
       _container = new CatalogHttpContainer(this);
       _item = new CatalogHttpItem(this);
       _itemData = new CatalogHttpItemData(this);
+      _content = new CatalogHttpContent(this);
    }
 
    /// <summary>Get the default container for a session (session/info).</summary>

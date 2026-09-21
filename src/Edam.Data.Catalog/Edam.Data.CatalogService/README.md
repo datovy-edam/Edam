@@ -11,6 +11,19 @@ Every catalog route is mounted under `/catalogservice/` (see `CatalogServiceMap`
 `container/*`, `catalog/item*`, `catalog/data*`, `catalog/branch/*`,
 `catalog/content/*`, plus the session `*/info` routes.
 
+Path-addressed **content** (the `IContentStore` blob/binary seam, ADR-0007) is also on the
+wire — mapped only when a content provider resolved for the configured target:
+
+| Route | Purpose |
+|---|---|
+| `GET /catalogservice/content/info?resourcePath=` | descriptor (existence) at a resource path |
+| `GET /catalogservice/content/item?resourcePath=` | payload, base64 in `ContentInfo` (absent → `Exists=false`) |
+| `POST /catalogservice/content/item` | write/replace (body: `ContentInfo` with `ContentBase64`) |
+| `DELETE /catalogservice/content/item?resourcePath=` | delete |
+
+Clients use it through the existing seam — `ICatalogClient.Content` is an `IContentStore`
+(`OpenReadAsync`/`WriteAsync`/`DeleteAsync`/`ExistsAsync`); base64 is a wire detail.
+
 Operational endpoints (from `Edam.ServiceDefaults`):
 
 | Route | Purpose |

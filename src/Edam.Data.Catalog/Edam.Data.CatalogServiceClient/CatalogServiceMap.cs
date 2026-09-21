@@ -1,5 +1,6 @@
 using System;
 using System.Collections.Generic;
+using System.IO;
 using Microsoft.AspNetCore.Builder;
 using Microsoft.Extensions.DependencyInjection;
 
@@ -19,10 +20,12 @@ namespace Edam.Data.CatalogServiceClient;
 public class CatalogServiceMap
 {
    private readonly ICatalogStore store;
+   private readonly IContentStore? content;
 
-   public CatalogServiceMap(WebApplication app, ICatalogStore store)
+   public CatalogServiceMap(WebApplication app, ICatalogStore store, IContentStore? content = null)
    {
       this.store = store;
+      this.content = content;
 
       #region -- 1.50 - Initialization and Session Management
 
@@ -222,6 +225,73 @@ public class CatalogServiceMap
       {
          return store.GetContentType(contentTypeId);
       });
+
+      #endregion
+      #region -- 4.00 - Path-addressed Content (IContentStore, ADR-0007)
+
+      // Content is addressed path/URI-style and travels base64-encoded (ContentInfo) so the JSON
+      // wire stays the single canonical contract. Mapped only when a content provider is configured.
+      if (content is not null)
+      {
+         var contentStore = content;   // non-nullable local — safe to capture in the handlers
+
+         // content descriptor (existence) at a resource path
+         app.MapGet("/catalogservice/content/info", async (
+            string sessionId, string resourcePath) =>
+         {
+            var exists = await contentStore.ExistsAsync(resourcePath);
+            return new ContentInfo(resourcePath, exists);
+         });
+
+         // content payload at a resource path (base64; Exists=false when absent)
+         app.MapGet("/catalogservice/content/item", async (
+            string sessionId, string resourcePath) =>
+         {
+            using var stream = await contentStore.OpenReadAsync(resourcePath);
+            if (stream is null)
+               return new ContentInfo(resourcePath, false);
+
+            using var ms = new MemoryStream();
+            await stream.CopyToAsync(ms);
+            var bytes = ms.ToArray();
+            return new ContentInfo(resourcePath, true, bytes.Length,
+               "application/octet-stream", System.Convert.ToBase64String(bytes));
+         });
+
+         // write/replace content at a resource path
+         app.MapPost("/catalogservice/content/item", async (
+            string sessionId, ContentInfo payload) =>
+         {
+            if (payload.ContentBase64 is null)
+               return new ContentInfo(payload.ResourcePath, false);
+
+            using var ms = new MemoryStream(
+               System.Convert.FromBase64String(payload.ContentBase64));
+            await contentStore.WriteAsync(payload.ResourcePath, ms);
+            return new ContentInfo(
+               payload.ResourcePath, true, ms.Length, payload.ContentType);
+         });
+
+         // delete content at a resource path
+         app.MapDelete("/catalogservice/content/item", async (
+            string sessionId, string resourcePath) =>
+         {
+            RequestResponseInfo response = new RequestResponseInfo();
+            try
+            {
+               response.Success = await contentStore.DeleteAsync(resourcePath);
+               response.Status = response.Success
+                  ? RequestStatus.Completed : RequestStatus.Failed;
+            }
+            catch (Exception)
+            {
+               response.Success = false;
+               response.SessionId = sessionId;
+               response.Status = RequestStatus.Failed;
+            }
+            return response;
+         });
+      }
 
       #endregion
    }
