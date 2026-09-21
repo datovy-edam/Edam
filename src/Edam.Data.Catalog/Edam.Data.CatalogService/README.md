@@ -30,15 +30,12 @@ Operational endpoints (from `Edam.ServiceDefaults`):
 |---|---|
 | `GET /health` | readiness (all checks; mapped in Development) |
 | `GET /alive` | liveness (`live`-tagged checks) |
+| `GET /openapi/v1.json` | OpenAPI document for the whole catalog API surface |
 
-> **Known follow-up — OpenAPI:** the service used to map `/openapi/v1.json`, but it needs the
-> **`Microsoft.AspNetCore.OpenApi` 10.x** package, which cannot be restored from this build
-> environment (the NuGet service index is unreachable — TLS/schannel — and a network probe shows the
-> package is *not* part of the .NET 10 shared framework/ref pack: `Microsoft.AspNetCore.App` 10.0.12
-> ships no `Microsoft.AspNetCore.OpenApi.dll`). The only cached version is **9.0.5 (net9)**, which
-> faults on the net10 runtime. Once online: add the 10.x package, then re-add `AddOpenApi()` /
-> `MapOpenApi()` in `Program.cs` (the 500-faulting mapping was deliberately removed rather than
-> shipped).
+> **OpenAPI:** served via **`Microsoft.AspNetCore.OpenApi` 10.0.12** (matches the ASP.NET Core 10
+> shared framework). One constraint inherited from it: `ItemInfo`'s parameters are all **required**
+> because the schema service cannot round-trip a `DateTimeOffset` parameter default — see the
+> remarks on `ItemInfo`. Don't re-add `= default` to its timestamps.
 
 ## Run it standalone
 

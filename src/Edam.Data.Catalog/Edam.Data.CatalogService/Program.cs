@@ -32,6 +32,10 @@ public static class Program
       builder.Services.AddProblemDetails();
       builder.Services.AddCors();
 
+      // The catalog API's OpenAPI document (/openapi/v1.json) — needs Microsoft.AspNetCore.OpenApi
+      // 10.x, which matches the ASP.NET Core 10 shared framework.
+      builder.Services.AddOpenApi();
+
       // Wire the catalog back-end behind the ICatalogStore/IContentStore seams (BL-7.2/BL-7.4).
       // The consolidated composition root selects the provider by configuration
       // (Edam:Catalog:Target; here PostgreSQL via ConnectionStrings:catalog, or FileSystem).
@@ -44,6 +48,9 @@ public static class Program
 
       // Aspire health probes (/health readiness, /alive liveness) for the AppHost dashboard.
       app.MapDefaultEndpoints();
+
+      // Serve the OpenAPI document describing the catalog API surface.
+      app.MapOpenApi();
 
       // setup service container (content is optional — its routes are mapped only when a
       // content provider resolved for the configured target)

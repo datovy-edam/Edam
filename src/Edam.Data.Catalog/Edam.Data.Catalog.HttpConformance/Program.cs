@@ -35,9 +35,10 @@ await app.StartAsync();
 
 try
 {
-   var baseUri = $"http://127.0.0.1:{port}/catalogservice/";
+   var origin = $"http://127.0.0.1:{port}";
+   var baseUri = $"{origin}/catalogservice/";
    var client = new CatalogHttpClient("httpCon", baseUri);
-   var checks = await RunChecksAsync(client, app.Services, fsRoot);
+   var checks = await RunChecksAsync(client, app.Services, fsRoot, origin);
 
    var failed = checks.Count(c => !c.Passed);
    foreach (var c in checks)
@@ -51,7 +52,7 @@ finally
 }
 
 static async Task<IReadOnlyList<(string Name, bool Passed, string Detail)>> RunChecksAsync(
-   CatalogHttpClient client, IServiceProvider services, string workRoot)
+   CatalogHttpClient client, IServiceProvider services, string workRoot, string origin)
 {
    var checks = new List<(string, bool, string)>();
    void Add(string name, bool passed, string detail) => checks.Add((name, passed, detail));
@@ -196,6 +197,20 @@ static async Task<IReadOnlyList<(string Name, bool Passed, string Detail)>> RunC
       fContent.Dispose();
    }
    Add("Folder ingest: content visible over the API", fText == "indexed-content", fText);
+
+   // 24 BL-7.x: the API's OpenAPI document is served (needs Microsoft.AspNetCore.OpenApi 10.x).
+   try
+   {
+      using var http = new HttpClient();
+      var document = await http.GetStringAsync($"{origin}/openapi/v1.json");
+      Add("OpenAPI: document served (/openapi/v1.json)",
+         document.Contains("\"openapi\"") && document.Contains("\"paths\""),
+         $"{document.Length} bytes");
+   }
+   catch (Exception ex)
+   {
+      Add("OpenAPI: document served (/openapi/v1.json)", false, ex.Message);
+   }
 
    return checks;
 }
