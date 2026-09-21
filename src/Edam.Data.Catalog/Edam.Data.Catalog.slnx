@@ -4,6 +4,7 @@
     <Project Path="Edam.Data.Catalog.Contracts\Edam.Data.Catalog.Contracts.csproj" />
     <Project Path="Edam.Data.Catalog.PostgreSql\Edam.Data.Catalog.PostgreSql.csproj" />
     <Project Path="Edam.Data.Catalog.FileSystem\Edam.Data.Catalog.FileSystem.csproj" />
+    <Project Path="Edam.Data.Catalog.Folder\Edam.Data.Catalog.Folder.csproj" />
     <Project Path="Edam.Data.Catalog.DependencyInjection\Edam.Data.Catalog.DependencyInjection.csproj" />
     <Project Path="Edam.Data.Catalog.Conformance\Edam.Data.Catalog.Conformance.csproj" />
     <Project Path="Edam.Data.Catalog.HttpConformance\Edam.Data.Catalog.HttpConformance.csproj" />

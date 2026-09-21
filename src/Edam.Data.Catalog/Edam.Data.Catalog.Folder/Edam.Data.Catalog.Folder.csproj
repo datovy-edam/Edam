@@ -1,0 +1,15 @@
+<Project Sdk="Microsoft.NET.Sdk">
+
+  <PropertyGroup>
+    <TargetFramework>net10.0</TargetFramework>
+    <ImplicitUsings>enable</ImplicitUsings>
+    <Nullable>enable</Nullable>
+  </PropertyGroup>
+
+  <ItemGroup>
+    <!-- Only the Contracts: the indexer is provider-agnostic (it drives the seams), so it must
+         not reference a provider, DI, EF, or the Model. -->
+    <ProjectReference Include="..\Edam.Data.Catalog.Contracts\Edam.Data.Catalog.Contracts.csproj" />
+  </ItemGroup>
+
+</Project>

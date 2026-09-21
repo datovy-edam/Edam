@@ -81,7 +81,7 @@ public class CatalogServiceHelper
           (AppSettings.GetConnectionString("catalog") ?? CATALOG_DEFAULT_DSN) :
           connectionString;
 
-      var store = GetProvider(_conString).GetRequiredService<catContracts.ICatalogStore>();
+      var (store, _) = GetLocalStore(_conString);
       var instance = new catSvcClient.StoreBackedCatalogService(
          store, CatalogBaseClient.SessionId);
       instance.Container.SetContainer(CatalogBaseClient.SessionId, "");
@@ -94,10 +94,27 @@ public class CatalogServiceHelper
       (value.StartsWith("http://", StringComparison.OrdinalIgnoreCase) ||
        value.StartsWith("https://", StringComparison.OrdinalIgnoreCase));
 
+   /// <summary>
+   /// The platform catalog store + content back-end for the local catalog, resolved via the DI
+   /// composition root (BL-7.4 / ADR-0006/0007) — the provider is hidden behind the seams and
+   /// selected by configuration; the consumer never names an implementation. Used for in-process
+   /// operations such as folder ingestion (<c>FolderCatalogIndexer</c>).
+   /// </summary>
+   public static (catContracts.ICatalogStore store, catContracts.IContentStore? content) GetLocalStore(
+       string? connectionString = null)
+   {
+      var _conString = String.IsNullOrWhiteSpace(connectionString) ?
+          (AppSettings.GetConnectionString("catalog") ?? CATALOG_DEFAULT_DSN) :
+          connectionString;
+
+      var provider = GetProvider(_conString);
+      return (provider.GetRequiredService<catContracts.ICatalogStore>(),
+              provider.GetService<catContracts.IContentStore>());
+   }
+
    /// <summary>Built-once-per-connection-string DI container for the local catalog back-end.</summary>
    private static readonly Dictionary<string, IServiceProvider> _providers =
-      new(StringComparer.OrdinalIgnoreCase);
-   private static readonly Dictionary<string, IServiceProvider> _remoteProviders =
+      new(StringComparer.OrdinalIgnoreCase);   private static readonly Dictionary<string, IServiceProvider> _remoteProviders =
       new(StringComparer.OrdinalIgnoreCase);
    private static readonly object _providerGate = new();
 

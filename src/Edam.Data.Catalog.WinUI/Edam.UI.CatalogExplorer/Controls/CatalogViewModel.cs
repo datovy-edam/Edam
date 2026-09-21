@@ -5,6 +5,7 @@ using System.Text;
 using System.Threading.Tasks;
 
 // -----------------------------------------------------------------------------
+using Edam.Data.Catalog.Folder;
 using Edam.Data.CatalogModel;
 using Edam.Data.CatalogServiceClient;
 using Edam.UI.Catalog.Models;
@@ -112,18 +113,16 @@ public class CatalogViewModel
    public async Task<ICatalogService> GetFileSystemProviderAsync(
       ContainerInfo container)
    {
-      // A FileSystem Container's URI is a real folder that is ENUMERATED into catalog items
-      // (CatalogFileSystem.FileSystemToCatalogAsync). The platform's FileSystemCatalogStore is a
-      // metadata-only store and does NOT provide folder enumeration, so this feature stays on the
-      // Model file client until that capability is ported behind the Contracts seam (see HANDOFF
-      // item 24). Do not "migrate" this to ICatalogProviderResolver<ICatalogStore> — it would
-      // silently swap a folder catalog for an empty metadata store.
-      var client = new FolderCatalogClient(
-         Guid.NewGuid().ToString(), container.ContainerId,
-         container.ContainerURI);
-      await client.InitializeClientAsync(
-         Catalog.CatalogService.Container);
-      return client;
+      // BL-7.x: a FileSystem container's URI is a real folder that is INGESTED into the catalog
+      // through the Contracts seams (FolderCatalogIndexer) — provider-agnostic and DI-resolved, so
+      // it targets the same catalog the desktop already uses, and the identical call works against
+      // a remote catalog client. This replaces the bespoke Model FolderCatalogClient: the folder
+      // becomes ordinary catalog items/content, browsable through the standard surface.
+      var (store, content) = CatalogServiceHelper.GetLocalStore();
+      await FolderCatalogIndexer.IndexAsync(
+         store, content, container.ContainerId, container.ContainerURI ?? String.Empty);
+
+      return new StoreBackedCatalogService(store, CatalogBaseClient.SessionId);
    }
 
    /// <summary>

@@ -9,7 +9,9 @@ using System.Net;
 using System.Net.Sockets;
 using System.Text;
 using Edam.Data.Catalog.Contracts;
+using Edam.Data.Catalog.Folder;
 using Edam.Data.CatalogServiceClient;
+using Microsoft.Extensions.DependencyInjection;
 
 var target = args.Length > 0 ? args[0] : "filesystem";
 var fsRoot = Path.Combine(Path.GetTempPath(), "edam-http-conformance-" + Guid.NewGuid().ToString("N"));
@@ -35,7 +37,7 @@ try
 {
    var baseUri = $"http://127.0.0.1:{port}/catalogservice/";
    var client = new CatalogHttpClient("httpCon", baseUri);
-   var checks = await RunChecksAsync(client);
+   var checks = await RunChecksAsync(client, app.Services, fsRoot);
 
    var failed = checks.Count(c => !c.Passed);
    foreach (var c in checks)
@@ -48,7 +50,8 @@ finally
    try { Directory.Delete(fsRoot, true); } catch { }
 }
 
-static async Task<IReadOnlyList<(string Name, bool Passed, string Detail)>> RunChecksAsync(CatalogHttpClient client)
+static async Task<IReadOnlyList<(string Name, bool Passed, string Detail)>> RunChecksAsync(
+   CatalogHttpClient client, IServiceProvider services, string workRoot)
 {
    var checks = new List<(string, bool, string)>();
    void Add(string name, bool passed, string detail) => checks.Add((name, passed, detail));
@@ -160,6 +163,39 @@ static async Task<IReadOnlyList<(string Name, bool Passed, string Detail)>> RunC
 
    var missing = await client.Content.OpenReadAsync(branchRoot + "/content/absent.bin");
    Add("Content: missing returns null", missing is null, missing is null ? "(null)" : "(unexpected content)");
+
+   // 20-22 BL-7.x / ADR-0007: folder ingestion — index a REAL folder into the catalog through the
+   // Contracts seams (provider-agnostic), then confirm the result is visible over the API (items +
+   // content). This is what lets a FileSystem container be ingested/resolved through DI instead of
+   // a bespoke Model client, and the identical call works against a remote client.
+   var indexRoot = Path.Combine(workRoot, "index-src");
+   Directory.CreateDirectory(Path.Combine(indexRoot, "sub"));
+   await File.WriteAllTextAsync(Path.Combine(indexRoot, "readme.txt"), "indexed-content");
+   await File.WriteAllTextAsync(Path.Combine(indexRoot, "sub", "nested.txt"), "nested-content");
+
+   var indexContainerId = "folder-index-" + runId;
+   var indexed = await FolderCatalogIndexer.IndexAsync(
+      services.GetRequiredService<ICatalogStore>(),
+      services.GetService<IContentStore>(),
+      indexContainerId, indexRoot);
+   Add("Folder ingest: index a real folder", indexed >= 3, $"{indexed} item(s)");
+
+   var fContainer = client.Container.GetContainer(indexContainerId);
+   var fItems = client.Item.GetContainerItems(fContainer!.Id);
+   Add("Folder ingest: items visible over the API",
+      fItems.Any(i => i.FullPath == "/readme.txt") && fItems.Any(i => i.FullPath == "/sub"),
+      string.Join(",", fItems.Select(i => i.FullPath)));
+
+   var fContent = await client.Content.OpenReadAsync("/readme.txt");
+   string? fText = null;
+   if (fContent is not null)
+   {
+      using var fRead = new MemoryStream();
+      await fContent.CopyToAsync(fRead);
+      fText = Encoding.UTF8.GetString(fRead.ToArray());
+      fContent.Dispose();
+   }
+   Add("Folder ingest: content visible over the API", fText == "indexed-content", fText);
 
    return checks;
 }

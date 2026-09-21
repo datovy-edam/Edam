@@ -14,6 +14,8 @@
     <ProjectReference Include="..\Edam.Data.CatalogService\Edam.Data.CatalogService.csproj" />
     <ProjectReference Include="..\Edam.Data.CatalogServiceClient\Edam.Data.CatalogServiceClient.csproj" />
     <ProjectReference Include="..\Edam.Data.Catalog.Contracts\Edam.Data.Catalog.Contracts.csproj" />
+    <!-- Folder ingestion through the Contracts seams (used by the folder-ingest checks). -->
+    <ProjectReference Include="..\Edam.Data.Catalog.Folder\Edam.Data.Catalog.Folder.csproj" />
     <!-- Direct (not transitive): Edam.ServiceDefaults is IsAspireSharedProject, so it does not
          flow transitively into this in-process host's deps.json — but BuildApp needs it. -->
     <ProjectReference Include="..\..\Edam.ServiceDefaults\Edam.ServiceDefaults.csproj" />

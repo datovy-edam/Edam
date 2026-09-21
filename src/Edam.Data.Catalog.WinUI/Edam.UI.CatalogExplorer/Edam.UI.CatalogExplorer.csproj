@@ -21,6 +21,8 @@
          FileSystem) comes in transitively — this consumer never names a provider implementation. -->
     <ProjectReference Include="..\..\Edam.Data.Catalog\Edam.Data.Catalog.DependencyInjection\Edam.Data.Catalog.DependencyInjection.csproj" />
     <ProjectReference Include="..\..\Edam.Data.Catalog\Edam.Data.Catalog.Contracts\Edam.Data.Catalog.Contracts.csproj" />
+    <!-- BL-7.x: folder ingestion through the Contracts seams (replaces the Model FolderCatalogClient). -->
+    <ProjectReference Include="..\..\Edam.Data.Catalog\Edam.Data.Catalog.Folder\Edam.Data.Catalog.Folder.csproj" />
     <ProjectReference Include="..\..\Edam.Data.Catalog\Edam.Data.CatalogModel\Edam.Data.CatalogModel.csproj" />
     <ProjectReference Include="..\..\Edam.Data.Catalog\Edam.Data.CatalogServiceClient\Edam.Data.CatalogServiceClient.csproj" />
     <ProjectReference Include="..\..\Edam.Monaco\Monaco.csproj" />
