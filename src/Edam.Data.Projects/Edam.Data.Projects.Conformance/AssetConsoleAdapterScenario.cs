@@ -35,9 +35,11 @@ public static class AssetConsoleAdapterScenario
          => checks.Add(new ProjectScenario.Check(name, passed, detail));
 
       var working = Path.Combine(workRoot, "adapter-working");
-      Directory.CreateDirectory(working);
-      File.WriteAllText(Path.Combine(working, "Run.Args.json"), ArgsJson);
-      File.WriteAllText(Path.Combine(working, "sample.ddl"), "CREATE TABLE dbo.Sample (Id INT);");
+      Directory.CreateDirectory(Path.Combine(working, "Arguments"));
+      Directory.CreateDirectory(Path.Combine(working, "Archive"));
+      // the arguments sit at their project-relative path — exactly how the runner materializes them
+      File.WriteAllText(Path.Combine(working, "Arguments", "Run.Args.json"), ArgsJson);
+      File.WriteAllText(Path.Combine(working, "Archive", "sample.ddl"), "CREATE TABLE dbo.Sample (Id INT);");
 
       var context = new ProjectProcessContext(
          new ProjectInfo("1", "Datovy.HC.CD", "v1r0", "collection", ProjectPath.Parse("/collection/Projects/Datovy.HC.CD")),
@@ -101,10 +103,11 @@ public static class AssetConsoleAdapterScenario
    {
       var working = Path.Combine(workRoot, "real-working");
       Directory.CreateDirectory(Path.Combine(working, "Archive"));
+      Directory.CreateDirectory(Path.Combine(working, "Arguments"));
       Directory.CreateDirectory(Path.Combine(working, "Documents"));
       File.WriteAllText(Path.Combine(working, "Archive", "sample.ddl"),
          "CREATE TABLE dbo.Sample (Id INT NOT NULL, Name VARCHAR(50) NULL);");
-      File.WriteAllText(Path.Combine(working, "Run.Args.json"), ArgsJson);
+      File.WriteAllText(Path.Combine(working, "Arguments", "Run.Args.json"), ArgsJson);
 
       var context = new ProjectProcessContext(
          new ProjectInfo("1", "Probe", "v1r0", "collection", ProjectPath.Parse("/collection/Projects/Probe")),

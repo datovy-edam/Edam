@@ -213,6 +213,37 @@ try
       Console.WriteLine("  probe: real asset-console invocation -> " +
          await AssetConsoleAdapterScenario.ProbeRealConsoleAsync(work));
    }
+
+   // ---- 10. a REAL end-to-end process attempt (PE-5c) — INFORMATIONAL ------------------------
+   //      Reports what the legacy pipeline actually does; deliberately not a pass/fail, so the
+   //      remaining gap (the console needs real project data to yield assets) stays visible.
+   {
+      var root = Path.Combine(temp, "real-fs");
+      Directory.CreateDirectory(root);
+      var catalog = new FileSystemProjectCatalog(root);
+      var store = new FileSystemProjectStore(catalog);
+      var resources = new FileSystemProjectResources(root, catalog);
+
+      Console.WriteLine("  probe: real process (file-system) -> " +
+         await RealProcessScenario.ProbeAsync(
+            catalog, store, resources, Path.Combine(temp, "real-fs-work")));
+   }
+   if (dsn is not null)
+   {
+      var run = Guid.NewGuid().ToString("N")[..8];
+      var store = new PostgreSqlCatalogStore(dsn);
+      var content = new PostgreSqlContentStore(dsn);
+      var containerId = "pe5c-pg-" + run;
+      store.EnlistContainer(containerId, "PE-5c real process collection", null, ContainerType.FileSystem);
+
+      var catalog = new CatalogProjectCatalog(store, store, containerId);
+      var projectStore = new CatalogProjectStore(catalog, store, store, content);
+      var resources = new CatalogProjectResources(store, store, content);
+
+      Console.WriteLine("  probe: real process (catalog postgres) -> " +
+         await RealProcessScenario.ProbeAsync(
+            catalog, projectStore, resources, Path.Combine(temp, "real-pg-work")));
+   }
 }
 finally
 {
@@ -235,7 +266,7 @@ var cwdUnchanged = cwdBefore == cwdAfter;
 Console.WriteLine($"  [{(cwdUnchanged ? "PASS" : "FAIL")}] No process current-directory change: '{cwdBefore}' -> '{cwdAfter}'");
 if (!cwdUnchanged) failed++;
 
-Console.WriteLine($"result: projects conformance (PE-2/PE-3/PE-4/PE-5a/PE-5b) {(failed == 0 ? "ALL CONFORM" : $"{failed} FAILED")}");
+Console.WriteLine($"result: projects conformance (PE-2\u2026PE-5c) {(failed == 0 ? "ALL CONFORM" : $"{failed} FAILED")}");
 
 // ---------------------------------------------------------------------------------------------
 

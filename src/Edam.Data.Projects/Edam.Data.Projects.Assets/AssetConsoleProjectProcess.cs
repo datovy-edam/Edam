@@ -31,13 +31,50 @@ public sealed class AssetConsoleProjectProcess : IProjectProcess
 
    private readonly ExecuteHandler _execute;
 
+   private static readonly object InitializeGate = new();
+   private static bool _initialized;
+
+   /// <summary>
+   /// The console's own initialization failed (session, <c>appsettings.json</c>, the type registry,
+   /// the procedure registry). Surfaced with a failed run rather than thrown, so a host that
+   /// substitutes the console call is unaffected.
+   /// </summary>
+   public static string? InitializationError { get; private set; }
+
    /// <param name="execute">Console invocation; defaults to the real asset console.</param>
    public AssetConsoleProjectProcess(ExecuteHandler? execute = null)
    {
-      // idempotent: the console's procedure registry must be populated before a dispatch
-      AssetServiceHelper.PrepareProceduresRegistry();
+      // the console needs its FULL initialization (not only the procedure registry): session, an
+      // optional appsettings.json, the type registry (e.g. the OpenXML row builder) and the
+      // procedures. Done once, best effort.
+      EnsureInitialized();
+
       _execute = execute ?? new ExecuteHandler((arguments, argumentsFilePath) =>
          AssetServiceHelper.Execute(arguments, argumentsFilePath));
+   }
+
+   private static void EnsureInitialized()
+   {
+      if (_initialized) return;
+
+      lock (InitializeGate)
+      {
+         if (_initialized) return;
+
+         try
+         {
+            AssetServiceHelper.Initialize();
+            InitializationError = null;
+            _initialized = true;
+         }
+         catch (Exception ex)
+         {
+            InitializationError = ex.Message;
+
+            // the procedure registry is still worth preparing on its own
+            try { AssetServiceHelper.PrepareProceduresRegistry(); } catch { /* best effort */ }
+         }
+      }
    }
 
    public Task<ProjectRunResult> RunAsync(
@@ -45,7 +82,11 @@ public sealed class AssetConsoleProjectProcess : IProjectProcess
    {
       ArgumentNullException.ThrowIfNull(context);
 
-      var argumentsFilePath = Path.Combine(context.WorkingFolder, context.ArgumentsFile.Name);
+      // the runner materializes every resource at its PROJECT-RELATIVE path, so the arguments
+      // document sits at its own relative path inside the working folder (e.g. Arguments/x.Args.json)
+      var argumentsFilePath = Path.Combine(context.WorkingFolder,
+         context.ArgumentsFile.Value.TrimStart('/').Replace('/', Path.DirectorySeparatorChar));
+
       if (!File.Exists(argumentsFilePath))
          return Task.FromResult(new ProjectRunResult(false,
             $"The arguments file was not materialized in the working folder: {argumentsFilePath}"));
@@ -85,11 +126,15 @@ public sealed class AssetConsoleProjectProcess : IProjectProcess
 
    private static string Describe(IResultsLog? results)
    {
-      if (results is null) return "the asset console returned no results.";
+      var message = results is null
+         ? "the asset console returned no results."
+         : results.MessageText;
 
-      var message = results.MessageText;
-      return string.IsNullOrWhiteSpace(message)
-         ? "the process failed (see the asset console log)."
-         : message;
+      if (string.IsNullOrWhiteSpace(message))
+         message = "the process failed (see the asset console log).";
+
+      return InitializationError is null
+         ? message
+         : $"{message} (console initialization: {InitializationError})";
    }
 }
