@@ -16,6 +16,7 @@
     <ProjectReference Include="..\Edam.Data.Projects.Contracts\Edam.Data.Projects.Contracts.csproj" />
     <ProjectReference Include="..\Edam.Data.Projects.FileSystem\Edam.Data.Projects.FileSystem.csproj" />
     <ProjectReference Include="..\Edam.Data.Projects.Catalog\Edam.Data.Projects.Catalog.csproj" />
+    <ProjectReference Include="..\Edam.Data.Projects.DependencyInjection\Edam.Data.Projects.DependencyInjection.csproj" />
     <ProjectReference Include="..\..\Edam.Data.Catalog\Edam.Data.Catalog.Contracts\Edam.Data.Catalog.Contracts.csproj" />
     <ProjectReference Include="..\..\Edam.Data.Catalog\Edam.Data.Catalog.FileSystem\Edam.Data.Catalog.FileSystem.csproj" />
     <ProjectReference Include="..\..\Edam.Data.Catalog\Edam.Data.Catalog.PostgreSql\Edam.Data.Catalog.PostgreSql.csproj" />

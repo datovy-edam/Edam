@@ -1,0 +1,24 @@
+<Project Sdk="Microsoft.NET.Sdk">
+
+  <PropertyGroup>
+    <TargetFramework>net10.0</TargetFramework>
+    <ImplicitUsings>enable</ImplicitUsings>
+    <Nullable>enable</Nullable>
+  </PropertyGroup>
+
+  <ItemGroup>
+    <!-- The composition root is allowed to name providers (that is its job): it wires the
+         contracts to a file-system or a catalog-backed implementation. -->
+    <ProjectReference Include="..\Edam.Data.Projects.Contracts\Edam.Data.Projects.Contracts.csproj" />
+    <ProjectReference Include="..\Edam.Data.Projects.FileSystem\Edam.Data.Projects.FileSystem.csproj" />
+    <ProjectReference Include="..\Edam.Data.Projects.Catalog\Edam.Data.Projects.Catalog.csproj" />
+    <!-- For the catalog target the catalog composition root supplies ICatalogStore/IContentStore. -->
+    <ProjectReference Include="..\..\Edam.Data.Catalog\Edam.Data.Catalog.DependencyInjection\Edam.Data.Catalog.DependencyInjection.csproj" />
+  </ItemGroup>
+
+  <ItemGroup>
+    <PackageReference Include="Microsoft.Extensions.DependencyInjection.Abstractions" Version="10.0.0" />
+    <PackageReference Include="Microsoft.Extensions.Configuration" Version="10.0.0" />
+  </ItemGroup>
+
+</Project>

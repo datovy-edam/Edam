@@ -137,8 +137,8 @@
 | PE-1 | `Edam.Data.Projects.Contracts` — value records + `IProjectCatalog`/`IProjectStore`/`IProjectResources`/`IProjectRunner` | Architecture / contracts | **High** | M | **Done** (2026-09-18) — builds 0-error, dependency-free, no consumer changed |
 | PE-2 | File-system `IProjectResources` (behaviour-preserving) — the hinge that removes the file-system + CWD dependency | Refactor | **High** | M | **Done** (2026-09-18) — `Edam.Data.Projects.FileSystem` + `Edam.Data.Projects.Conformance` **15/15 ALL CONFORM** (incl. no CWD mutation) |
 | PE-3 | **Catalog** implementation: project = branch, artifacts = items + `IContentStore`; collections via `ContainerBinding`; import/export (upload/download) | Capability / integration | **High** | L | **Done** (2026-09-18) — `Edam.Data.Projects.Catalog`; **ALL CONFORM** on file-system + catalog-local + catalog-remote HTTP + **postgres (local and remote)**; project paths collection-scoped |
-| PE-4 | `AddProjectServices(config)` DI composition root; retire the static project surface | Infrastructure | Medium | M | New |
-| PE-5 | Consumers: asset pipeline first (`ProjectConsole`/`AssetServiceHelper`), then Studio UI | Integration | Medium | L | New |
+| PE-4 | `AddProjectServices(config)` DI composition root; retire the static project surface (**retirement moved to PE-5**) | Infrastructure | Medium | M | **Done** (2026-09-18) — `Edam.Data.Projects.DependencyInjection`; **8 conformance targets ALL CONFORM** incl. 3 resolved through DI |
+| PE-5 | Consumers: asset pipeline + `IProjectRunner`, then Studio UI; **then retire the statics** | Integration | Medium | L | New |
 
 > **Overview + decisions:** `Projects-Enhancements.md` (**ADR-0009**). Model agreed: **Collection = container, Project = branch**, artifacts = items + content in the Catalog; filesystem kept as a registered provider during the transition.
 
@@ -150,7 +150,7 @@
 
 - **Wave 1 (current initiative):** `Wave-1-Migration.md` → **BL-6.1** (Aspire baseline) → **BL-6.2** (onboard resources) → **BL-6.3/BL-6.7** (shells + diagnostics) → **BL-6.4** (services health) → **BL-6.6** (persistence). **BL-6.5 (Python) dropped** — functionality via MCP (parked, MAF later; ADR-0004/0005). *UI not in scope.*
 - **Wave 1.1 (catalog decoupling — next, de-risked):** `Wave-1.1-Catalog-Decoupling.md` → **1 Relocate**: **BL-7.1** (move real projects as-is) → **2 Prove**: **BL-7.5** (working end-to-end slice, FileSystem first) → **3 Extract**: **BL-7.3** (derive contracts from relocated types) → **4 Abstract**: **BL-7.2** (EF-independence + PostgreSQL) → **5 Seam**: **BL-7.4** (DI + per-**Container** resolution). Azure/blob → **Wave 2**.
-- **Projects Enhancements (PE — current):** `Projects-Enhancements.md` (ADR-0009) → **PE-0…PE-3 DONE** (scope/inventory, contracts, file-system providers, **Catalog-backed providers — ALL CONFORM incl. remote HTTP**) → **PE-4** `AddProjectServices` DI + retire the statics → **PE-5** consumers + `IProjectRunner` (pipeline, then Studio UI). Depends on Wave 1.1 (done).
+- **Projects Enhancements (PE — current):** `Projects-Enhancements.md` (ADR-0009) → **PE-0…PE-4 DONE** (scope/inventory, contracts, file-system providers, Catalog-backed providers, **DI composition root — 8 conformance targets ALL CONFORM**) → **PE-5** consumers + `IProjectRunner` + retire the statics (pipeline, then Studio UI). Depends on Wave 1.1 (done).
 - **Phase 0 (platform runtime — ASAP):** **BL-3.1** — upgrade to .NET 10 (current LTS), moving off .NET 9 (STS end-of-support).
 - **Phase 1 (unblock build):** BL-1.1
 - **Phase 2 (test foundation):** BL-1.13 (test project + fixtures), BL-1.3 (workflow → test scenarios)

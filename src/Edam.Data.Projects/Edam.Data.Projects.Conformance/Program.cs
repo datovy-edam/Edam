@@ -13,7 +13,9 @@ using Edam.Data.Catalog.PostgreSql;
 using Edam.Data.Projects.Catalog;
 using Edam.Data.Projects.Conformance;
 using Edam.Data.Projects.Contracts;
+using Edam.Data.Projects.DependencyInjection;
 using Edam.Data.Projects.FileSystem;
+using Microsoft.Extensions.DependencyInjection;
 
 const string ContainerId = "pe3-projects";
 
@@ -143,6 +145,58 @@ try
          }
       }
    }
+
+   // ---- 6/7/8. through the DI composition root (PE-4) ----------------------------------------
+   {
+      var root = Path.Combine(temp, "di-fs");
+      using var provider = new ServiceCollection()
+         .AddProjectServices(new Dictionary<string, string>
+         {
+            ["Edam:Projects:Target"] = "filesystem",
+            ["Edam:Projects:Root"] = root,
+         })
+         .BuildServiceProvider();
+
+      all["di (file-system)"] = await RunViaProviderAsync(provider, Path.Combine(temp, "di-fs-work"));
+   }
+   {
+      // the collection must already exist: registering collections is a configuration concern
+      var root = Path.Combine(temp, "di-cat");
+      using var provider = new ServiceCollection()
+         .AddProjectServices(new Dictionary<string, string>
+         {
+            ["Edam:Projects:Target"] = "catalog",
+            ["Edam:Projects:DefaultCollection"] = "di-collection",
+            ["Edam:Catalog:Target"] = "filesystem",
+            ["Edam:Catalog:FileSystemRoot"] = root,
+         })
+         .BuildServiceProvider();
+
+      provider.GetRequiredService<ICatalogStore>()
+         .EnlistContainer("di-collection", "DI catalog collection", null, ContainerType.FileSystem);
+
+      all["di (catalog, local file-system)"] =
+         await RunViaProviderAsync(provider, Path.Combine(temp, "di-cat-work"));
+   }
+   if (dsn is not null)
+   {
+      var containerId = "di-pg-" + Guid.NewGuid().ToString("N")[..8];
+      using var provider = new ServiceCollection()
+         .AddProjectServices(new Dictionary<string, string>
+         {
+            ["Edam:Projects:Target"] = "catalog",
+            ["Edam:Projects:DefaultCollection"] = containerId,
+            ["Edam:Catalog:Target"] = "postgres",
+            ["ConnectionStrings:catalog"] = dsn,
+         })
+         .BuildServiceProvider();
+
+      provider.GetRequiredService<ICatalogStore>()
+         .EnlistContainer(containerId, "DI postgres collection", null, ContainerType.FileSystem);
+
+      all["di (catalog, postgres)"] =
+         await RunViaProviderAsync(provider, Path.Combine(temp, "di-pg-work"));
+   }
 }
 finally
 {
@@ -165,7 +219,7 @@ var cwdUnchanged = cwdBefore == cwdAfter;
 Console.WriteLine($"  [{(cwdUnchanged ? "PASS" : "FAIL")}] No process current-directory change: '{cwdBefore}' -> '{cwdAfter}'");
 if (!cwdUnchanged) failed++;
 
-Console.WriteLine($"result: PE-3 conformance {(failed == 0 ? "ALL CONFORM" : $"{failed} FAILED")}");
+Console.WriteLine($"result: projects conformance (PE-2/PE-3/PE-4) {(failed == 0 ? "ALL CONFORM" : $"{failed} FAILED")}");
 
 // ---------------------------------------------------------------------------------------------
 
@@ -178,6 +232,14 @@ static async Task<List<ProjectScenario.Check>> RunCatalogAsync(
    var resources = new CatalogProjectResources(containers, items, content);
    return await ProjectScenario.RunAsync(catalog, store, resources, workRoot);
 }
+
+static async Task<List<ProjectScenario.Check>> RunViaProviderAsync(
+   IServiceProvider provider, string workRoot)
+   => await ProjectScenario.RunAsync(
+      provider.GetRequiredService<IProjectCatalog>(),
+      provider.GetRequiredService<IProjectStore>(),
+      provider.GetRequiredService<IProjectResources>(),
+      workRoot);
 
 static int GetFreePort()
 {
