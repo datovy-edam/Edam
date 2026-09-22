@@ -1,0 +1,15 @@
+<Project Sdk="Microsoft.NET.Sdk">
+
+  <PropertyGroup>
+    <TargetFramework>net10.0</TargetFramework>
+    <ImplicitUsings>enable</ImplicitUsings>
+    <Nullable>enable</Nullable>
+  </PropertyGroup>
+
+  <ItemGroup>
+    <!-- Implementation projects reference the contracts (and only the contracts): the
+         file-system provider must not drag in the asset pipeline, EF, AppSettings or the UI. -->
+    <ProjectReference Include="..\Edam.Data.Projects.Contracts\Edam.Data.Projects.Contracts.csproj" />
+  </ItemGroup>
+
+</Project>

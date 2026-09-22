@@ -1,6 +1,6 @@
 # Projects Enhancements (PE) — Projects in the Catalog instead of a file system
 
-> **Status:** Started (2026-09-18) — **PE-0 + PE-1 complete**; PE-2…PE-5 planned.
+> **Status:** Started (2026-09-18) — **PE-0…PE-2 complete**; PE-3…PE-5 planned.
 > **Goal:** move EDAM **Projects** off the file system and onto the **Catalog** platform, behind interfaces so the storage is replaceable and the surface is easy to consume (CLI, Studio, services).
 > **Decision record:** **ADR-0009**. Source specification: *EDAM Studio — Understanding Projects* (2023-02-05).
 > **Authority:** per `AGENTS.md`, the live repository is the authority; this document is a planning aid.
@@ -55,10 +55,12 @@ Value records: `ProjectCollectionInfo` (+ `ProjectCollectionType`, `ProjectColle
 |---|---|---|
 | **PE-0** | Scope + inventory + decisions (this doc, ADR-0009) | Documents current; index + handoff updated |
 | **PE-1** | `Edam.Data.Projects.Contracts` — value records + 4 interfaces | Builds **0 error**, dependency-free, **zero** existing consumers changed ✅ |
-| **PE-2** | **File-system** `IProjectResources` (+ `IProjectRunner` wiring) — behaviour-preserving | The document's example `*.Args.json` runs headlessly with paths resolved through the interface; **no `SetCurrentDirectory`** on that path |
+| **PE-2** ✅ | **File-system** `IProjectCatalog`/`IProjectStore`/`IProjectResources` (behaviour-preserving) + a headless conformance runner | **Done 2026-09-18** — `Edam.Data.Projects.Conformance` = **15/15 ALL CONFORM**: the spec's `./Archive/…` / `./Documents/…` paths resolve through the interface, binary content round-trips, import (**upload**) / export (**download**) work, and **the process current directory is never changed**. `IProjectRunner`'s real implementation binds to the asset pipeline in **PE-5** |
 | **PE-3** | **Catalog** implementation: project = branch, folders = branches, artifacts = items + `IContentStore`; collections via `ContainerBinding`; import via `FolderCatalogIndexer`; upload/download | Catalog conformance run: import → run → export on **PostgreSQL + FileSystem**, and remotely over the REST API |
 | **PE-4** | `AddProjectServices(config)` DI composition root; retire the statics | Consumers resolve interfaces; no static project state; filesystem + catalog providers both registered |
-| **PE-5** | Consumers: asset pipeline first (`ProjectConsole`/`AssetServiceHelper`), then Studio UI (`ProjectViewerViewModel`/`ProjectContext`) | Pipeline reads/writes project resources through the seam; UI browses/edits from the catalog |
+| **PE-5** | Consumers **and `IProjectRunner`**: bind the asset pipeline (`ProjectConsole`/`AssetServiceHelper`, plus the path readers `UriResourceInfo`/`FolderFileReader`/`ExcelDocumentReader`) to `IProjectResources`, then the Studio UI (`ProjectViewerViewModel`/`ProjectContext`) | Pipeline reads/writes project resources through the seam (no CWD); the spec's example `*.Args.json` actually **runs** through `IProjectRunner`; UI browses/edits from the catalog |
+
+**Evidence:** `Edam.Data.Projects.Conformance` → `result: PE-2 conformance ALL CONFORM` (15 checks, incl. *no process current-directory change*).
 
 Filesystem remains a **registered provider** throughout so nothing regresses before PE-3 lands.
 

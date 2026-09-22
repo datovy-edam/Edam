@@ -38,6 +38,12 @@ public static class ProjectFolders
    public const string Libraries = "Libraries";
    public const string TextMaps = "TextMaps";
 
+   /// <summary>All standard project folder names (the structure created for a new project).</summary>
+   public static readonly string[] All =
+   {
+      Archive, Arguments, Documents, Files, Samples, UseCases, Libraries, TextMaps,
+   };
+
    /// <summary>The project-relative <see cref="ProjectPath"/> of a folder (e.g. <c>/Archive</c>).</summary>
    public static ProjectPath Path(string folder) => ProjectPath.Parse("/" + folder);
 }
