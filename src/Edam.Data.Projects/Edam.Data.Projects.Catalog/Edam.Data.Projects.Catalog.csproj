@@ -1,0 +1,17 @@
+<Project Sdk="Microsoft.NET.Sdk">
+
+  <PropertyGroup>
+    <TargetFramework>net10.0</TargetFramework>
+    <ImplicitUsings>enable</ImplicitUsings>
+    <Nullable>enable</Nullable>
+  </PropertyGroup>
+
+  <ItemGroup>
+    <!-- The Catalog-backed project provider: the project contracts + the catalog seams
+         (and the folder indexer used for import). No asset pipeline, no EF, no UI. -->
+    <ProjectReference Include="..\Edam.Data.Projects.Contracts\Edam.Data.Projects.Contracts.csproj" />
+    <ProjectReference Include="..\..\Edam.Data.Catalog\Edam.Data.Catalog.Contracts\Edam.Data.Catalog.Contracts.csproj" />
+    <ProjectReference Include="..\..\Edam.Data.Catalog\Edam.Data.Catalog.Folder\Edam.Data.Catalog.Folder.csproj" />
+  </ItemGroup>
+
+</Project>

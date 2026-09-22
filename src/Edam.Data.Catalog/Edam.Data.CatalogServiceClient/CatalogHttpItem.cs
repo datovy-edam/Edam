@@ -28,7 +28,15 @@ public sealed class CatalogHttpItem : ICatalogItem
       CancellationToken ct = default)
    {
       var container = containerId ?? _client.CurrentContainer?.Id ?? Guid.Empty;
-      var item = new ItemInfo(Guid.NewGuid(), container, path, path,
+
+      // Name is the path's leaf (the local stores derive it the same way); passing the whole path
+      // here made a remote-created branch unfindable by name.
+      var leaf = path.TrimEnd('/');
+      var slash = leaf.LastIndexOf('/');
+      var name = slash >= 0 ? leaf[(slash + 1)..] : leaf;
+      if (string.IsNullOrEmpty(name)) name = path;
+
+      var item = new ItemInfo(Guid.NewGuid(), container, path, name,
          description, ItemType.Branch, DateTimeOffset.UtcNow, DateTimeOffset.UtcNow);
       return await AddItemAsync(item, ct).ConfigureAwait(false);
    }

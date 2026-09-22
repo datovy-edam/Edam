@@ -8,8 +8,21 @@
   </PropertyGroup>
 
   <ItemGroup>
+    <!-- The runner hosts Edam.Data.CatalogService in-process for the remote scenario. -->
+    <FrameworkReference Include="Microsoft.AspNetCore.App" />
+  </ItemGroup>
+
+  <ItemGroup>
     <ProjectReference Include="..\Edam.Data.Projects.Contracts\Edam.Data.Projects.Contracts.csproj" />
     <ProjectReference Include="..\Edam.Data.Projects.FileSystem\Edam.Data.Projects.FileSystem.csproj" />
+    <ProjectReference Include="..\Edam.Data.Projects.Catalog\Edam.Data.Projects.Catalog.csproj" />
+    <ProjectReference Include="..\..\Edam.Data.Catalog\Edam.Data.Catalog.Contracts\Edam.Data.Catalog.Contracts.csproj" />
+    <ProjectReference Include="..\..\Edam.Data.Catalog\Edam.Data.Catalog.FileSystem\Edam.Data.Catalog.FileSystem.csproj" />
+    <ProjectReference Include="..\..\Edam.Data.Catalog\Edam.Data.CatalogService\Edam.Data.CatalogService.csproj" />
+    <ProjectReference Include="..\..\Edam.Data.Catalog\Edam.Data.CatalogServiceClient\Edam.Data.CatalogServiceClient.csproj" />
+    <!-- Direct (not transitive): Edam.ServiceDefaults is IsAspireSharedProject, so it does not
+         flow into this in-process host's deps.json — but the service's BuildApp needs it. -->
+    <ProjectReference Include="..\..\Edam.ServiceDefaults\Edam.ServiceDefaults.csproj" />
   </ItemGroup>
 
 </Project>

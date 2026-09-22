@@ -2,6 +2,7 @@
   <Folder Name="/src/Edam.Data.Projects/">
     <Project Path="Edam.Data.Projects.Contracts\Edam.Data.Projects.Contracts.csproj" />
     <Project Path="Edam.Data.Projects.FileSystem\Edam.Data.Projects.FileSystem.csproj" />
+    <Project Path="Edam.Data.Projects.Catalog\Edam.Data.Projects.Catalog.csproj" />
     <Project Path="Edam.Data.Projects.Conformance\Edam.Data.Projects.Conformance.csproj" />
   </Folder>
 </Solution>

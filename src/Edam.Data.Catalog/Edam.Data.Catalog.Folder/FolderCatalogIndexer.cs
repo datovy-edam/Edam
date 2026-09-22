@@ -4,30 +4,45 @@ using System.Text;
 
 namespace Edam.Data.Catalog.Folder;
 
+/// <summary>What a folder index produced.</summary>
+/// <param name="Folders">Folder items created (including the root/project branch).</param>
+/// <param name="Files">File items created.</param>
+public sealed record FolderIndexResult(int Folders, int Files)
+{
+   /// <summary>Total items created (folders + files).</summary>
+   public int Total => Folders + Files;
+}
+
 /// <summary>
 /// Ingests a real folder tree <b>into</b> a catalog (ADR-0007) through the Contracts seams:
 /// directories become branch items, files become leaf items, and (optionally) file bytes are
-/// written to the <see cref="IContentStore"/> at the same path.
+/// written to the <see cref="IContentStore"/> at the same path (the item's full path is the content
+/// key, so content never collides between containers/projects).
 /// <para>
 /// Provider-agnostic by construction — it drives <see cref="ICatalogContainer"/> /
 /// <see cref="ICatalogItem"/> / <see cref="IContentStore"/>, so the SAME ingestion works against any
-/// local provider (PostgreSQL, FileSystem) or a remote <c>ICatalogClient</c> over the wire. This is
-/// what lets "open a folder as a catalog" be resolved through DI like every other catalog target
-/// instead of a bespoke client.
+/// local provider (PostgreSQL, FileSystem) or a remote <c>ICatalogClient</c> over the wire.
 /// </para>
 /// <para>
-/// Item ids are <b>deterministic</b> (derived from container + relative path), so re-indexing the
-/// same folder is idempotent: existing items are updated in place rather than duplicated. The
+/// <b><c>pathPrefix</c></b> places the folder <i>under</i> an existing path — used to import a
+/// project as the branch <c>/Projects/&lt;name&gt;</c>. Callers that already own the container (e.g.
+/// the project store) use the <see cref="Guid"/> overload, which does <b>not</b> enlist — so an
+/// import can never rewrite the container's URI/description.
+/// </para>
+/// <para>
+/// Item ids are <b>deterministic</b> (container id + full path — see <see cref="DeterministicId"/>),
+/// so re-indexing is idempotent: existing items are updated in place rather than duplicated. The
 /// catalog is a <b>snapshot</b> — call again to pick up folder changes.
 /// </para>
 /// </summary>
 public static class FolderCatalogIndexer
 {
    /// <summary>Index <paramref name="rootPath"/> into <paramref name="store"/> (convenience overload).</summary>
-   public static Task<int> IndexAsync(
+   public static async Task<int> IndexAsync(
       ICatalogStore store, IContentStore? content, string containerId, string rootPath,
       string? description = null, bool indexContent = true, CancellationToken ct = default)
-      => IndexAsync(store, store, content, containerId, rootPath, description, indexContent, ct);
+      => (await IndexDetailedAsync(store, store, content, containerId, rootPath,
+            description, indexContent, ct, pathPrefix: null).ConfigureAwait(false)).Total;
 
    /// <summary>
    /// Index <paramref name="rootPath"/> into the catalog, driving the three Contracts surfaces
@@ -38,52 +53,98 @@ public static class FolderCatalogIndexer
       ICatalogContainer containers, ICatalogItem items, IContentStore? content,
       string containerId, string rootPath, string? description = null,
       bool indexContent = true, CancellationToken ct = default)
-   {
-      if (string.IsNullOrWhiteSpace(containerId) || string.IsNullOrWhiteSpace(rootPath))
-         return 0;
-      if (!Directory.Exists(rootPath))
-         return 0;
+      => (await IndexDetailedAsync(containers, items, content, containerId, rootPath,
+            description, indexContent, ct, pathPrefix: null).ConfigureAwait(false)).Total;
 
-      var root = Path.GetFullPath(rootPath);
+   /// <summary>Index a folder into a store, reporting folder/file counts separately.</summary>
+   public static Task<FolderIndexResult> IndexDetailedAsync(
+      ICatalogStore store, IContentStore? content, string containerId, string rootPath,
+      string? description = null, bool indexContent = true, CancellationToken ct = default,
+      string? pathPrefix = null)
+      => IndexDetailedAsync(store, store, content, containerId, rootPath,
+            description, indexContent, ct, pathPrefix);
+
+   /// <summary>
+   /// Index <paramref name="rootPath"/> into the catalog (optionally under
+   /// <paramref name="pathPrefix"/>), enlisting <paramref name="containerId"/> on the way.
+   /// </summary>
+   public static async Task<FolderIndexResult> IndexDetailedAsync(
+      ICatalogContainer containers, ICatalogItem items, IContentStore? content,
+      string containerId, string rootPath, string? description = null,
+      bool indexContent = true, CancellationToken ct = default, string? pathPrefix = null)
+   {
+      if (string.IsNullOrWhiteSpace(containerId))
+         return new FolderIndexResult(0, 0);
 
       var container = containers.EnlistContainer(
-         containerId, description ?? ("Folder catalog: " + root), root, ContainerType.FileSystem);
+         containerId,
+         description ?? ("Folder catalog: " + rootPath),
+         Directory.Exists(rootPath) ? Path.GetFullPath(rootPath) : rootPath,
+         ContainerType.FileSystem);
 
-      var indexed = 0;
+      return await IndexDetailedAsync(container.Id, items, content, rootPath,
+         indexContent, ct, pathPrefix).ConfigureAwait(false);
+   }
 
-      // the container's root item
-      await items.CreateBranchAsync("/", "root", container.Id, ct);
-      indexed++;
+   /// <summary>
+   /// Index <paramref name="rootPath"/> into an <b>already-resolved</b> container (no enlistment).
+   /// </summary>
+   public static async Task<FolderIndexResult> IndexDetailedAsync(
+      Guid containerId, ICatalogItem items, IContentStore? content, string rootPath,
+      bool indexContent = true, CancellationToken ct = default, string? pathPrefix = null)
+   {
+      if (string.IsNullOrWhiteSpace(rootPath) || !Directory.Exists(rootPath))
+         return new FolderIndexResult(0, 0);
+
+      var root = Path.GetFullPath(rootPath);
+      var prefix = NormalizePrefix(pathPrefix);
+
+      var folders = 0;
+      var files = 0;
+
+      // the root item: the container root, or the project branch when a prefix is given
+      await items.CreateBranchAsync(prefix.Length == 0 ? "/" : prefix, "root", containerId, ct);
+      folders++;
 
       foreach (var dir in Walk(root, directories: true))
       {
          ct.ThrowIfCancellationRequested();
-         var relative = Relative(root, dir);
+         var full = Combine(prefix, Relative(root, dir));
          var info = new DirectoryInfo(dir);
          await items.AddItemAsync(new ItemInfo(
-            DeterministicId(containerId, relative), container.Id, relative, info.Name, null,
+            DeterministicId(containerId, full), containerId, full, info.Name, null,
             ItemType.Branch, info.CreationTimeUtc, info.LastWriteTimeUtc), ct);
-         indexed++;
+         folders++;
       }
 
       foreach (var file in Walk(root, directories: false))
       {
          ct.ThrowIfCancellationRequested();
-         var relative = Relative(root, file);
+         var full = Combine(prefix, Relative(root, file));
          var info = new FileInfo(file);
          await items.AddItemAsync(new ItemInfo(
-            DeterministicId(containerId, relative), container.Id, relative, info.Name, null,
+            DeterministicId(containerId, full), containerId, full, info.Name, null,
             ItemType.Leaf, info.CreationTimeUtc, info.LastWriteTimeUtc), ct);
-         indexed++;
+         files++;
 
          if (indexContent && content is not null)
          {
             await using var stream = File.OpenRead(file);
-            await content.WriteAsync(relative, stream, ct);
+            await content.WriteAsync(full, stream, ct);
          }
       }
 
-      return indexed;
+      return new FolderIndexResult(folders, files);
+   }
+
+   /// <summary>
+   /// Stable id for a (container, full path) pair — makes re-indexing idempotent and lets other
+   /// catalog writers (e.g. the project store) address the same item.
+   /// </summary>
+   public static Guid DeterministicId(Guid containerId, string fullPath)
+   {
+      var hash = SHA256.HashData(Encoding.UTF8.GetBytes(containerId + "|" + fullPath));
+      return new Guid(hash.AsSpan(0, 16));
    }
 
    /// <summary>Path relative to the root, normalized to a leading-slash catalog path.</summary>
@@ -93,12 +154,13 @@ public static class FolderCatalogIndexer
       return relative.StartsWith('/') ? relative : "/" + relative;
    }
 
-   /// <summary>Stable id for a (container, path) pair — makes re-indexing idempotent.</summary>
-   private static Guid DeterministicId(string containerId, string relativePath)
-   {
-      var hash = SHA256.HashData(Encoding.UTF8.GetBytes(containerId + "|" + relativePath));
-      return new Guid(hash.AsSpan(0, 16));
-   }
+   private static string NormalizePrefix(string? pathPrefix)
+      => string.IsNullOrWhiteSpace(pathPrefix) || pathPrefix == "/"
+         ? string.Empty
+         : "/" + pathPrefix.Replace('\\', '/').Trim('/');
+
+   private static string Combine(string prefix, string relative)
+      => prefix.Length == 0 ? relative : prefix + "/" + relative.TrimStart('/');
 
    /// <summary>
    /// Depth-first walk that tolerates unreadable sub-directories (skips them rather than throwing
