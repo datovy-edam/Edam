@@ -18,6 +18,7 @@
     <ProjectReference Include="..\Edam.Data.Projects.Catalog\Edam.Data.Projects.Catalog.csproj" />
     <ProjectReference Include="..\..\Edam.Data.Catalog\Edam.Data.Catalog.Contracts\Edam.Data.Catalog.Contracts.csproj" />
     <ProjectReference Include="..\..\Edam.Data.Catalog\Edam.Data.Catalog.FileSystem\Edam.Data.Catalog.FileSystem.csproj" />
+    <ProjectReference Include="..\..\Edam.Data.Catalog\Edam.Data.Catalog.PostgreSql\Edam.Data.Catalog.PostgreSql.csproj" />
     <ProjectReference Include="..\..\Edam.Data.Catalog\Edam.Data.CatalogService\Edam.Data.CatalogService.csproj" />
     <ProjectReference Include="..\..\Edam.Data.Catalog\Edam.Data.CatalogServiceClient\Edam.Data.CatalogServiceClient.csproj" />
     <!-- Direct (not transitive): Edam.ServiceDefaults is IsAspireSharedProject, so it does not

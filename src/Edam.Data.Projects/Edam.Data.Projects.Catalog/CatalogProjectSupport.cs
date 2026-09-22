@@ -10,12 +10,20 @@ namespace Edam.Data.Projects.Catalog;
 /// </summary>
 internal static class CatalogProjectSupport
 {
-   /// <summary>The branch that holds the projects of a collection.</summary>
-   internal const string ProjectsRoot = "/Projects";
+   /// <summary>The folder that holds a collection's projects.</summary>
+   internal const string ProjectsFolder = "Projects";
+
+   /// <summary>
+   /// The branch that holds a collection's projects — <b>scoped by the collection id</b>. Catalog
+   /// item paths are global (not container-scoped: <c>GetItemByPath</c> ignores the container), so
+   /// two collections would otherwise collide on <c>/Projects/&lt;name&gt;</c>.
+   /// </summary>
+   internal static string ProjectsRoot(string collectionId)
+      => "/" + (collectionId ?? string.Empty).Trim('/') + "/" + ProjectsFolder;
 
    /// <summary>The branch of a project within its collection.</summary>
-   internal static ProjectPath ProjectBranch(string projectName)
-      => ProjectPath.Root.Combine(ProjectsRoot).Combine(projectName);
+   internal static ProjectPath ProjectBranch(string collectionId, string projectName)
+      => ProjectPath.Parse(ProjectsRoot(collectionId)).Combine(projectName);
 
    /// <summary>The catalog (full) path of a project-relative resource.</summary>
    internal static string Full(ProjectInfo project, ProjectPath path)

@@ -9,12 +9,19 @@ using System.Net;
 using System.Net.Sockets;
 using Edam.Data.Catalog.Contracts;
 using Edam.Data.Catalog.FileSystem;
+using Edam.Data.Catalog.PostgreSql;
 using Edam.Data.Projects.Catalog;
 using Edam.Data.Projects.Conformance;
 using Edam.Data.Projects.Contracts;
 using Edam.Data.Projects.FileSystem;
 
 const string ContainerId = "pe3-projects";
+
+// Optional: a PostgreSQL DSN as the first argument adds the postgres targets (the default run is
+// hermetic — file-system + in-process HTTP — so it needs no database).
+var dsn = args.Length > 0 && args[0].StartsWith("Server=", StringComparison.OrdinalIgnoreCase)
+   ? args[0]
+   : null;
 
 var all = new Dictionary<string, List<ProjectScenario.Check>>(StringComparer.OrdinalIgnoreCase);
 var cwdBefore = Directory.GetCurrentDirectory();
@@ -84,6 +91,56 @@ try
       finally
       {
          await app.StopAsync();
+      }
+   }
+
+   // ---- 4/5. PostgreSQL targets (only when a DSN is supplied) --------------------------------
+   if (dsn is not null)
+   {
+      var run = Guid.NewGuid().ToString("N")[..8];
+
+      // local provider
+      {
+         var store = new PostgreSqlCatalogStore(dsn);
+         var content = new PostgreSqlContentStore(dsn);
+         var containerId = "pe3-pg-" + run;
+         store.EnlistContainer(containerId, "PE-3 postgres collection", null, ContainerType.FileSystem);
+
+         all["catalog (postgres, local)"] = await RunCatalogAsync(
+            store, store, content, Path.Combine(temp, "pg-work"), containerId);
+      }
+
+      // remote over the REST API, service backed by postgres
+      {
+         var root = Path.Combine(temp, "pg-remote");
+         Directory.CreateDirectory(root);
+         Environment.SetEnvironmentVariable("Edam__Catalog__Target", "postgres");
+         Environment.SetEnvironmentVariable("ConnectionStrings__catalog", dsn);
+         Environment.SetEnvironmentVariable("Logging__LogLevel__Default", "Warning");
+
+         var port = GetFreePort();
+         using var app = Edam.Data.CatalogService.Program.BuildApp();
+         app.Urls.Add($"http://127.0.0.1:{port}");
+         await app.StartAsync();
+
+         try
+         {
+            var client = new Edam.Data.CatalogServiceClient.CatalogHttpClient(
+               "pe3", $"http://127.0.0.1:{port}/catalogservice/");
+            await client.InitializeClientAsync("pe3", "");
+
+            var containerId = "pe3-pg-remote-" + run;
+            client.Container.EnlistContainer(
+               containerId, "PE-3 postgres (remote) collection", null, ContainerType.FileSystem);
+
+            all["catalog (postgres, remote HTTP)"] = await RunCatalogAsync(
+               client.Container, client.Item, client.Content,
+               Path.Combine(temp, "pg-remote-work"), containerId);
+         }
+         finally
+         {
+            await app.StopAsync();
+         }
       }
    }
 }

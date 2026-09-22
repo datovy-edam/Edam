@@ -136,7 +136,7 @@
 | PE-0 | Scope, surface inventory + decisions for catalog-backed Projects | Spec / architecture | **High** | S | **Done** (2026-09-18) — `Projects-Enhancements.md` + ADR-0009 |
 | PE-1 | `Edam.Data.Projects.Contracts` — value records + `IProjectCatalog`/`IProjectStore`/`IProjectResources`/`IProjectRunner` | Architecture / contracts | **High** | M | **Done** (2026-09-18) — builds 0-error, dependency-free, no consumer changed |
 | PE-2 | File-system `IProjectResources` (behaviour-preserving) — the hinge that removes the file-system + CWD dependency | Refactor | **High** | M | **Done** (2026-09-18) — `Edam.Data.Projects.FileSystem` + `Edam.Data.Projects.Conformance` **15/15 ALL CONFORM** (incl. no CWD mutation) |
-| PE-3 | **Catalog** implementation: project = branch, artifacts = items + `IContentStore`; collections via `ContainerBinding`; import/export (upload/download) | Capability / integration | **High** | L | **Done** (2026-09-18) — `Edam.Data.Projects.Catalog`; **ALL CONFORM** on file-system + catalog-local + catalog-remote HTTP |
+| PE-3 | **Catalog** implementation: project = branch, artifacts = items + `IContentStore`; collections via `ContainerBinding`; import/export (upload/download) | Capability / integration | **High** | L | **Done** (2026-09-18) — `Edam.Data.Projects.Catalog`; **ALL CONFORM** on file-system + catalog-local + catalog-remote HTTP + **postgres (local and remote)**; project paths collection-scoped |
 | PE-4 | `AddProjectServices(config)` DI composition root; retire the static project surface | Infrastructure | Medium | M | New |
 | PE-5 | Consumers: asset pipeline first (`ProjectConsole`/`AssetServiceHelper`), then Studio UI | Integration | Medium | L | New |
 

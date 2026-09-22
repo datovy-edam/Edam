@@ -14,9 +14,6 @@ namespace Edam.Data.Projects.Catalog;
 /// </summary>
 public sealed class CatalogProjectCatalog : IProjectCatalog
 {
-   /// <summary>The branch that holds the projects of a collection.</summary>
-   public const string ProjectsRoot = CatalogProjectSupport.ProjectsRoot;
-
    private readonly ICatalogContainer _containers;
    private readonly ICatalogItem _items;
    private readonly string? _defaultCollectionId;
@@ -69,7 +66,7 @@ public sealed class CatalogProjectCatalog : IProjectCatalog
       try { container = await CatalogProjectSupport.RequireContainerAsync(_containers, collectionId, ct); }
       catch (InvalidOperationException) { return projects; }
 
-      var prefix = ProjectsRoot + "/";
+      var prefix = CatalogProjectSupport.ProjectsRoot(container.ContainerId) + "/";
       foreach (var item in _items.GetContainerItems(container.Id))
       {
          // a project is a DIRECT branch child of /Projects

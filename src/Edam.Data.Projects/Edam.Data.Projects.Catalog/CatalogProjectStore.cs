@@ -37,14 +37,15 @@ public sealed class CatalogProjectStore : IProjectStore
       var container = await CatalogProjectSupport
          .RequireContainerAsync(_containers, collectionId, ct).ConfigureAwait(false);
 
-      var projectPath = CatalogProjectSupport.ProjectBranch(name);
+      var projectPath = CatalogProjectSupport.ProjectBranch(container.ContainerId, name);
 
       // idempotent: an existing project is returned as-is
       var existing = _items.GetItemByPath(projectPath.Value);
       if (existing is not null) return CatalogProjectCatalog.ToProject(existing, container);
 
       await _items.CreateBranchAsync(
-         CatalogProjectCatalog.ProjectsRoot, "Projects", container.Id, ct).ConfigureAwait(false);
+         CatalogProjectSupport.ProjectsRoot(container.ContainerId), "Projects", container.Id, ct)
+         .ConfigureAwait(false);
 
       var project = await _items.CreateBranchAsync(
          projectPath.Value, description, container.Id, ct).ConfigureAwait(false);
@@ -72,7 +73,7 @@ public sealed class CatalogProjectStore : IProjectStore
       var container = await CatalogProjectSupport
          .RequireContainerAsync(_containers, collectionId, ct).ConfigureAwait(false);
 
-      var projectPath = CatalogProjectSupport.ProjectBranch(name);
+      var projectPath = CatalogProjectSupport.ProjectBranch(container.ContainerId, name);
 
       // index the folder INTO the project branch; content keys are full paths (no collisions)
       var indexed = await FolderCatalogIndexer.IndexDetailedAsync(
