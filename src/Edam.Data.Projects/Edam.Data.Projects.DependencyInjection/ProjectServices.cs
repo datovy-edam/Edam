@@ -3,6 +3,7 @@ using Edam.Data.Catalog.DependencyInjection;
 using Edam.Data.Projects.Catalog;
 using Edam.Data.Projects.Contracts;
 using Edam.Data.Projects.FileSystem;
+using Edam.Data.Projects.Runner;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
 
@@ -34,6 +35,9 @@ public static class ProjectServices
    public const string COLLECTIONS_SECTION = "Edam:Projects:Collections";
    public const string DEFAULT_COLLECTION_KEY = "Edam:Projects:DefaultCollection";
 
+   /// <summary>Where the runner materializes inputs for a process (default: the temp folder).</summary>
+   public const string WORKING_ROOT_KEY = "Edam:Projects:WorkingRoot";
+
    /// <summary>Today's app-data root key — the fallback for <see cref="ROOT_KEY"/>.</summary>
    public const string CONSOLE_PATH_KEY = "AppSettings:AssetConsolePath";
 
@@ -54,13 +58,27 @@ public static class ProjectServices
       if (config is null) throw new ArgumentNullException(nameof(config));
 
       var target = (config[TARGET_KEY] ?? "filesystem").Trim().ToLowerInvariant();
-      return target switch
+      switch (target)
       {
-         "filesystem" or "fs" or "folder" => AddFileSystem(services, config),
-         "catalog" or "cat" => AddCatalog(services, config),
-         _ => throw new InvalidOperationException(
-            $"Unknown {TARGET_KEY} '{target}' — expected 'filesystem' or 'catalog'."),
-      };
+         case "filesystem" or "fs" or "folder":
+            AddFileSystem(services, config);
+            break;
+         case "catalog" or "cat":
+            AddCatalog(services, config);
+            break;
+         default:
+            throw new InvalidOperationException(
+               $"Unknown {TARGET_KEY} '{target}' — expected 'filesystem' or 'catalog'.");
+      }
+
+      // The runner is provider-independent (it works through IProjectResources). A bound
+      // IProjectProcess supplies the execution itself; without one, running fails with guidance.
+      services.AddSingleton<IProjectRunner>(provider => new ProjectArgumentRunner(
+         provider.GetRequiredService<IProjectResources>(),
+         (IProjectProcess?)provider.GetService<IProjectProcess>() ?? new UnboundProjectProcess(),
+         config[WORKING_ROOT_KEY]));
+
+      return services;
    }
 
    // ---------------------------------------------------------------------

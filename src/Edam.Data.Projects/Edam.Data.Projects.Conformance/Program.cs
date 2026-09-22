@@ -15,6 +15,7 @@ using Edam.Data.Projects.Conformance;
 using Edam.Data.Projects.Contracts;
 using Edam.Data.Projects.DependencyInjection;
 using Edam.Data.Projects.FileSystem;
+using Edam.Data.Projects.Runner;
 using Microsoft.Extensions.DependencyInjection;
 
 const string ContainerId = "pe3-projects";
@@ -40,8 +41,10 @@ try
       var store = new FileSystemProjectStore(catalog);
       var resources = new FileSystemProjectResources(root, catalog);
 
-      var checks = await ProjectScenario.RunAsync(
-         catalog, store, resources, Path.Combine(temp, "fs-work"));
+      var checks = await RunAllAsync(
+         catalog, store, resources,
+         new ProjectArgumentRunner(resources, new ProjectRunScenario.EchoProcess()),
+         Path.Combine(temp, "fs-work"));
 
       // file-system specific: project paths map to the documented physical layout.
       // (Asserts the arguments file + the produced output — the scenario deletes the archive input.)
@@ -155,6 +158,7 @@ try
             ["Edam:Projects:Target"] = "filesystem",
             ["Edam:Projects:Root"] = root,
          })
+         .AddSingleton<IProjectProcess>(_ => new ProjectRunScenario.EchoProcess())
          .BuildServiceProvider();
 
       all["di (file-system)"] = await RunViaProviderAsync(provider, Path.Combine(temp, "di-fs-work"));
@@ -170,6 +174,7 @@ try
             ["Edam:Catalog:Target"] = "filesystem",
             ["Edam:Catalog:FileSystemRoot"] = root,
          })
+         .AddSingleton<IProjectProcess>(_ => new ProjectRunScenario.EchoProcess())
          .BuildServiceProvider();
 
       provider.GetRequiredService<ICatalogStore>()
@@ -189,6 +194,7 @@ try
             ["Edam:Catalog:Target"] = "postgres",
             ["ConnectionStrings:catalog"] = dsn,
          })
+         .AddSingleton<IProjectProcess>(_ => new ProjectRunScenario.EchoProcess())
          .BuildServiceProvider();
 
       provider.GetRequiredService<ICatalogStore>()
@@ -219,7 +225,7 @@ var cwdUnchanged = cwdBefore == cwdAfter;
 Console.WriteLine($"  [{(cwdUnchanged ? "PASS" : "FAIL")}] No process current-directory change: '{cwdBefore}' -> '{cwdAfter}'");
 if (!cwdUnchanged) failed++;
 
-Console.WriteLine($"result: projects conformance (PE-2/PE-3/PE-4) {(failed == 0 ? "ALL CONFORM" : $"{failed} FAILED")}");
+Console.WriteLine($"result: projects conformance (PE-2/PE-3/PE-4/PE-5a) {(failed == 0 ? "ALL CONFORM" : $"{failed} FAILED")}");
 
 // ---------------------------------------------------------------------------------------------
 
@@ -230,15 +236,28 @@ static async Task<List<ProjectScenario.Check>> RunCatalogAsync(
    var catalog = new CatalogProjectCatalog(containers, items, containerId);
    var store = new CatalogProjectStore(catalog, containers, items, content);
    var resources = new CatalogProjectResources(containers, items, content);
-   return await ProjectScenario.RunAsync(catalog, store, resources, workRoot);
+   var runner = new ProjectArgumentRunner(resources, new ProjectRunScenario.EchoProcess());
+   return await RunAllAsync(catalog, store, resources, runner, workRoot);
+}
+
+/// <summary>The project scenario plus the PE-5 runner scenario, for one target.</summary>
+static async Task<List<ProjectScenario.Check>> RunAllAsync(
+   IProjectCatalog catalog, IProjectStore store, IProjectResources resources,
+   IProjectRunner runner, string workRoot)
+{
+   var checks = await ProjectScenario.RunAsync(catalog, store, resources, workRoot);
+   checks.AddRange(await ProjectRunScenario.RunAsync(
+      catalog, resources, runner, Path.Combine(workRoot, "run")));
+   return checks;
 }
 
 static async Task<List<ProjectScenario.Check>> RunViaProviderAsync(
    IServiceProvider provider, string workRoot)
-   => await ProjectScenario.RunAsync(
+   => await RunAllAsync(
       provider.GetRequiredService<IProjectCatalog>(),
       provider.GetRequiredService<IProjectStore>(),
       provider.GetRequiredService<IProjectResources>(),
+      provider.GetRequiredService<IProjectRunner>(),
       workRoot);
 
 static int GetFreePort()

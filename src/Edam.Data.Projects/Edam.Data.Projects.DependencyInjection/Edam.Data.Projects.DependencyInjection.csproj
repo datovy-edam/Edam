@@ -12,6 +12,7 @@
     <ProjectReference Include="..\Edam.Data.Projects.Contracts\Edam.Data.Projects.Contracts.csproj" />
     <ProjectReference Include="..\Edam.Data.Projects.FileSystem\Edam.Data.Projects.FileSystem.csproj" />
     <ProjectReference Include="..\Edam.Data.Projects.Catalog\Edam.Data.Projects.Catalog.csproj" />
+    <ProjectReference Include="..\Edam.Data.Projects.Runner\Edam.Data.Projects.Runner.csproj" />
     <!-- For the catalog target the catalog composition root supplies ICatalogStore/IContentStore. -->
     <ProjectReference Include="..\..\Edam.Data.Catalog\Edam.Data.Catalog.DependencyInjection\Edam.Data.Catalog.DependencyInjection.csproj" />
   </ItemGroup>

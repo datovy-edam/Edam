@@ -26,9 +26,10 @@ public interface IProjectRunner
 
    /// <summary>
    /// Run the process writing its output to <paramref name="outputFile"/> — the Studio "save option"
-   /// flow (export the produced assets to a chosen artifact).
+   /// flow (export the produced assets to a chosen artifact). When <c>null</c>, the output declared
+   /// by the arguments document is used.
    /// </summary>
    Task<ProjectRunResult> RunAsync(
-      ProjectInfo project, ProjectPath argumentsFile, ProjectPath outputFile,
+      ProjectInfo project, ProjectPath argumentsFile, ProjectPath? outputFile,
       CancellationToken ct = default);
 }

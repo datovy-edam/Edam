@@ -1,0 +1,15 @@
+<Project Sdk="Microsoft.NET.Sdk">
+
+  <PropertyGroup>
+    <TargetFramework>net10.0</TargetFramework>
+    <ImplicitUsings>enable</ImplicitUsings>
+    <Nullable>enable</Nullable>
+  </PropertyGroup>
+
+  <ItemGroup>
+    <!-- Contracts + BCL only: the runner works through IProjectResources, so it is
+         storage-agnostic by construction (file system, catalog, remote — all the same). -->
+    <ProjectReference Include="..\Edam.Data.Projects.Contracts\Edam.Data.Projects.Contracts.csproj" />
+  </ItemGroup>
+
+</Project>
