@@ -203,6 +203,16 @@ try
       all["di (catalog, postgres)"] =
          await RunViaProviderAsync(provider, Path.Combine(temp, "di-pg-work"));
    }
+
+   // ---- 9. the asset-console adapter (PE-5b) -------------------------------------------------
+   {
+      var work = Path.Combine(temp, "adapter");
+      all["asset-console adapter"] = await AssetConsoleAdapterScenario.RunAsync(work);
+
+      // informational only: what does the REAL legacy pipeline do in this environment?
+      Console.WriteLine("  probe: real asset-console invocation -> " +
+         await AssetConsoleAdapterScenario.ProbeRealConsoleAsync(work));
+   }
 }
 finally
 {
@@ -225,7 +235,7 @@ var cwdUnchanged = cwdBefore == cwdAfter;
 Console.WriteLine($"  [{(cwdUnchanged ? "PASS" : "FAIL")}] No process current-directory change: '{cwdBefore}' -> '{cwdAfter}'");
 if (!cwdUnchanged) failed++;
 
-Console.WriteLine($"result: projects conformance (PE-2/PE-3/PE-4/PE-5a) {(failed == 0 ? "ALL CONFORM" : $"{failed} FAILED")}");
+Console.WriteLine($"result: projects conformance (PE-2/PE-3/PE-4/PE-5a/PE-5b) {(failed == 0 ? "ALL CONFORM" : $"{failed} FAILED")}");
 
 // ---------------------------------------------------------------------------------------------
 

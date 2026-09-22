@@ -4,6 +4,7 @@
     <Project Path="Edam.Data.Projects.FileSystem\Edam.Data.Projects.FileSystem.csproj" />
     <Project Path="Edam.Data.Projects.Catalog\Edam.Data.Projects.Catalog.csproj" />
     <Project Path="Edam.Data.Projects.Runner\Edam.Data.Projects.Runner.csproj" />
+    <Project Path="Edam.Data.Projects.Assets\Edam.Data.Projects.Assets.csproj" />
     <Project Path="Edam.Data.Projects.DependencyInjection\Edam.Data.Projects.DependencyInjection.csproj" />
     <Project Path="Edam.Data.Projects.Conformance\Edam.Data.Projects.Conformance.csproj" />
   </Folder>
