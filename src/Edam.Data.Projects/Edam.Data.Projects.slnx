@@ -1,0 +1,5 @@
+<Solution>
+  <Folder Name="/src/Edam.Data.Projects/">
+    <Project Path="Edam.Data.Projects.Contracts\Edam.Data.Projects.Contracts.csproj" />
+  </Folder>
+</Solution>

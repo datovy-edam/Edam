@@ -1,0 +1,13 @@
+<Project Sdk="Microsoft.NET.Sdk">
+
+  <PropertyGroup>
+    <TargetFramework>net10.0</TargetFramework>
+    <ImplicitUsings>enable</ImplicitUsings>
+    <Nullable>enable</Nullable>
+  </PropertyGroup>
+
+  <!-- Deliberately dependency-free (ADR-0006 purity / ADR-0009): the project surface must be
+       replaceable — a Catalog-backed implementation, a file-system implementation, or a future
+       web/cloud one — so the contracts reference no provider, no Catalog, no AppSettings, no EF. -->
+
+</Project>

@@ -27,6 +27,7 @@
 | **Area R** | `BL-5.x` | Repository hygiene / recommended fixes |
 | **Area W1** | `BL-6.x` | **Wave 1** — move EDAM legacy resources into the distributed platform (Aspire; observability first-class; UI not in scope) |
 | **Area W1.1** | `BL-7.x` | **Wave 1.1** — catalog decoupling: UI/EF-independent `Edam.Data.Catalog` platform |
+| **Area PE** | `PE-x` | **Projects Enhancements** — EDAM Projects in the **Catalog** instead of a file system; interface-bound and replaceable (ADR-0009) |
 
 ## Backlog index
 
@@ -128,6 +129,19 @@
 
 > **Wave 1.1 overview + definition-of-complete:** `Wave-1.1-Catalog-Decoupling.md` (ADR-0007). Azure/blob content targets deferred to **Wave 2** (seam reserved in `IContentStore`).
 
+### Area PE — Projects Enhancements (Projects in the Catalog)
+
+| ID | Title | Type | Priority | Effort | Status |
+|---|---|---|---|---|---|
+| PE-0 | Scope, surface inventory + decisions for catalog-backed Projects | Spec / architecture | **High** | S | **Done** (2026-09-18) — `Projects-Enhancements.md` + ADR-0009 |
+| PE-1 | `Edam.Data.Projects.Contracts` — value records + `IProjectCatalog`/`IProjectStore`/`IProjectResources`/`IProjectRunner` | Architecture / contracts | **High** | M | **Done** (2026-09-18) — builds 0-error, dependency-free, no consumer changed |
+| PE-2 | File-system `IProjectResources` (behaviour-preserving) — the hinge that removes the file-system + CWD dependency | Refactor | **High** | M | New |
+| PE-3 | **Catalog** implementation: project = branch, artifacts = items + `IContentStore`; collections via `ContainerBinding`; import/export (upload/download) | Capability / integration | **High** | L | New |
+| PE-4 | `AddProjectServices(config)` DI composition root; retire the static project surface | Infrastructure | Medium | M | New |
+| PE-5 | Consumers: asset pipeline first (`ProjectConsole`/`AssetServiceHelper`), then Studio UI | Integration | Medium | L | New |
+
+> **Overview + decisions:** `Projects-Enhancements.md` (**ADR-0009**). Model agreed: **Collection = container, Project = branch**, artifacts = items + content in the Catalog; filesystem kept as a registered provider during the transition.
+
 ## Suggested sequencing
 
 > **Area 1 is now a verification effort** — the features are implemented; the work is to test them. BL-1.2 (naming) is deferred as secondary.
@@ -136,6 +150,7 @@
 
 - **Wave 1 (current initiative):** `Wave-1-Migration.md` → **BL-6.1** (Aspire baseline) → **BL-6.2** (onboard resources) → **BL-6.3/BL-6.7** (shells + diagnostics) → **BL-6.4** (services health) → **BL-6.6** (persistence). **BL-6.5 (Python) dropped** — functionality via MCP (parked, MAF later; ADR-0004/0005). *UI not in scope.*
 - **Wave 1.1 (catalog decoupling — next, de-risked):** `Wave-1.1-Catalog-Decoupling.md` → **1 Relocate**: **BL-7.1** (move real projects as-is) → **2 Prove**: **BL-7.5** (working end-to-end slice, FileSystem first) → **3 Extract**: **BL-7.3** (derive contracts from relocated types) → **4 Abstract**: **BL-7.2** (EF-independence + PostgreSQL) → **5 Seam**: **BL-7.4** (DI + per-**Container** resolution). Azure/blob → **Wave 2**.
+- **Projects Enhancements (PE — current):** `Projects-Enhancements.md` (ADR-0009) → **PE-0/PE-1 DONE** (scope + inventory + contracts) → **PE-2** file-system `IProjectResources` (behaviour-preserving; kills the CWD dependency) → **PE-3** Catalog implementation (project = branch; artifacts + binary content in the catalog; import/export as upload/download) → **PE-4** DI + retire statics → **PE-5** consumers (pipeline, then Studio UI). Depends on Wave 1.1 (done).
 - **Phase 0 (platform runtime — ASAP):** **BL-3.1** — upgrade to .NET 10 (current LTS), moving off .NET 9 (STS end-of-support).
 - **Phase 1 (unblock build):** BL-1.1
 - **Phase 2 (test foundation):** BL-1.13 (test project + fixtures), BL-1.3 (workflow → test scenarios)
