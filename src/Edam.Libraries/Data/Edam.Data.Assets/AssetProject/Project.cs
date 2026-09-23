@@ -1,4 +1,4 @@
-﻿using System;
+using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Text;
@@ -71,6 +71,9 @@ namespace Edam.Data.AssetProject
       /// <summary>
       /// Initialize Project...
       /// </summary>
+      [Obsolete("Superseded by the project platform (ADR-0009): register the project services " +
+         "with AddProjectServices and resolve IProjectCatalog/IProjectStore/IProjectResources " +
+         "instead of initializing static project state.")]
       public static void InitializeProject()
       {
          m_ProjectsPath = m_ProjectsPath ??
@@ -120,6 +123,9 @@ namespace Edam.Data.AssetProject
       /// Get Projects full Path...
       /// </summary>
       /// <returns></returns>
+      [Obsolete("Superseded by the project platform (ADR-0009): collections and project paths " +
+         "come from IProjectCatalog.GetCollectionsAsync / ProjectPath, not from a global " +
+         "projects folder computed at run time.")]
       public static string GetProjectsPath(
          bool getRelativePath = false, bool onlyPath = false)
       {
@@ -149,25 +155,14 @@ namespace Edam.Data.AssetProject
       }
 
       /// <summary>
-      /// Select Projects path.
-      /// </summary>
-      /// <param name="folderPath">folder path for projects</param>
-      public static void SetProjectsPath(string folderPath)
-      {
-         if (String.IsNullOrWhiteSpace(folderPath))
-         {
-            SetDefaultFullPath();
-         }
-         m_ConsolePath = folderPath;
-      }
-
-      /// <summary>
       /// Get Projects full Path...
       /// </summary>
       /// <returns></returns>
       public static string GetTextMapPath(bool getRelativePath = false)
       {
+#pragma warning disable CS0618 // the text-map folder still derives from the legacy console path
          string consolePath = GetProjectsPath();
+#pragma warning restore CS0618
          return (getRelativePath ? "." : consolePath) + TEXT_MAPS + "/";
       }
 
@@ -178,6 +173,9 @@ namespace Edam.Data.AssetProject
       /// is provided then the GetProjectsPath() will be used instead</param>
       /// <returns>results log is returned.  the results.Data contains the 
       /// setted current directory</returns>
+      [Obsolete("Superseded by the project platform (ADR-0009): select a collection through " +
+         "IProjectCatalog and read/write project resources through IProjectResources " +
+         "(this member also mutates the process current directory).")]
       public static ResultsLog<string> SetProjectsDirectory(
          string projectsPath = null)
       {
@@ -240,6 +238,9 @@ namespace Edam.Data.AssetProject
       /// Set the project directory before working on a project.
       /// </summary>
       /// <param name="arguments"></param>
+      [Obsolete("Superseded by the project platform (ADR-0009): resolve a project through " +
+         "IProjectCatalog and address its artifacts with ProjectPath/IProjectResources; the " +
+         "platform never changes the process current directory.")]
       public static void GotoProject(AssetConsoleArgumentsInfo arguments)
       {
          string path = GetProjectPath(arguments.ProjectName);
@@ -254,6 +255,9 @@ namespace Edam.Data.AssetProject
       /// else create directory and move there</param>
       /// <returns>results are returned.  The results.ResultValueObject contains
       /// the file-path of the newly created project</returns>
+      [Obsolete("Superseded by the project platform (ADR-0009): create a project with " +
+         "IProjectStore.CreateAsync, which scaffolds the same folders without changing the " +
+         "process current directory or copying a template from the current directory.")]
       public static ResultLog CreateProject(
          string name, bool useProject = false)
       {
@@ -321,54 +325,6 @@ namespace Edam.Data.AssetProject
          }
 
          return results;
-      }
-
-      /// <summary>
-      /// Get all Projects as found in the Projects default folder.
-      /// </summary>
-      /// <returns>instance of FolderFileItemInfo is returned with all 
-      /// projects and file/folder artifacts</returns>
-      public static FolderFileItemInfo GetProjectItems()
-      {
-         ResultsLog<string> results = SetProjectsDirectory();
-         if (!results.Success)
-         {
-            return null;
-         }
-         return FolderFileReader.GetFolderFileInfo(results.Data);
-      }
-
-      /// <summary>
-      /// Get a single project file/folder artifacts...
-      /// </summary>
-      /// <param name="rootFilePath">name of project</param>
-      /// <returns>instance of FolderFileItemInfo is returned with requested 
-      /// project and file/folder artifacts</returns>
-      public static FolderFileItemInfo GetProjectItems(string rootFilePath)
-      {
-         string cdir = Directory.GetCurrentDirectory();
-
-         ResultsLog<string> results = SetProjectsDirectory(rootFilePath);
-         if (!results.Success)
-         {
-            return null;
-         }
-
-         FolderFileItemInfo finfo = null;
-         try
-         {
-            finfo = FolderFileReader.GetFolderFileInfo(results.Data);
-         }
-         catch (Exception ex)
-         {
-            results.Failed(ex);
-         }
-         finally
-         {
-            Directory.SetCurrentDirectory(cdir);
-         }
-
-         return finfo;
       }
 
       /// <summary>

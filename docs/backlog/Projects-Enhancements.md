@@ -1,6 +1,6 @@
 # Projects Enhancements (PE) — Projects in the Catalog instead of a file system
 
-> **Status:** Started (2026-09-18) — **PE-0…PE-4 complete**; **PE-5 in progress (5a + 5b done, 5c–5d remaining)**.
+> **Status:** Started (2026-09-18) — **PE-0…PE-4 complete**; **PE-5 in progress (5a–5c done; 5d partial — remainder blocked by the pipeline refactor)**.
 > **Goal:** move EDAM **Projects** off the file system and onto the **Catalog** platform, behind interfaces so the storage is replaceable and the surface is easy to consume (CLI, Studio, services).
 > **Decision record:** **ADR-0009**. Source specification: *EDAM Studio — Understanding Projects* (2023-02-05).
 > **Authority:** per `AGENTS.md`, the live repository is the authority; this document is a planning aid.
@@ -58,11 +58,38 @@ Value records: `ProjectCollectionInfo` (+ `ProjectCollectionType`, `ProjectColle
 | **PE-2** ✅ | **File-system** `IProjectCatalog`/`IProjectStore`/`IProjectResources` (behaviour-preserving) + a headless conformance runner | **Done 2026-09-18** — `Edam.Data.Projects.Conformance` = **15/15 ALL CONFORM**: the spec's `./Archive/…` / `./Documents/…` paths resolve through the interface, binary content round-trips, import (**upload**) / export (**download**) work, and **the process current directory is never changed**. `IProjectRunner`'s real implementation binds to the asset pipeline in **PE-5** |
 | **PE-3** ✅ | **Catalog** implementation: project = branch, folders = branches, artifacts = items + `IContentStore`; collections via `ContainerBinding`; import via `FolderCatalogIndexer`; upload/download | **Done 2026-09-18** — `Edam.Data.Projects.Catalog`; the SAME scenario passes on **five** targets — file-system (14 checks), catalog-local, catalog-remote HTTP, **catalog-postgres local** and **catalog-postgres remote HTTP** (13 each) → **PE-3 conformance ALL CONFORM**, no CWD change. Project paths are **collection-scoped** (`<collectionId>/Projects/<name>`). Surfaced + fixed a wire defect (`CatalogHttpItem.CreateBranchAsync` used the full path as the item `Name`) |
 | **PE-4** ✅ | `AddProjectServices(config)` DI composition root | **Done 2026-09-18** — `Edam.Data.Projects.DependencyInjection` registers `IProjectCatalog`/`IProjectStore`/`IProjectResources` for `Edam:Projects:Target = filesystem` (**default**; root falls back to today's `AppSettings:AssetConsolePath`, so nothing regresses) or `catalog` (delegating to `AddCatalogServices`). The runner now also resolves **through DI**: `di (file-system)`, `di (catalog, local file-system)`, `di (catalog, postgres)` — all ALL CONFORM. **Static retirement moved to PE-5** (the statics are still referenced by the Studio UI + pipeline that PE-5 rewires) |
-| **PE-5** | Consumers + execution — in verified sub-steps: **5a** ✅ runner seam · **5b** ✅ asset-console adapter · **5c** ✅ real process (part 1) + ✅ Studio UI via DI (part 2) · **5d** retire the statics | **5a/5b/5c done 2026-09-18.** **5a:** runner materializes inputs, runs, **captures outputs back** (all targets, CWD unchanged). **5b:** the adapter runs `AssetServiceHelper` with the CWD contained and restored. **5c part 1:** attempting a **real** process found + fixed two defects (arguments file looked up at the working-folder root instead of its **project-relative** path; only `PrepareProceduresRegistry()` instead of the console's full **`Initialize()`** incl. the type registry); the real run still needs real project data (`Asset Data Items expected but not found`), reported as **informational probes**. **5c part 2:** `ProjectServicesHelper` resolves the platform via DI (catalog target when a catalog connection is configured, else file system with today's `AssetConsolePath`); the Studio's **collection list**, **projects tree** and **new-project creation** now come from the platform, and the static `Project.SetProjectsPath` side effect is gone from that path. Execution sites stay on the legacy console until the runner is proven with real data. `Edam.WinUI.Controls` builds 0 error and the **Studio app now builds too** — `Edam.Studio.sln` 0 error with correct PRI output (the PRI-off library workaround was incompatible with the MSIX-packaged app; see HANDOFF item 40 / BL-3.1 "Superseded"). **5d:** no static project state remains |
+| **PE-5** | Consumers + execution — in verified sub-steps: **5a** ✅ runner seam · **5b** ✅ asset-console adapter · **5c** ✅ real process (part 1) + ✅ Studio UI via DI (part 2) · **5d** retire the statics | **5a/5b/5c done 2026-09-18.** **5a:** runner materializes inputs, runs, **captures outputs back** (all targets, CWD unchanged). **5b:** the adapter runs `AssetServiceHelper` with the CWD contained and restored. **5c part 1:** attempting a **real** process found + fixed two defects (arguments file looked up at the working-folder root instead of its **project-relative** path; only `PrepareProceduresRegistry()` instead of the console's full **`Initialize()`** incl. the type registry); the real run still needs real project data (`Asset Data Items expected but not found`), reported as **informational probes**. **5c part 2:** `ProjectServicesHelper` resolves the platform via DI (catalog target when a catalog connection is configured, else file system with today's `AssetConsolePath`); the Studio's **collection list**, **projects tree** and **new-project creation** now come from the platform, and the static `Project.SetProjectsPath` side effect is gone from that path. The **execution sites** stay on the legacy console until the runner is proven with real data. `Edam.WinUI.Controls` builds 0 error and the **Studio app now builds too** — `Edam.Studio.sln` 0 error with correct PRI output (the PRI-off library workaround was incompatible with the MSIX-packaged app; see HANDOFF item 40 / BL-3.1 "Superseded"). **5d partial (2026-09-18):** the three members PE-5c left **unreferenced** were **deleted** (`Project.GetProjectItems` ×2, `Project.SetProjectsPath`) and the superseded-but-live project-lifecycle members (`InitializeProject`, `GetProjectsPath`, `SetProjectsDirectory`, `GotoProject`, `CreateProject`) are marked **`[Obsolete]`** pointing at the platform — the build now lists the remaining usage as `CS0618`. **Full deletion is blocked** (see the audit below). |
 
 **Evidence:** `Edam.Data.Projects.Conformance` → `result: projects conformance (PE-2…PE-5c) ALL CONFORM` — **9 target groups** (`file-system` with 17 checks, the other eight with 16 each) plus **`asset-console adapter` (6 checks)**, incl. *no process current-directory change*, and three **informational probes** reporting the real console/process outcomes. Pass a PostgreSQL DSN as the first argument to include the postgres targets (the default run is hermetic).
 
 Both providers are registered by `AddProjectServices`; the default target is **file-system**, so switching to the catalog is a configuration change.
+
+## PE-5d retirement audit (2026-09-18) — what was retired and what still blocks deletion
+
+**Deleted — verified to have zero callers** (PE-5c removed the last ones; the compiler confirms by building clean):
+
+| Member | Why it was dead |
+|---|---|
+| `Project.GetProjectItems()` | the Studio's project-tree read now comes from `ProjectServicesHelper` (PE-5c) |
+| `Project.GetProjectItems(string)` | same |
+| `Project.SetProjectsPath(string)` | the static path side effect removed from `FetchProjectFolderInfo` (PE-5c) |
+
+**Deprecated in place** — `[Obsolete]` with a message naming the ADR-0009 replacement: `InitializeProject`, `GetProjectsPath`, `SetProjectsDirectory`, `GotoProject`, `CreateProject`. Safe because **no project sets `TreatWarningsAsErrors`**, and useful because the build now **enumerates the remaining usage** as `CS0618` (6 warnings in `Edam.Data.Assets` alone). One live internal use is covered by a file-local `#pragma` — `GetTextMapPath` → `GetProjectsPath`, a text-map folder that is not part of the project model.
+
+**Still blocking full deletion (the honest part) — the legacy pipeline itself owns these:**
+
+| Consumer | Member(s) | Why it cannot move yet |
+|---|---|---|
+| `Edam.Application` — `AppSettings` | `GetProjectsPath` | core setting resolving the app-data/projects path |
+| `Edam.Data.Assets.Services` — `AssetServiceHelper` | `CreateProject` | backs the console's `CreateProject`/`UseProject` procedures |
+| `Edam.Data.Assets` — `AssetReportBuilder` | `GotoProject` | report building still changes the process current directory |
+| `Edam.Data.Assets` — `AssetConsoleArgumentsInfo` | `GetProjectsPath`, `CreateProject` | arguments parsing derives the project folder |
+| Studio `ProjectContext` / `ProjectHelper` | `ProjectConsole.Execute` / `ProcessItem` / `GetArgsContext` | the UI's run/save path — deliberately kept until the runner is proven with real data (PE-5c part 1) |
+| `Edam.Test.*` (headless suite) | `GotoProject`, `SetDefaultFullPath`, `SetProjectsDirectory` | project fixtures for the existing tests |
+
+Deleting these requires rewriting the asset libraries' **by-path file resolution** onto `IProjectResources` (the deep refactor flagged in PE-5) **plus** the real-data validation of the runner. Until then, "no static project state remains" **cannot be truthfully claimed**.
+
+> **Republish caveat:** the Studio and the tests consume `Edam.Data.Assets` / `Edam.Data.Asset.Services` as **feed packages** (`c:\nugetlocalfeed`), so the new `[Obsolete]` guidance only reaches them after those packages are republished (a user step). In-repo project references see it immediately.
 
 ## Open questions
 
