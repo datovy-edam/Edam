@@ -11,13 +11,15 @@
   </PropertyGroup>
 
   <ItemGroup>
-      <PackageReference Include="CommunityToolkit.Common" Version="7.1.2" />
-      <PackageReference Include="CommunityToolkit.Mvvm" Version="7.1.2" />
+      <!-- Latest available offline. The WinUI Controls package (7.1.2) does not depend on these, so
+           they move independently; 8.x keeps ObservableObject/RelayCommand/Messenger. -->
+      <PackageReference Include="CommunityToolkit.Common" Version="8.2.1" />
+      <PackageReference Include="CommunityToolkit.Mvvm" Version="8.4.0" />
       <PackageReference Include="Edam.Data.Assets" Version="1.0.1" />
       <PackageReference Include="Edam.DataObjects" Version="1.0.1" />
       <PackageReference Include="Edam.System" Version="1.0.0" />
       <PackageReference Include="Microsoft.WindowsAppSDK" Version="1.6.250205002" />
-      <PackageReference Include="Microsoft.Windows.SDK.BuildTools" Version="10.0.22621.756" />
+      <PackageReference Include="Microsoft.Windows.SDK.BuildTools" Version="10.0.26100.1742" />
   </ItemGroup>
 
   <ItemGroup>

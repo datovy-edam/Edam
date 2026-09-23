@@ -13,7 +13,7 @@
     <PackageReference Include="Edam.Data.Templates" Version="1.0.0" />
     <PackageReference Include="Edam.DataObjects" Version="1.0.1" />
     <PackageReference Include="Edam.System" Version="1.0.0" />
-    <PackageReference Include="Microsoft.Windows.SDK.BuildTools" Version="10.0.22621.756" />
+    <PackageReference Include="Microsoft.Windows.SDK.BuildTools" Version="10.0.26100.1742" />
     <PackageReference Include="Microsoft.WindowsAppSDK" Version="1.6.250205002" />
     <PackageReference Include="sqlite-net-pcl" Version="1.8.116" />
   </ItemGroup>

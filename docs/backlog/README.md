@@ -102,6 +102,7 @@
 | [BL-5.4](BL-5.4.md) | Replace `async void` / `.Wait()/.Result`; add session management | Refactor / quality | Medium | M | New | **Ready** |
 | [BL-5.5](BL-5.5.md) | Align EF Core versions + add migrations | Dependency / data | Medium | L | New | **Ready** *(with BL-3.1)* |
 | [BL-5.6](BL-5.6.md) | Add catalog REST client + local repository tests | Testing | Medium | M | New | **Ready** |
+| [BL-5.7](BL-5.7.md) | Dependency vulnerability cleanup (NuGet Audit findings) | Dependency / security | **High** | M | **In Progress** — 5/6 advisories fixed 2026-09-18; SQLitePCLRaw blocked offline | **Ready** |
 
 ### Area W1 — Wave 1: move legacy resources into the distributed platform
 
