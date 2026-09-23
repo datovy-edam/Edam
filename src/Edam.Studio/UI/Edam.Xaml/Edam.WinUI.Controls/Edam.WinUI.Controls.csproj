@@ -79,7 +79,7 @@
       <PackageReference Include="Edam.System" Version="1.0.0" />
       <PackageReference Include="Edam.Xml" Version="1.0.0" />
       <PackageReference Include="Jsonata.Net.Native" Version="2.4.1" />
-      <PackageReference Include="Microsoft.EntityFrameworkCore" Version="6.0.25" />
+      <PackageReference Include="Microsoft.EntityFrameworkCore" Version="9.0.2" />
       <PackageReference Include="Microsoft.Extensions.DependencyInjection" Version="10.0.11" />
       <PackageReference Include="Microsoft.Extensions.Logging.Abstractions" Version="10.0.11" />
       <PackageReference Include="Microsoft.WindowsAppSDK" Version="1.6.250205002" />

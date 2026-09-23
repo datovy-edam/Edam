@@ -55,7 +55,7 @@ Also brought to the **latest available offline**: `Newtonsoft.Json` 13.0.3→**1
 
 | Package | Now | Newest known | Why not now |
 |---|---|---|---|
-| `Microsoft.EntityFrameworkCore` (+`.SqlServer`) | 6.0.25 | 9.0.2 cached / 10.x online | EF 6→9/10 is a **breaking migration**; the `Edam.*` feed packages are compiled against EF 6. Needs a deliberate, runtime-validated upgrade — that is **BL-5.5** |
+| `Microsoft.EntityFrameworkCore` (+`.SqlServer`) | **9.0.2** (aligned 2026-09-18 — BL-5.5) | 10.x online | EF 10's **SqlServer provider is not cached** (needs network); the 6.0.25 → 9.0.2 alignment itself is **done and compiling** |
 | `Microsoft.WindowsAppSDK` | 1.6.250205002 | 1.7 / 1.8 online | newer version **not in the offline cache** |
 | `DocumentFormat.OpenXml` | 2.19.0 | 3.x online | newer version **not cached** |
 | `pythonnet` | 3.0.3 | newer online | **not cached** |
