@@ -1,4 +1,4 @@
-﻿using System;
+using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Text;
@@ -253,31 +253,46 @@ namespace Edam.WinUI.Controls.ViewModels
 
       public ProjectViewerViewModel()
       {
-         PrepareUriItems();
          AllowItemEditing = false;
          SidePanelTab = TAB_FILE;
          SetAssetViewerVisibility(Visibility.Visible);
 
-         if (UriItems.Count > 0)
-         {
-            SelectedUriItem = UriItems.First();
-         }
-         //FetchProjectFolderInfo();
+         // collections load asynchronously through the platform; selecting one loads its projects
+         _ = PrepareUriItemsAsync();
       }
 
       #endregion
       #region -- 4.00 - Support methods...
 
-      private void PrepareUriItems()
+      private async Task PrepareUriItemsAsync()
       {
-         ObservableCollection<UriItemInfo> l = 
-            new ObservableCollection<UriItemInfo>();
-         var items = uiApp.AppSettings.GetUriList(UriType.ConsolePath);
-         foreach(var i in items)
+         try
          {
-            l.Add(i);
+            // PE-5c: the collections come from the project platform (DI composition root) — the
+            // file-system root, or the catalog when a catalog connection is configured — instead of
+            // AppSettings' UriList.
+            var l = new ObservableCollection<UriItemInfo>();
+            foreach (var collection in await ProjectServicesHelper.GetCollectionsAsync())
+            {
+               l.Add(new UriItemInfo
+               {
+                  Name = collection.Name,
+                  Type = UriType.ConsolePath,
+                  UriText = collection.Uri,
+               });
+            }
+
+            UriItems = l;
+
+            if (UriItems.Count > 0)
+            {
+               SelectedUriItem = UriItems.First();
+            }
          }
-         UriItems = l;
+         catch (Exception ex)
+         {
+            NotifiedMessageText = ex.Message;
+         }
       }
 
       public void SetAssetViewerVisibility(Visibility? visibility)
@@ -338,13 +353,20 @@ namespace Edam.WinUI.Controls.ViewModels
          return m_SupportedExtensions.Contains(ext.ToLower());
       }
 
-      public void FetchProjectFolderInfo()
+      public async void FetchProjectFolderInfo()
       {
-         var item = SelectedUriItem;
-         FolderFileItemInfo ffinfo = prjs.Project.GetProjectItems(
-            SelectedUriItem == null ? null : SelectedUriItem.UriText);
-         TreeView = ProjectDataModel.ToObservable(ffinfo);
-         Project.SetProjectsPath(item.UriText);
+         try
+         {
+            // PE-5c: the projects tree comes from the project platform (the static
+            // Project.GetProjectItems / Project.SetProjectsPath pair is no longer used here)
+            var ffinfo = await ProjectServicesHelper.GetProjectsTreeAsync(
+               SelectedUriItem == null ? null : SelectedUriItem.UriText);
+            TreeView = ProjectDataModel.ToObservable(ffinfo);
+         }
+         catch (Exception ex)
+         {
+            NotifiedMessageText = ex.Message;
+         }
       }
 
       public void ManageResults(IResultsLog results)
@@ -625,7 +647,7 @@ namespace Edam.WinUI.Controls.ViewModels
       /// project and show it on the Items-Tree control...
       /// </summary>
       /// <param name="result">dialog results passed in the callBack</param>
-      private void ProcessNewProjectResult(
+      private async void ProcessNewProjectResult(
          Dialogs.IDialogObjectInfo result)
       {
          var rslt = result as Dialogs.IDialogObjectInfo;
@@ -645,13 +667,23 @@ namespace Edam.WinUI.Controls.ViewModels
                return;
             }
 
-            var results = Project.CreateProject(pname.ValueText, false);
-            string path = results.ResultValueObject as string;
-            if (!String.IsNullOrWhiteSpace(path))
+            try
             {
-               FolderFileItemInfo ffinfo = Project.GetProjectItems(path);
+               // PE-5c: create the project through the platform, then show it
+               var collectionUri = SelectedUriItem == null ? null : SelectedUriItem.UriText;
+               var created = await ProjectServicesHelper.CreateProjectAsync(
+                  collectionUri, pname.ValueText, pdesc.ValueText);
+
+               var ffinfo = await ProjectServicesHelper.GetProjectTreeAsync(created, collectionUri);
                var tItem = ProjectDataModel.ToObservable(ffinfo);
-               TreeView.Children.Add(tItem);
+               if (tItem != null && TreeView != null)
+               {
+                  TreeView.Children.Add(tItem);
+               }
+            }
+            catch (Exception ex)
+            {
+               NotifiedMessageText = ex.Message;
             }
          }
       }
