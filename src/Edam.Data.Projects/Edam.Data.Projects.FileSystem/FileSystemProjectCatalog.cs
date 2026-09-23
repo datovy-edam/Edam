@@ -85,6 +85,67 @@ public sealed class FileSystemProjectCatalog : IProjectCatalog
    internal static string ProjectsRoot(ProjectCollectionInfo collection)
       => Path.Combine(collection.Uri, ProjectCollectionFolders.Projects);
 
+   /// <summary>
+   /// Resolve a <b>physical path</b> back to the project that owns it and the resource's
+   /// project-relative path — the inverse of <see cref="ProjectAddress"/> plus the on-disk layout
+   /// (<c>&lt;collection&gt;/Projects/&lt;name&gt;/…</c>).
+   /// <para>
+   /// This is the mapping a consumer holding a file-system path needs in order to drive the platform
+   /// instead (e.g. the Studio's project tree): it lets a legacy disk path become
+   /// (<see cref="ProjectInfo"/>, <see cref="ProjectPath"/>) without the consumer knowing the layout.
+   /// </para>
+   /// </summary>
+   /// <returns><c>true</c> when the path lies inside a declared collection's <c>Projects/</c> folder.</returns>
+   public bool TryResolveResource(
+      string physicalPath, out ProjectCollectionInfo? collection,
+      out ProjectInfo? project, out ProjectPath? resourcePath)
+   {
+      collection = null;
+      project = null;
+      resourcePath = null;
+
+      if (string.IsNullOrWhiteSpace(physicalPath)) return false;
+
+      string full;
+      try { full = Path.GetFullPath(physicalPath); }
+      catch { return false; }
+
+      // longest matching collection root wins, in case one collection nests inside another
+      foreach (var candidate in _collections
+                  .OrderByDescending(c => Path.GetFullPath(c.Uri).Length))
+      {
+         var projectsRoot = Path.GetFullPath(ProjectsRoot(candidate));
+         if (!full.StartsWith(projectsRoot + Path.DirectorySeparatorChar,
+               StringComparison.OrdinalIgnoreCase))
+         {
+            continue;
+         }
+
+         var remainder = full[(projectsRoot.Length + 1)..];
+         var segments = remainder.Split(
+            [Path.DirectorySeparatorChar, Path.AltDirectorySeparatorChar],
+            StringSplitOptions.RemoveEmptyEntries);
+         if (segments.Length == 0) continue;
+
+         var name = segments[0];
+         collection = candidate;
+         project = new ProjectInfo(name, name, string.Empty, candidate.CollectionId,
+            ProjectAddress(name));
+         resourcePath = segments.Length == 1
+            ? ProjectPath.Root
+            : ProjectPath.Parse("/" + string.Join('/', segments[1..]));
+         return true;
+      }
+
+      return false;
+   }
+
+   /// <summary>Convenience overload of <see cref="TryResolveResource"/>.</summary>
+   public bool TryResolveResource(
+      string physicalPath, out ProjectInfo? project, out ProjectPath? resourcePath)
+      => TryResolveResource(physicalPath, out _, out project, out resourcePath);
+
+
    /// <summary>A project's address within its collection: <c>/Projects/&lt;name&gt;</c>.</summary>
    internal static ProjectPath ProjectAddress(string projectName)
       => ProjectPath.Root.Combine(ProjectCollectionFolders.Projects).Combine(projectName);

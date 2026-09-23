@@ -1,4 +1,4 @@
-﻿using System;
+using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Text;
@@ -117,12 +117,24 @@ namespace Edam.WinUI.Controls.ViewModels
       /// Process Project Item.
       /// </summary>
       /// <param name="projectItem">item to process</param>
-      public void ProcessProjectItem(object projectItem)
+      public async void ProcessProjectItem(object projectItem)
       {
          ProjectItem prj = (ProjectItem)projectItem;
 
-         // TODO: make the following Async...
-         var results = ProjectHelper.Execute(prj);
+         // PE-5d option A: execute through the platform when it is enabled
+         // (Edam:Projects:Process = runner); the legacy static console remains the fallback.
+         ResultsLog<List<AssetData>> results;
+         try
+         {
+            results = ProjectServicesHelper.ProcessRunnerEnabled
+               ? await ProjectHelper.ExecuteAsync(prj)
+               : ProjectHelper.Execute(prj);
+         }
+         catch (Exception)
+         {
+            results = ProjectHelper.Execute(prj);
+         }
+
          if (results.Success)
          {
             m_AssetDataSet = results.Data;

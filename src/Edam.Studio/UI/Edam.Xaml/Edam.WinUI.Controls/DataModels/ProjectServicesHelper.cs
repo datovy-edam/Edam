@@ -1,7 +1,11 @@
 using Edam.Application;
+using Edam.Data.AssetConsole;
+using Edam.Data.AssetConsole.Services;
+using Edam.Data.AssetSchema;
 using Edam.Data.Projects.Catalog;
 using Edam.Data.Projects.Contracts;
 using Edam.Data.Projects.DependencyInjection;
+using Edam.Data.Projects.FileSystem;
 using Edam.InOut;
 using Microsoft.Extensions.DependencyInjection;
 using System;
@@ -172,6 +176,137 @@ namespace Edam.WinUI.Controls.DataModels
          }
 
          return collections.FirstOrDefault(c => c.IsDefault) ?? collections[0];
+      }
+
+      // ---------------------------------------------------------------------
+      // PE-5d option A: execute through the platform and derive assets from the artifact
+      // ---------------------------------------------------------------------
+
+      /// <summary>Configuration key that opts the Studio into platform execution.</summary>
+      public const string PROCESS_MODE_KEY = "Edam:Projects:Process";
+
+      /// <summary>
+      /// Whether the Studio should execute projects through the platform (<see cref="IProjectRunner"/>)
+      /// rather than the legacy static console. <b>Opt-in</b> — set
+      /// <c>Edam:Projects:Process = runner</c> — so nothing changes unless it is asked for.
+      /// </summary>
+      public static bool ProcessRunnerEnabled
+      {
+         get
+         {
+            var mode = AppSettings.GetString(PROCESS_MODE_KEY);
+            return string.Equals(mode, "runner", StringComparison.OrdinalIgnoreCase);
+         }
+      }
+
+      /// <summary>
+      /// Resolve a <b>file-system path</b> (e.g. a Studio tree item) to the platform's project and
+      /// project-relative resource path. Only meaningful for the file-system target: a catalog
+      /// project has no external disk address — that is the point of ADR-0009.
+      /// </summary>
+      public static bool TryResolveProject(
+         string? physicalPath, out ProjectInfo? project, out ProjectPath? resourcePath)
+      {
+         project = null;
+         resourcePath = null;
+
+         if (string.IsNullOrWhiteSpace(physicalPath) || !m_PhysicalPaths) return false;
+
+         return Catalog is FileSystemProjectCatalog fileSystem &&
+                fileSystem.TryResolveResource(physicalPath!, out _, out project, out resourcePath);
+      }
+
+      /// <summary>
+      /// Run a project's process through the platform, given the file-system path of its arguments
+      /// document; the documents it produces are <b>captured back into the project</b>.
+      /// Returns <c>null</c> when the path cannot be resolved to a project (caller falls back).
+      /// </summary>
+      public static async Task<ProjectRunResult?> RunProjectAsync(
+         string? physicalArgumentsPath, string? outputFile = null, CancellationToken ct = default)
+      {
+         if (!TryResolveProject(physicalArgumentsPath, out var project, out var resourcePath) ||
+             project is null || resourcePath is not { } argumentsPath)
+         {
+            return null;
+         }
+
+         ProjectPath? output = string.IsNullOrWhiteSpace(outputFile)
+            ? null
+            : ProjectPath.Parse(outputFile!);
+         return await Runner.RunAsync(project, argumentsPath, output, ct).ConfigureAwait(false);
+      }
+
+      /// <summary>Read a document the platform captured back into the project.</summary>
+      public static async Task<byte[]?> ReadArtifactAsync(
+         ProjectInfo project, ProjectPath artifact, CancellationToken ct = default)
+      {
+         using var stream = await Resources.OpenReadAsync(project, artifact, ct).ConfigureAwait(false);
+         if (stream is null) return null;
+
+         using var buffer = new MemoryStream();
+         await stream.CopyToAsync(buffer, ct).ConfigureAwait(false);
+         return buffer.ToArray();
+      }
+
+      /// <summary>
+      /// <b>Option A (PE-5d):</b> derive the assets from a document the process produced, by feeding
+      /// that artifact to the console's own input procedure
+      /// (<c>JsdToAssets</c>/<c>XsdToAssets</c>/<c>DdlToAssets</c>). No reader is rewritten and no
+      /// contract is extended — the produced artifact becomes the input, which is what makes
+      /// "the Catalog contains all artifact content" (ADR-0009) the working model.
+      /// </summary>
+      /// <returns>The assets, or <c>null</c> when the artifact's format is not asset-bearing.</returns>
+      public static async Task<List<AssetData>?> TryLoadAssetsFromArtifactAsync(
+         ProjectInfo project, ProjectPath artifact, AssetConsoleArgumentsInfo? template,
+         CancellationToken ct = default)
+      {
+         var extension = artifact.Extension?.ToLowerInvariant() ?? string.Empty;
+         var procedure = extension switch
+         {
+            ".jsd" or ".json" or ".jsonld" => AssetConsoleProcedure.JsdToAssets,
+            ".xsd" or ".xml" => AssetConsoleProcedure.XsdToAssets,
+            ".ddl" or ".sql" => AssetConsoleProcedure.DdlToAssets,
+            _ => AssetConsoleProcedure.Unknown,
+         };
+
+         if (procedure == AssetConsoleProcedure.Unknown) return null;
+
+         var bytes = await ReadArtifactAsync(project, artifact, ct).ConfigureAwait(false);
+         if (bytes is null) return null;
+
+         // the input procedures read from a physical file, so materialize the artifact for them only
+         var input = Path.Combine(Path.GetTempPath(),
+            "edam-artifact-" + Guid.NewGuid().ToString("N") + extension);
+         try
+         {
+            await File.WriteAllBytesAsync(input, bytes, ct).ConfigureAwait(false);
+
+            var arguments = template is null
+               ? new AssetConsoleArgumentsInfo()
+               : AssetConsoleArgumentsInfo.Duplicate(template);
+            arguments.Procedure = procedure;
+            arguments.UriList = new List<Uri> { new Uri(input) };
+            if (arguments.InputFile is not null) arguments.InputFile.Full = input;
+
+            switch (procedure)
+            {
+               case AssetConsoleProcedure.JsdToAssets:
+                  AssetServiceHelper.JsdToAssets(arguments);
+                  break;
+               case AssetConsoleProcedure.XsdToAssets:
+                  AssetServiceHelper.XsdToAssets(arguments);
+                  break;
+               default:
+                  AssetServiceHelper.DdlToAssets(arguments);
+                  break;
+            }
+
+            return arguments.AssetDataItems as List<AssetData>;
+         }
+         finally
+         {
+            try { File.Delete(input); } catch { /* best effort */ }
+         }
       }
 
       // ---------------------------------------------------------------------

@@ -55,6 +55,30 @@ try
          File.Exists(physicalArgs) && File.Exists(physicalOutput),
          Path.GetRelativePath(root, physicalArgs)));
 
+      // file-system specific: a legacy DISK path resolves back to its project + resource path.
+      // This is the mapping a consumer holding a path (e.g. the Studio's project tree) needs in
+      // order to drive the platform instead of the static project API (PE-5d, option A).
+      catalog.TryResolveResource(physicalArgs, out var resolvedCollection,
+         out var resolvedProject, out var resolvedResource);
+      checks.Add(new ProjectScenario.Check(
+         "A disk path resolves back to its project + resource path",
+         resolvedProject?.Name == "Datovy.HC.CD" &&
+         resolvedResource?.Value == "/Arguments/Datovy.HC.CD.ToAssets.Args.json" &&
+         resolvedCollection is not null,
+         $"{resolvedProject?.Name} {resolvedResource?.Value}"));
+
+      catalog.TryResolveResource(Path.Combine(root, "Projects", "Datovy.HC.CD"),
+         out _, out var projectNode, out var projectResource);
+      checks.Add(new ProjectScenario.Check(
+         "A project folder resolves to the project root",
+         projectNode?.Name == "Datovy.HC.CD" && projectResource?.IsRoot == true,
+         $"{projectNode?.Name} {projectResource?.Value}"));
+
+      checks.Add(new ProjectScenario.Check(
+         "A path outside the collections does not resolve",
+         !catalog.TryResolveResource(Path.Combine(temp, "outside", "x.txt"), out _, out _, out _),
+         "outside => false"));
+
       all["file-system"] = checks;
    }
 

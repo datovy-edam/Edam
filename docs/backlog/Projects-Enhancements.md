@@ -1,6 +1,6 @@
 # Projects Enhancements (PE) — Projects in the Catalog instead of a file system
 
-> **Status:** Started (2026-09-18) — **PE-0…PE-4 complete**; **PE-5 in progress (5a–5c done; 5d partial — blocked on a UI-execution *design decision*, not on a reader refactor)**.
+> **Status:** Started (2026-09-18) — **PE-0…PE-4 complete**; **PE-5 in progress (5a–5c done; 5d: option A implemented — opt-in, build-verified, runtime validation pending)**.
 > **Goal:** move EDAM **Projects** off the file system and onto the **Catalog** platform, behind interfaces so the storage is replaceable and the surface is easy to consume (CLI, Studio, services).
 > **Decision record:** **ADR-0009**. Source specification: *EDAM Studio — Understanding Projects* (2023-02-05).
 > **Authority:** per `AGENTS.md`, the live repository is the authority; this document is a planning aid.
@@ -111,6 +111,16 @@ So the migration is **not mechanical**: the UI's flagship flow is "execute and h
 - **(C) Leave the UI on `ProjectConsole`** (status quo) — the statics stay; PE-5d stays partial. Acceptable as an explicit choice, but then the file-system project surface is never retired.
 
 **Decision needed before PE-5d can finish.** Whichever way it goes, it also gates deleting the statics, because those three call sites plus the filesystem-mode path helpers (`AppSettings`, `AssetConsoleArgumentsInfo`, `AssetReportBuilder`) are the only remaining consumers.
+
+### Option A — implemented (2026-09-18; build-verified, opt-in, runtime validation pending)
+
+- **Provider mapping (verified).** `FileSystemProjectCatalog.TryResolveResource(physicalPath, …)` resolves a legacy **disk path** back to its project + project-relative resource path — the inverse of `ProjectAddress` plus the on-disk layout. Covered by the conformance runner: **file-system is now 20 checks**, including the round trip, project-folder → project root, and rejection of a path outside the collections.
+- **UI bridge.** `ProjectServicesHelper` gains `ProcessRunnerEnabled` (config `Edam:Projects:Process = runner`), `TryResolveProject`, `RunProjectAsync` (→ `IProjectRunner`), `ReadArtifactAsync`, and `TryLoadAssetsFromArtifactAsync` — which feeds the **captured artifact** to the console's own `JsdToAssets`/`XsdToAssets`/`DdlToAssets`. So **no reader is rewritten and no contract is extended**; the produced document becomes the input of record.
+- **UI wiring.** `ProjectHelper.ExecuteAsync` = resolve → run → read the artifact → derive the assets; `AssetViewerViewModel.ProcessProjectItem` is now `async void` (the method's own `// TODO: make the following Async...`) and prefers the platform, **falling back to the legacy console on any failure**.
+- **Verified:** `Edam.WinUI.Controls` and `Edam.Studio.sln` build **0 error**; the platform conformance is ALL CONFORM; the changed files add **no** new warnings (the solution's warnings are pre-existing + the 5 known `NU1903` SQLite advisories).
+- **Not verified:** runtime UI behaviour — WinUI cannot run in this environment, so the flow must be exercised in Studio.
+- **Safe by default:** the switch is **off** unless `Edam:Projects:Process = runner`, so today's behaviour is unchanged.
+- **Still legacy (honest):** `ProjectHelper.PrepareOutputFile` — it overrides the **procedure** (`AssetsToLexiconDatabase`, `AssetsToLexiconWorkbook`, …), which the runner cannot express because it runs the procedure the arguments declare — and `ProjectContext.PrepareArguments` (the in-memory arguments path). Those two remaining `ProjectConsole` call sites need option **B**'s contract addition (a procedure/argument override on the run request) before they can move.
 
 ## Open questions
 

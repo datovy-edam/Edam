@@ -1,5 +1,6 @@
-﻿using System;
+using System;
 using System.Collections.Generic;
+using System.Threading.Tasks;
 
 // -----------------------------------------------------------------------------
 using Edam.DataObjects.ReferenceData;
@@ -207,6 +208,60 @@ namespace Edam.WinUI.Controls.DataModels
          results.Succeeded();
 
          return results;
+      }
+
+      /// <summary>
+      /// <b>PE-5d option A:</b> process the project item through the <b>platform</b> when it is enabled
+      /// (<see cref="ProjectServicesHelper.ProcessRunnerEnabled"/>) and the item resolves to a project —
+      /// run it with <c>IProjectRunner</c>, then <b>derive the assets from the documents the run
+      /// captured back into the project</b>. Falls back to the legacy static console otherwise, so
+      /// nothing changes unless the platform path is switched on.
+      /// </summary>
+      /// <remarks>
+      /// The legacy flow obtained the assets as in-memory pipeline state; here the produced artifact
+      /// is the input of record (ADR-0009 — "the Catalog contains all artifact content").
+      /// </remarks>
+      public static async Task<ResultsLog<List<AssetData>>> ExecuteAsync(ProjectItem item)
+      {
+         if (item?.Item?.Full is string argumentsFile &&
+             ProjectServicesHelper.ProcessRunnerEnabled &&
+             ProjectServicesHelper.TryResolveProject(argumentsFile, out var project, out _) &&
+             project is not null)
+         {
+            var run = await ProjectServicesHelper.RunProjectAsync(argumentsFile)
+               .ConfigureAwait(true);
+
+            if (run is { Success: true } && run.Artifacts is { Count: > 0 })
+            {
+               var template = AssetConsoleArgumentsInfo.FromJsonFilePath(argumentsFile);
+
+               foreach (var artifact in run.Artifacts)
+               {
+                  var assets = await ProjectServicesHelper.TryLoadAssetsFromArtifactAsync(
+                     project, artifact, template).ConfigureAwait(true);
+
+                  if (assets is null || assets.Count == 0) continue;
+
+                  var results = new ResultsLog<List<AssetData>>();
+
+                  item.CurrentArguments = template;
+                  if (template is not null)
+                  {
+                     ProjectContext.SetAssetDataSet(template.AssetDataItems);
+                     ProjectContext.SetProjectAndResetArguments(item);
+                  }
+
+                  AssetData.ReconcileUseCases(assets, template?.UseCases);
+
+                  results.Data = assets;
+                  results.ResultValueObject = assets;
+                  results.Succeeded();
+                  return results;
+               }
+            }
+         }
+
+         return Execute(item);
       }
 
       /// <summary>
