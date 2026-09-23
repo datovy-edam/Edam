@@ -1,6 +1,7 @@
 using Edam.Application;
 using Edam.Data.AssetConsole;
 using Edam.Data.AssetConsole.Services;
+using Edam.Data.AssetManagement.Helpers;
 using Edam.Data.AssetSchema;
 using Edam.Data.Projects.Catalog;
 using Edam.Data.Projects.Contracts;
@@ -84,11 +85,20 @@ namespace Edam.WinUI.Controls.DataModels
          }
          else
          {
-            var root = AppSettings.GetString("AppSettings:AssetConsolePath")
-                       ?? AppSettings.GetString("AssetConsolePath")
-                       ?? AppSettings.GetString("AppSettings:DefaultRootFileFolder");
+            // Mirror the legacy surface exactly (Project.SetDefaultFullPath): an empty
+            // AssetConsolePath is normal in appsettings.json, and then the app-data folder is the
+            // root — resolved absolutely the same way, so the SAME folder is used either way.
+            var root = AppSettings.GetString("AppSettings:AssetConsolePath");
+            if (string.IsNullOrWhiteSpace(root)) root = AppSettings.GetString("AssetConsolePath");
+            if (string.IsNullOrWhiteSpace(root)) root = AppData.GetApplicationDataFolder();
+            if (!string.IsNullOrWhiteSpace(root))
+            {
+               var absolute = ConfigurationHelper.GetAbsoluteAppDataPath(root!);
+               if (!string.IsNullOrWhiteSpace(absolute)) root = absolute;
+            }
+
             config["Edam:Projects:Target"] = "filesystem";
-            config["Edam:Projects:Root"] = root ?? string.Empty;
+            config["Edam:Projects:Root"] = (root ?? string.Empty).Trim();
          }
 
          var services = new ServiceCollection();
