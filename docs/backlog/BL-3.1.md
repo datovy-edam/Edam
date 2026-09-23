@@ -78,3 +78,14 @@ After the SDK was repaired, `Edam.Test.Studio` failed `NETSDK1083` (RID not reco
 
 ### Sequencing note
 BL-4.1 (MEL bridge, DIM, injected ILogger) + BL-4.2 (collision) core is implemented and verified on net10 (see BL-4.1.md). BL-6.1 Aspire was previously offline-blocked; **network + nuget.org are now restored** on this machine, so the Aspire templates/packages may be reachable — re-verify before treating as still blocked.
+
+### Superseded (2026-09-18) — blanket PRI-off removed from the three Studio XAML libraries
+The `AppxGeneratePriEnabled=false` + `AppxGeneratePrisForPortableLibrariesEnabled=false` + `WindowsPackageType=None` workaround (above) was a **bare-`dotnet`** workaround, but it is **incompatible with the MSIX-packaged `Edam.Studio` app**, whose PRI step consumes its referenced libraries' PRIs. Building `Edam.Studio.sln` therefore failed:
+
+```
+WINAPPSDKGENERATEPROJECTPRIFILE : error PRI175: Processing Resources failed
+WINAPPSDKGENERATEPROJECTPRIFILE : error PRI252: File …\Edam.WinUI.Controls.pri not found   (then …\Edam.UI.pri)
+```
+
+**Resolution:** `Edam.WinUI.Controls`, `Edam.UI` and `Edam.UI.DataModel` now generate PRI normally (the three properties removed) — the same configuration the already-working WinUI library `Edam.UI.CatalogExplorer` uses. **Verified (MSBuild/VS path):** `Edam.Studio.sln` builds **0 errors** at `Platform=x64/AnyCPU` and the app output is a correct runnable layout — `Edam.Studio.exe` plus `resources.pri` merged from `Edam.WinUI.Controls.pri`, `Edam.UI.pri` and `Edam.UI.DataModel.pri`. **Not verified here:** the bare-`dotnet` path (this sandbox cannot restore — nuget.org unreachable, and `--no-restore` also aborts on network diagnostics). **`Edam.Test.Studio` keeps PRI-off** (that flag belongs to the test host, and it still builds in the solution). If a bare `dotnet` build of those libraries regresses on a networked machine, the alternative is to make the PRI-off conditional on the build host (`Condition="'$(BuildingInsideVisualStudio)' != 'true'"`) rather than blanket-applying it.
+
