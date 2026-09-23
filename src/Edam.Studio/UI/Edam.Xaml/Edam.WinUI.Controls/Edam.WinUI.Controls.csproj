@@ -69,8 +69,8 @@
       <PackageReference Include="Edam.Data.AssetDb" Version="1.0.0" />
       <PackageReference Include="Edam.Data.AssetMapping" Version="1.0.0" />
       <PackageReference Include="Edam.Data.Assets" Version="1.0.1" />
-      <PackageReference Include="Edam.Data.Dictionary" Version="1.0.0" />
-      <PackageReference Include="Edam.Data.Lexicon" Version="1.0.0" />
+      <PackageReference Include="Edam.Data.Dictionary" Version="1.1.0" />
+      <PackageReference Include="Edam.Data.Lexicon" Version="1.1.0" />
       <PackageReference Include="Edam.Data.Schema" Version="1.0.0" />
       <PackageReference Include="Edam.Data.Templates" Version="1.0.0" />
       <PackageReference Include="Edam.DataObjects" Version="1.0.1" />

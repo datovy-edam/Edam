@@ -87,7 +87,7 @@
 
   <ItemGroup>
     <PackageReference Include="Edam.Application" Version="1.0.0" />
-    <PackageReference Include="Edam.Data.Lexicon" Version="1.0.0" />
+    <PackageReference Include="Edam.Data.Lexicon" Version="1.1.0" />
     <PackageReference Include="Edam.DataObjects" Version="1.0.1" />
     <PackageReference Include="Edam.Language.Python" Version="1.0.0" />
     <PackageReference Include="Edam.Security" Version="1.0.0" />

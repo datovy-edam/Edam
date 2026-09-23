@@ -7,7 +7,7 @@
 | **Type** | Dependency / data |
 | **Priority** | Medium |
 | **Effort** | L |
-| **Status** | **In Progress** — version alignment done 2026-09-18; migrations + feed republish pending |
+| **Status** | **In Progress** — EF 6.0.25 → **9.0.2** aligned, republished (**1.1.0**) and consumed 2026-09-18; runtime validation + migrations pending |
 
 ## Description
 
@@ -36,7 +36,7 @@ Catalog uses EF Core `EnsureCreated()`; versions are skewed (EF Core 6.0.x vs .N
 ## Acceptance criteria
 
 - [x] EF Core version aligned with the .NET 10 target (6.0.25 → 9.0.2) in every EF-referencing project.
-- [ ] **Feed republish required (delivery step — user):** `Edam.Data.Lexicon` / `Edam.Data.Dictionary` still pack as `Version 1.0.0`, so republishing would produce the **same** version and NuGet would keep serving the cached **EF-6-compiled** assemblies. Completion therefore needs a **SemVer bump** (e.g. 1.1.0 — Engineering Standards **E6** package hygiene), consumer reference updates, and a cache clear. Until then the app runs **EF 9 assemblies against EF-6-compiled package code** — the residual risk.
+- [x] **Feed republish done — 2026-09-18:** `Edam.Data.Lexicon` and `Edam.Data.Dictionary` were bumped **1.0.0 → 1.1.0** (SemVer — Engineering Standards **E6**) and republished to `c:\nugetlocalfeed`; the consumers (`Edam.Studio`, `Edam.WinUI.Controls`) reference **1.1.0**, and the app now **resolves Lexicon/Dictionary 1.1.0 with EF Core 9.0.2** (verified: the 1.1.0 nuspecs declare EF 9.0.2, and the restored graph resolves 1.1.0). **The version bump was essential** — both projects pin `<Version>` literally, so republishing at 1.0.0 would have emitted the same version and NuGet would have kept serving the cached **EF-6-compiled** assemblies.
 - [ ] **Runtime validation:** exercise the Lexicon/Dictionary database paths. The packages now compile against 9.0.2, but this environment cannot run them against a live database.
 - [ ] Migrations used instead of `EnsureCreated()`; schema versioned. (The user also **deferred Postgres schema versioning for the Catalog** — revisit alongside that.)
 
