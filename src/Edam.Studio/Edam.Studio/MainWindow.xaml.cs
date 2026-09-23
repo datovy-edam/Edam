@@ -29,9 +29,12 @@ namespace Edam.Studio
    {
       public MainWindow()
       {
+         StartupDiagnostics.Trace("MainWindow ctor: begin");
          this.InitializeComponent();
+         StartupDiagnostics.Trace("MainWindow ctor: InitializeComponent completed");
          Title = "EDAM Studio";
          UIApp.AppSettings.VerifySetConnectionString();
+         StartupDiagnostics.Trace("MainWindow ctor: completed");
       }
 
       private void myButton_Click(object sender, RoutedEventArgs e)

@@ -20,6 +20,7 @@
       <PackageReference Include="Edam.System" Version="1.0.0" />
       <PackageReference Include="Microsoft.WindowsAppSDK" Version="1.6.250205002" />
       <PackageReference Include="Microsoft.Windows.SDK.BuildTools" Version="10.0.26100.1742" />
+      <PackageReference Include="SQLitePCLRaw.lib.e_sqlite3" Version="2.1.12-pre20260709125052" />
   </ItemGroup>
 
   <ItemGroup>

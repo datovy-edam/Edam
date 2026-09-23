@@ -26,6 +26,18 @@
     <PlatformTarget>x64</PlatformTarget>
     <SignAssembly>False</SignAssembly>
   </PropertyGroup>
+
+  <!--
+    Debug runs UNPACKAGED so the built exe can be launched directly from the output folder.
+    A packaged WinUI app needs PACKAGE IDENTITY for WinRT/XAML activation: launching the raw exe
+    outside its package fails in Application.Start with 0x80040154 REGDB_E_CLASSNOTREG
+    ("Class not registered"). With WindowsPackageType=None the Windows App SDK bootstrapper
+    initializes the installed runtime instead, so plain "run the exe" works for development.
+    Release keeps the MSIX packaging/signing configuration used for distribution.
+  -->
+  <PropertyGroup Condition="'$(Configuration)' == 'Debug'">
+    <WindowsPackageType>None</WindowsPackageType>
+  </PropertyGroup>
   <ItemGroup>
     <Compile Remove="BundleArtifacts\**" />
     <EmbeddedResource Remove="BundleArtifacts\**" />
@@ -116,6 +128,10 @@
     <PackageReference Include="System.IdentityModel.Tokens.Jwt" Version="8.19.2" />
     <PackageReference Include="Microsoft.IdentityModel.JsonWebTokens" Version="8.19.2" />
     <Manifest Include="$(ApplicationManifest)" />
+  </ItemGroup>
+
+  <ItemGroup>
+    <PackageReference Include="SQLitePCLRaw.lib.e_sqlite3" Version="2.1.12-pre20260709125052" />
   </ItemGroup>
 
   <!-- 

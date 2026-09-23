@@ -103,6 +103,10 @@
   </ItemGroup>
 
   <ItemGroup>
+    <PackageReference Include="SQLitePCLRaw.lib.e_sqlite3" Version="2.1.12-pre20260709125052" />
+  </ItemGroup>
+
+  <ItemGroup>
     <ProjectReference Include="..\..\Edam.UI.DataModel\Edam.UI.DataModel.csproj" />
     <ProjectReference Include="..\..\Edam.UI\Edam.UI.csproj" />
     <!-- PE-5c: the Studio resolves the project surface from the project platform (contracts + the

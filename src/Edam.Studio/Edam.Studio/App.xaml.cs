@@ -1,4 +1,4 @@
-﻿// Copyright (c) Microsoft Corporation and Contributors.
+// Copyright (c) Microsoft Corporation and Contributors.
 // Licensed under the MIT License.
 
 using Microsoft.UI.Xaml;
@@ -37,7 +37,9 @@ namespace Edam.Studio
       /// </summary>
       public App()
       {
+         StartupDiagnostics.Trace("App ctor: begin");
          this.InitializeComponent();
+         StartupDiagnostics.Trace("App ctor: InitializeComponent completed");
       }
 
       /// <summary>
@@ -46,10 +48,29 @@ namespace Edam.Studio
       /// <param name="args">Details about the launch request and process.</param>
       protected override void OnLaunched(Microsoft.UI.Xaml.LaunchActivatedEventArgs args)
       {
-         ApplicationHelper.InitializeApplication();
-         m_window = new MainWindow();
-         m_window.Activate();
-         ApplicationHelper.InitializeApplication(m_window);
+         try
+         {
+            StartupDiagnostics.Trace("OnLaunched: begin");
+            ApplicationHelper.InitializeApplication();
+            StartupDiagnostics.Trace("OnLaunched: InitializeApplication completed");
+
+            m_window = new MainWindow();
+            StartupDiagnostics.Trace("OnLaunched: MainWindow created");
+
+            m_window.Activate();
+            StartupDiagnostics.Trace("OnLaunched: MainWindow activated");
+
+            ApplicationHelper.InitializeApplication(m_window);
+            StartupDiagnostics.Trace("OnLaunched: completed");
+         }
+         catch (Exception ex)
+         {
+            // Without this a startup failure is silent (the user sees only a crash / exit code, and
+            // the event log names Microsoft.UI.Xaml.dll but not the cause). Record it, then rethrow
+            // so the failure stays visible while debugging.
+            StartupDiagnostics.Report(ex);
+            throw;
+         }
       }
 
       private Window m_window;
