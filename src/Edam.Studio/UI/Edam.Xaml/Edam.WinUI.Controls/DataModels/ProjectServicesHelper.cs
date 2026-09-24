@@ -8,6 +8,7 @@ using Edam.Data.Projects.Contracts;
 using Edam.Data.Projects.DependencyInjection;
 using Edam.Data.Projects.FileSystem;
 using Edam.InOut;
+using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
 using System;
 using System.Collections.Generic;
@@ -47,6 +48,9 @@ namespace Edam.WinUI.Controls.DataModels
       public static IProjectResources Resources => Services.GetRequiredService<IProjectResources>();
       public static IProjectRunner Runner => Services.GetRequiredService<IProjectRunner>();
 
+      /// <summary>Seeding is a capability of its own (LM-5/LM-6): structure stays scaffolding.</summary>
+      public static IProjectSeeder Seeder => Services.GetRequiredService<IProjectSeeder>();
+
       /// <summary>True when the resolved target stores projects on disk (node paths are disk paths).</summary>
       public static bool UsesPhysicalPaths
       {
@@ -73,39 +77,57 @@ namespace Edam.WinUI.Controls.DataModels
       /// <summary>Build the composition root from the application's configuration.</summary>
       private static (IServiceProvider Provider, bool PhysicalPaths) Build()
       {
-         var config = new Dictionary<string, string>(StringComparer.OrdinalIgnoreCase);
+         // LM-6: the Studio reads its configuration through the ONE settings reader (ADR-0011) rather
+         // than poking individual keys, so EDAM_ROOT, bindings and the legacy keys behave identically
+         // here and in any other host.
+         var values = new Dictionary<string, string>(StringComparer.OrdinalIgnoreCase)
+         {
+            [ProjectSettings.TARGET_KEY] = "filesystem",
+         };
 
          var connection = AppSettings.GetConnectionString("catalog");
          if (!string.IsNullOrWhiteSpace(connection))
          {
-            // projects live in the catalog
-            config["Edam:Projects:Target"] = "catalog";
-            config["Edam:Catalog:Target"] = "postgres";
-            config["ConnectionStrings:catalog"] = connection;
+            // projects live in the catalog: the provider family is catalog, and the reader derives the
+            // container's BINDING from the catalog's own keys (LM-4)
+            values[ProjectSettings.TARGET_KEY] = "catalog";
+            values["Edam:Catalog:Target"] = "postgres";
+            values["ConnectionStrings:catalog"] = connection;
          }
          else
          {
-            // Mirror the legacy surface exactly (Project.SetDefaultFullPath): an empty
-            // AssetConsolePath is normal in appsettings.json, and then the app-data folder is the
-            // root — resolved absolutely the same way, so the SAME folder is used either way.
-            var root = AppSettings.GetString("AppSettings:AssetConsolePath");
-            if (string.IsNullOrWhiteSpace(root)) root = AppSettings.GetString("AssetConsolePath");
-            if (string.IsNullOrWhiteSpace(root)) root = AppData.GetApplicationDataFolder();
-            if (!string.IsNullOrWhiteSpace(root))
-            {
-               var absolute = ConfigurationHelper.GetAbsoluteAppDataPath(root!);
-               if (!string.IsNullOrWhiteSpace(absolute)) root = absolute;
-            }
+            // hand the reader the legacy spelling; it translates (and reports) it
+            var consolePath = AppSettings.GetString(ProjectSettings.LEGACY_CONSOLE_PATH_KEY)
+                              ?? AppSettings.GetString(ProjectSettings.LEGACY_SETTINGS_CONSOLE_PATH_KEY);
+            if (!string.IsNullOrWhiteSpace(consolePath))
+               values[ProjectSettings.LEGACY_CONSOLE_PATH_KEY] = consolePath!;
+         }
 
-            config["Edam:Projects:Target"] = "filesystem";
-            config["Edam:Projects:Root"] = (root ?? string.Empty).Trim();
+         var bootstrap = new ConfigurationBuilder().AddInMemoryCollection(values).Build();
+         var settings = ProjectSettings.Read(bootstrap);
+
+         // the Studio's own host policy: with nothing configured (and no EDAM_ROOT), its app-data
+         // folder is the root — resolved the same way the legacy surface resolved it.
+         if (!settings.HasRoot &&
+             !string.Equals(settings.Target, "catalog", StringComparison.OrdinalIgnoreCase))
+         {
+            var fallback = AppData.GetApplicationDataFolder();
+            if (!string.IsNullOrWhiteSpace(fallback))
+            {
+               var absolute = ConfigurationHelper.GetAbsoluteAppDataPath(fallback);
+               values[ProjectSettings.ROOT_KEY] =
+                  (string.IsNullOrWhiteSpace(absolute) ? fallback : absolute).Trim();
+            }
+         }
+         else if (settings.HasRoot)
+         {
+            values[ProjectSettings.ROOT_KEY] = settings.Root!;
          }
 
          var services = new ServiceCollection();
-         services.AddProjectServices(config);
+         services.AddProjectServices(values);
 
-         var physical = !string.Equals(config["Edam:Projects:Target"], "catalog",
-            StringComparison.OrdinalIgnoreCase);
+         var physical = !string.Equals(settings.Target, "catalog", StringComparison.OrdinalIgnoreCase);
          return (services.BuildServiceProvider(), physical);
       }
 
@@ -170,6 +192,45 @@ namespace Edam.WinUI.Controls.DataModels
          return await Store.CreateAsync(collection.CollectionId, name, description, ct)
             .ConfigureAwait(false);
       }
+
+      /// <summary>
+      /// <b>LM-6:</b> seed a new project's <c>Arguments</c> folder from the configured arguments
+      /// template — the behaviour the legacy <c>Project.CreateProject</c> had, now expressed as
+      /// <i>read an address, write an address</i>. Best effort: a missing template just means no
+      /// starter file (it never fails project creation).
+      /// </summary>
+      public static async Task<ProjectPath?> SeedArgumentsAsync(
+         ProjectInfo project, CancellationToken ct = default)
+      {
+         if (project is null) return null;
+
+         try
+         {
+            // the legacy setting names the template (e.g. "Templates/ToAssets.Args.json")
+            var configured = AppSettings.GetString(ArgumentsTemplateKey);
+            var fileName = string.IsNullOrWhiteSpace(configured)
+               ? "ToAssets.Args.json"
+               : Path.GetFileName(configured!);
+
+            var scope = new CatalogAddress(project.CollectionId, project.Path);
+            if (!ProjectLocations.TryResolve(
+                   ProjectLocations.AppScheme + ":" + ProjectLocations.Templates + "/" + fileName,
+                   scope, out var template, out _))
+            {
+               return null;
+            }
+
+            return await Seeder.SeedArgumentsAsync(project, template, ct: ct).ConfigureAwait(true);
+         }
+         catch (Exception)
+         {
+            // seeding is best effort: a host without a template still creates projects
+            return null;
+         }
+      }
+
+      /// <summary>The legacy key naming the arguments template (ADR-0011's compatibility reader reports it).</summary>
+      public const string ArgumentsTemplateKey = "AppSettings:AssetArgumentsTemplatePath";
 
       private static async Task<ProjectCollectionInfo?> ResolveCollectionAsync(
          string? collectionUri, CancellationToken ct)

@@ -674,6 +674,10 @@ namespace Edam.WinUI.Controls.ViewModels
                var created = await ProjectServicesHelper.CreateProjectAsync(
                   collectionUri, pname.ValueText, pdesc.ValueText);
 
+               // LM-6: scaffolding is structure-only, so seed the starter arguments template from an
+               // address — restoring what the legacy Project.CreateProject did (best effort).
+               await ProjectServicesHelper.SeedArgumentsAsync(created);
+
                var ffinfo = await ProjectServicesHelper.GetProjectTreeAsync(created, collectionUri);
                var tItem = ProjectDataModel.ToObservable(ffinfo);
                if (tItem != null && TreeView != null)

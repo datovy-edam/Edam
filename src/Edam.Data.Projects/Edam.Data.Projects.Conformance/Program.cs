@@ -250,6 +250,9 @@ try
    // ---- 10d. seeding: structure then content from an address (LM-5, ADR-0011) ----------------
    all["seeding"] = await SeedingScenario.RunAsync(Path.Combine(temp, "seeding"));
 
+   // ---- 10e. the consumer story from configuration only (LM-6, ADR-0011) ---------------------
+   all["host (LM-6)"] = await HostScenario.RunAsync(Path.Combine(temp, "host"));
+
    // ---- 11. a REAL end-to-end process attempt (PE-5c) — INFORMATIONAL ------------------------
    //      Reports what the legacy pipeline actually does; deliberately not a pass/fail, so the
    //      remaining gap (the console needs real project data to yield assets) stays visible.
