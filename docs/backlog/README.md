@@ -28,6 +28,7 @@
 | **Area W1** | `BL-6.x` | **Wave 1** — move EDAM legacy resources into the distributed platform (Aspire; observability first-class; UI not in scope) |
 | **Area W1.1** | `BL-7.x` | **Wave 1.1** — catalog decoupling: UI/EF-independent `Edam.Data.Catalog` platform |
 | **Area PE** | `PE-x` | **Projects Enhancements** — EDAM Projects in the **Catalog** instead of a file system; interface-bound and replaceable (ADR-0009) |
+| **Area LM** | `LM-x` | **Location Model** — the Catalog as the **single place locations are stated**: container + URI addressing, bindings separate from locations (ADR-0011; builds on ADR-0010) |
 
 ## Backlog index
 
@@ -82,7 +83,7 @@
 | [BL-4.4](BL-4.4.md) | Codebase semantic index + AI coder-compliance telemetry (i1 #2) | Capability / infrastructure | Medium | L | New | Parked (needs D2/D4 — AI framework + vector/embedding) |
 | [BL-4.5](BL-4.5.md) | Secrets & configuration management (i1 #3) | Infrastructure / security | **High** | M | New | **Ready** |
 | [BL-4.6](BL-4.6.md) | Identity & access infrastructure — OAuth2/OIDC (i1 #4) | Infrastructure / security | **High** | M | New | Parked (needs D1 — web shell + IdP) |
-| [BL-4.7](BL-4.7.md) | CI/CD + deployment + containerization (i1 #5) | Infrastructure | Medium | L | New | **Ready** *(foundation CI)* |
+| [BL-4.7](BL-4.7.md) | CI/CD + deployment + containerization (i1 #5) | Infrastructure | Medium | L | In Progress — desktop MSIX packaging and package-local app-data seeding fixed; CI/services/Aspire pending | **Ready** *(foundation CI)* |
 | [BL-4.8](BL-4.8.md) | Security tooling in-stack — SAST / dependency vuln / SBOM (i1 #6) | Security / tooling | Medium | M | New | **Ready** |
 | [BL-4.9](BL-4.9.md) | Crash/telemetry + backup/DR for stores (i1 #7) | Reliability / ops | Medium | M | New | Parked (needs BL-4.1 + D3 persistence) |
 | [BL-4.10](BL-4.10.md) | Import / connector layer (i1 #8) | Feature / capability | Medium | L | New | **Ready** |
@@ -143,6 +144,22 @@
 
 > **Overview + decisions:** `Projects-Enhancements.md` (**ADR-0009**). Model agreed: **Collection = container, Project = branch**, artifacts = items + content in the Catalog; filesystem kept as a registered provider during the transition.
 
+### Area LM — Location Model (the Catalog as the single place locations are stated)
+
+| ID | Title | Type | Priority | Effort | Status |
+|---|---|---|---|---|---|
+| LM-0 | Settings/seed debt cleanup: sanitize the seed source (machine paths + connection string), fix `ConsolePath`, **re-wire the packaged seed** (`ApplicationData\**` no longer exists), collapse the 13 duplicated copies — data/build only | Cleanup / hygiene | **High** | S | **Ready** — do alongside LM-1 |
+| LM-1 | **The address core**: `container + path` value type, well-known locations, alias expansion, relative resolution against a referring address | Architecture / contracts | **High** | M | **Ready — start here** |
+| LM-2 | Container-scoped content keys (`(container, path)`), drop the `/<collectionId>/` path prefix | Provider / migration | Medium | L | Planned (after LM-1) |
+| LM-3 | Settings schema (`collections[]`, aliases, `secrets{}`) + **compatibility reader** for every legacy key | Configuration | **High** | M | Planned |
+| LM-4 | Bindings: one statement per container (config/env/DI), credentials as vault references, documented precedence | Configuration / security | **High** | M | Planned |
+| LM-5 | Seed `app-data` into a container; app-level locations (`Templates`/`TextMaps`/`Samples`) as catalog items | Capability | Medium | M | Planned |
+| LM-6 | Consumer migration (AppSettings/ConfigurationHelper/AppData, Studio bridge, args resolution, deprecated `Project` surface) | Refactor | Medium | L | Planned |
+| LM-7 | Delete legacy keys + duplicated settings copies + the helpers that existed only for them | Cleanup | Medium | M | Planned |
+
+> **Plan + model:** `Location-Model.md` (**ADR-0011**, building on **ADR-0010**) — address = `catalog://<container>/<path>`; locations stated **once per container**; sub-paths **computed**; bindings separate; relative refs resolve against the **referring artifact's address**; physical paths only in the materialized working folder. **Start at LM-1** (additive, headlessly verifiable) with **LM-0** (data/build only).
+
+
 ## Suggested sequencing
 
 > **Area 1 is now a verification effort** — the features are implemented; the work is to test them. BL-1.2 (naming) is deferred as secondary.
@@ -152,6 +169,7 @@
 - **Wave 1 (current initiative):** `Wave-1-Migration.md` → **BL-6.1** (Aspire baseline) → **BL-6.2** (onboard resources) → **BL-6.3/BL-6.7** (shells + diagnostics) → **BL-6.4** (services health) → **BL-6.6** (persistence). **BL-6.5 (Python) dropped** — functionality via MCP (parked, MAF later; ADR-0004/0005). *UI not in scope.*
 - **Wave 1.1 (catalog decoupling — next, de-risked):** `Wave-1.1-Catalog-Decoupling.md` → **1 Relocate**: **BL-7.1** (move real projects as-is) → **2 Prove**: **BL-7.5** (working end-to-end slice, FileSystem first) → **3 Extract**: **BL-7.3** (derive contracts from relocated types) → **4 Abstract**: **BL-7.2** (EF-independence + PostgreSQL) → **5 Seam**: **BL-7.4** (DI + per-**Container** resolution). Azure/blob → **Wave 2**.
 - **Projects Enhancements (PE — current):** `Projects-Enhancements.md` (ADR-0009) → **PE-0…PE-4 DONE** (scope/inventory, contracts, file-system providers, Catalog-backed providers, **DI composition root — 8 conformance targets ALL CONFORM**) → **PE-5** consumers + `IProjectRunner` + retire the statics (pipeline, then Studio UI). Depends on Wave 1.1 (done).
+- **Location Model (LM — next):** `Location-Model.md` (ADR-0010) → **LM-0 + LM-1 first** (settings debt cleanup + the address core, additively and headlessly verifiable) → LM-3/LM-4 (one settings schema + bindings) → LM-5 (seed `app-data`) → LM-2 (container-scoped content keys) → LM-6/LM-7 (consumer migration + delete the legacy keys). Depends on ADR-0009 / Area PE (done).
 - **Phase 0 (platform runtime — ASAP):** **BL-3.1** — upgrade to .NET 10 (current LTS), moving off .NET 9 (STS end-of-support).
 - **Phase 1 (unblock build):** BL-1.1
 - **Phase 2 (test foundation):** BL-1.13 (test project + fixtures), BL-1.3 (workflow → test scenarios)
