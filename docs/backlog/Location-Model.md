@@ -15,8 +15,10 @@
 - **Relative references resolve against the referring artifact's address** — `./Archive/x.xsd` in `…/Projects/<name>/Arguments/x.Args.json` means the same container's `…/Projects/<name>/Archive/x.xsd`. `*.Args.json` shape unchanged (ADR-0009).
 - **Physical paths are ephemeral:** they exist only in the runner's materialized working folder (PE-5a/5b).
 - **Secrets are references** (`vault://…`), never values in files.
+- **The Catalog is artifact-agnostic** — it stores *any* artifact, not only projects. The layers are: **generic** (container + path + content) ← **project** (`Projects/<name>/{8 folders}`, `*.Args.json`) ← **app conveniences** (`project:documents`, `app:templates`). `Projects` is **one location family, not a privileged root**, and a new artifact kind needs **no new configuration keys** — only a path in a container.
+- **Scaffolding is structure; seeding is content** — the platform creates *locations* (the project branch + its standard folders); starter artifacts are seeded **through addresses** (a template in `Templates/` is read and written into the new project's `Arguments/`), never via an app-settings path or the CWD.
 
-## Well-known locations (the frequently-referenced ones)
+## Frequently-referenced locations (an alias set — not a closed taxonomy)
 
 | Alias | Path within the container | Purpose |
 |---|---|---|
@@ -35,28 +37,66 @@
 
 The right-hand column is the *only* thing that varies; everything else is derived from the container.
 
+> These names exist because they are **referenced often** — they are conveniences, not the model. Any artifact may live at any path in any container (dictionaries, vocabularies, schemas, reports, arbitrary files), and `Projects` is simply one location family among them. Adding a family must require **no new configuration key**.
+>
+> **Scaffolder behaviour to preserve (see LM-5):** `Edam.Data.AssetProject.Project.CreateProject` is the scaffolder of record — it created **7** folders (no `TextMaps`) and **seeded the arguments template** as `<project>.<template>`. The platform scaffolders create **8** folders (`ProjectFolders.All`) idempotently but **do not seed**; the folder set and idempotency are improvements, the lost seeding is a regression to fix deliberately (by the consumer, through addresses).
+
 ## Steps
 
 | Step | What | Acceptance | Verification | Risk |
 |---|---|---|---|---|
 | **LM-0** *(safe, do first)* | **Settings debt cleanup — data only, no schema change:** (a) sanitize the **seed source** `app-data/Edam.Settings.json` — it still carries two machine-specific absolute paths (`C:\prjs\Datovy.Edam/…`, `C:\Users\esobr\Documents/…`) and a committed connection string, contrary to **ADR-0010**'s own rule; (b) fix `App.ConsolePath` (names `app-data/Edam.Studio/Edam.App.Data/`; the real folder is `app-data/Edam.App.Data/`, and the separators are mixed); (c) **re-wire the packaged seed** — `Edam.Studio.csproj` includes `ApplicationData\**` but that folder no longer exists and nothing includes `app-data/`, so a clean build packages **no seed**; (d) collapse the 13 duplicated location keys in `appsettings.json` | no absolute machine path and no secret in any committed settings file; a **clean** build packages the seed; the settings agree with the repo layout | grep + a settings-vs-folders check + a clean-build check of the packaged seed | **none** (data/build wiring only) — and it must not be mistaken for the fix |
 | **LM-1** *(start here)* | **The address core:** a value type for `container + path` with parse/format/validate/normalise; the well-known-location table; alias expansion; relative resolution **against a referring address**. No consumer changes, no storage changes | addresses round-trip; `./Archive/x.xsd` resolved against a referring address stays in the same container; invalid input (drive path, `..` escaping the container, unknown alias) is rejected with a clear message | **headless conformance** — extend `Edam.Data.Projects.Conformance` with an `address` group | **none** — purely additive |
-| **LM-2** | **Container-scoped content keys:** make `IContentStore`/`IProjectResources` keys `(container, path)`; drop the `/<collectionId>/` path prefix convention | two containers may hold identical paths (the PE-3 collision becomes structurally impossible) and existing single-container content still resolves | conformance with two containers sharing paths (file-system + Postgres) | **medium-high** — provider change with migration implications; needs a documented compat rule |
+| **LM-2** | **Container-scoped artifact addressing:** the container must be part of the address/key for **items *and* content** `(container, path)`; drop the `/<collectionId>/` path-prefix convention | two containers may hold identical paths — for **any** artifact, not just projects — and existing single-container content still resolves | conformance with two containers sharing paths (file-system + Postgres) | **medium-high** — provider change with migration implications; needs a documented compat rule |
 | **LM-3** | **Settings schema + compatibility reader:** one `collections[]` registry (+ optional `locations{}` aliases, `secrets{}` references); a reader translating every legacy key — `AssetConsolePath`/`ConsolePath` → the default container's binding, `AssetProjectsPath` → the `Projects/` segment, `DefaultTextMapFolder` → `app:textMaps`, `DefaultInPath`/`OutPath` → `project:files`/`project:documents`, `UriList[]` → `collections[]` | legacy settings load unchanged; new settings load; the resolved table is logged once | conformance + a legacy/new settings fixture pair resolving to identical addresses | low-medium |
 | **LM-4** | **Bindings:** one statement per container (config / environment / DI), credentials as vault references; document precedence (defaults → user file → environment → command line) and the `EDAM_ROOT` / `EDAM_COLLECTION_<id>__ROOT` overrides | no storage location in project settings; switching a container from file-system to Postgres/service changes **only** the binding | **the payoff test:** the same settings file drives both targets in conformance | low-medium |
-| **LM-5** | **Seed `app-data` into a container; app-level locations as items:** repo `app-data/` = seed/import source; `Templates`/`TextMaps`/`Samples` become catalog items (self-hosting), with a file-system-backed container for development | dev and production differ only by binding; the repo folder is never itself a configured location | import/export conformance (exists) + a dev binding | low |
+| **LM-5** | **Seed `app-data` into a container; app-level locations as items; reconcile the scaffolder:** `Templates`/`TextMaps`/`Samples` (and any other family) become catalog artifacts, with a file-system-backed container for development; **restore template seeding through addresses** (`Templates/<template>` → `Projects/<name>/Arguments/<name>.<template>`) and keep the platform scaffolder structure-only | dev and production differ only by binding; the repo folder is never itself a configured location; creating a project yields a **seeded** `Arguments/` folder again, without app-settings or CWD | import/export conformance (exists) + a dev binding + a scaffolding check (folders + seeded template) | low |
 | **LM-6** | **Consumer migration:** `AppSettings`/`ConfigurationHelper`/`AppData` path helpers, the Studio bridge (`ProjectServicesHelper`), args resolution and the deprecated static `Project` surface move to the resolver; legacy keys warn | no consumer resolves a path itself; `Directory.SetCurrentDirectory` unused; the PE-5d `CS0618` set shrinks | builds + conformance + Studio (runtime, user) | medium |
 | **LM-7** | **Delete the legacy keys + the duplicated settings copies**, and the helpers that existed only for them; republish affected feed packages if the settings/`[Obsolete]` surface changed | one settings file for locations; grep proves no legacy key remains | builds + conformance | low |
 
-## Where to start (recommendation)
+## LM-2 in detail — where does the container live?
 
-**LM-1, with LM-0 alongside.**
+The container is currently absent from **four** layers, so nothing but a calling convention stops two containers from holding the same path — for *any* artifact, not just projects:
 
-- **LM-1 is additive** — nothing consumes it yet, so it cannot regress anything, and it is the one step that is **fully verifiable headlessly** (a real ceiling in this environment: `Edam.Data.Projects.Conformance` already runs 9 targets + adapter checks). Everything else depends on the address type existing.
-- **LM-0 is data-only** — it stops the immediate bleeding (a stale path, two machine paths, a committed connection string, 13 divergent copies) with no design risk. It is *not* the fix, and should not be presented as one.
-- **LM-2 should wait for LM-1.** It is the only step with provider/migration risk, and doing it first would mean designing content keys before the address exists.
+| Layer | Evidence | Effect |
+|---|---|---|
+| Content contract | `IContentStore` → `OpenReadAsync(string resourcePath)` (+ `Write`/`Delete`/`Exists`) | cannot name a container |
+| Content schema | `PostgreSqlContentStore`: `edam_content(resource_path text PRIMARY KEY, body bytea)` | the path alone is the key |
+| Content instance | `FileSystemContentStore(rootPath)` → `<root>/content/…`, registered once | containers sharing the store share the namespace |
+| Item **reads** + wire | `ICatalogItem.GetItemByPath(path)` ignores the container (stated in `CatalogProjectSupport`); `CatalogHttpContent` sends only `TAG_RESOURCE_PATH` | the same hole locally *and* remotely |
 
-Suggested order: **LM-0 + LM-1 → LM-3 → LM-4 → LM-5 → LM-2 → LM-6 → LM-7**. (LM-3/4 give the "single place" outcome early; LM-2 can land when the address shape has proven itself, before consumers move in LM-6.)
+Writes are already container-aware (`CreateBranchAsync(path, name, containerId)`) — **reads and keys are not**. The `/<collectionId>/Projects/…` convention (`CatalogProjectSupport.ProjectsRoot`) exists purely to paper over this, and it conflates two jobs in one string: the artifact's **location** and its **storage key**.
+
+| Option | Shape | Cost | Benefit |
+|---|---|---|---|
+| **2a** container in the contract | `(containerId, path)` on content + container-aware item reads; Postgres composite key; wire carries the container | breaking change across 3 content impls + item reads + REST wire + the project providers; **plus** content migration | impossible to get wrong; paths container-independent |
+| **2b** container-bound instances *(lean)* | one provider per container (BL-7.4's per-Container resolution); file-system already takes a root; Postgres instance carries its container id and the schema gains the dimension | same schema/wire work as 2a, **no API break**; wrong-instance risk (mitigated by resolving through the per-container factory) | keeps `IContentStore`/`ICatalogItem` pure (ADR-0006); the container is a *composition* fact |
+| **2c** status quo | container embedded in the path by convention | paths are not locations; the same artifact has different paths per container; every consumer must know the convention | none — cannot satisfy ADR-0011 |
+
+**Migration stance (choose when LM-2 starts):** existing content is conformance/test data plus any imports (real projects are still on disk), stored under prefixed paths — so re-keying is mechanical. Options: scripted re-key, dual-read compat during transition, or declare it disposable and reset. Adding the container dimension to `edam_content` is a **real schema change**, the natural moment to introduce the migrations deferred in BL-5.5.
+
+## How to start (concrete)
+
+**Order: LM-0 (data/build) + LM-1 (address core) in parallel. Do *not* start with LM-2** — it is the only step with provider/migration risk, and it needs the address shape to exist first.
+
+### LM-0 — stop the bleeding (data and build wiring only)
+1. **Sanitize the seed source** `app-data/Edam.Settings.json`: remove `C:\prjs\Datovy.Edam/…` and `C:\Users\esobr\Documents/…`, drop `DataSource.DefaultConnectionString`, and fix `App.ConsolePath` (the real folder is `app-data/Edam.App.Data/`; today it also mixes separators and names a folder that does not exist). ADR-0010 already requires the shipped seed to be free of machine paths and secrets.
+2. **Re-wire the packaged seed.** `Edam.Studio.csproj` includes `<Content Include="ApplicationData\**">`, but that folder no longer exists and nothing includes `app-data/` — so a clean build packages **no seed**. Point the include at the real source with the `ApplicationData/Edam.Studio/Edam.App.Data/**` layout, or restore the folder. *Acceptance: a clean build packages the seed.*
+3. **Collapse the duplicated location keys** across the ~13 `appsettings.json` copies into one default set (or a shared defaults file), after step 2 so there is one obvious source.
+4. **Verify:** no drive-letter path or connection string in any committed settings file; build; inspect the packaged `ApplicationData/…/Edam.Settings.json`.
+
+### LM-1 — the address core (the first code)
+All additive — nothing consumes it yet, so it cannot regress anything.
+1. **`CatalogAddress`** in `Edam.Data.Projects.Contracts` (dependency-free, like the rest of the contracts): `Container` + `Path`; `Parse`/`TryParse`; `ToString()` → **`catalog://<container>/<path>`**; `IsRoot`/`Parent`/`Combine`; `RelativeTo` (sibling-relative resolution used by `./Archive/x.xsd`); normalisation and validation (a `..` may not escape the container; a drive path is rejected).
+2. **The location table** — `ProjectFolders` already carries the 8 project names; add the app-level names — plus `Locations.Resolve(alias, project)` for `project:`/`app:` sugar.
+3. **Verify** by extending `Edam.Data.Projects.Conformance` with an `address` group: round-trip; `./Archive/x.xsd` against a referring address stays in the **same container**; rejection of `C:\…`, of `/../..`, and of an unknown alias. Run it exactly like the existing suite (VS MSBuild build, then the conformance exe).
+   *Acceptance:* the report shows `address: ALL CONFORM (n checks)` beside the existing targets.
+
+**What is needed from you:** nothing to start LM-1 (the scheme is settled as `catalog://`). The five open decisions are needed by **LM-3**, except the **2a/2b** choice, which LM-2 needs.
+
+**What cannot be verified in this environment:** WinUI/runtime behaviour and anything needing a deploy — those remain user-side, as with PE-5c.
+
+Suggested order overall: **LM-0 + LM-1 → LM-3 → LM-4 → LM-5 → LM-2 → LM-6 → LM-7** (LM-3/4 deliver the "single place" outcome early; LM-2 lands once the address shape has proven itself, before consumers move in LM-6).
 
 ## Open decisions (needed by LM-3 — not by LM-1)
 
