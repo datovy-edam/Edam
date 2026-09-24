@@ -21,6 +21,10 @@ public sealed class InMemoryCatalogStore : ICatalogStore
     private readonly ConcurrentDictionary<string, Guid> _containerByName = new();
     private readonly ConcurrentDictionary<string, Guid> _itemByPath = new();
 
+    /// <summary>LM-2a: item index key — <b>container + path</b>, so two containers may share a path.</summary>
+    private static string ItemKey(Guid containerId, string? path)
+        => containerId.ToString("N") + "|" + (path ?? string.Empty);
+
     public string DescribeStore() => "in-memory";
 
     public Task<ContainerInfo?> GetContainerAsync(string? containerId, bool checkId = true, CancellationToken ct = default)
@@ -77,7 +81,9 @@ public sealed class InMemoryCatalogStore : ICatalogStore
     public async Task<ItemInfo?> GetItemByPathAsync(string path, CancellationToken ct = default)
     {
         await Task.Yield();
-        return _itemByPath.TryGetValue(path, out var id) && _items.TryGetValue(id, out var i) ? i : null;
+        // LM-2a: legacy container-blind lookup (ambiguous once two containers share a path)
+        return _items.Values.FirstOrDefault(i =>
+            string.Equals(i.FullPath, path ?? string.Empty, StringComparison.OrdinalIgnoreCase));
     }
 
     public ItemInfo? GetItemByPath(string name) => GetItemByPathAsync(name).Result;
@@ -111,7 +117,7 @@ public sealed class InMemoryCatalogStore : ICatalogStore
     {
         await Task.Yield();
         _items[item.Id] = item;
-        _itemByPath[item.FullPath] = item.Id;
+        _itemByPath[ItemKey(item.ContainerId, item.FullPath)] = item.Id;
         return item;
     }
 
@@ -119,7 +125,11 @@ public sealed class InMemoryCatalogStore : ICatalogStore
 
     public Task<ItemInfo> CreateBranchAsync(string path, string? description = null, Guid? containerId = null, CancellationToken ct = default)
     {
-        var existing = GetItemByPath(path);
+        // LM-2a: match INSIDE the container — never return another container's branch for this path
+        var existing = containerId is null
+            ? GetItemByPath(path)
+            : (_itemByPath.TryGetValue(ItemKey(containerId.Value, path), out var id) &&
+               _items.TryGetValue(id, out var found) ? found : null);
         if (existing is not null) return Task.FromResult(existing);
         var name = System.IO.Path.GetFileName(path.TrimEnd('/'));
         var item = new ItemInfo(Guid.NewGuid(), containerId ?? Guid.Empty, path, string.IsNullOrEmpty(name) ? path : name, description, ItemType.Branch, DateTimeOffset.UtcNow, DateTimeOffset.UtcNow);
@@ -134,7 +144,7 @@ public sealed class InMemoryCatalogStore : ICatalogStore
     {
         await Task.Yield();
         var removed = _items.TryRemove(itemId, out var it);
-        if (removed) { _itemByPath.TryRemove(it.FullPath, out _); return true; }
+        if (removed) { _itemByPath.TryRemove(ItemKey(it.ContainerId, it.FullPath), out _); return true; }
         return false;
     }
 

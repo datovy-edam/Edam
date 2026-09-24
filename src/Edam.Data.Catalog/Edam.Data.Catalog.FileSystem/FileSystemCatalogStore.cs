@@ -17,6 +17,7 @@ public sealed class FileSystemCatalogStore : ICatalogStore
    private readonly object _lock = new();
 
    private readonly Dictionary<string, ContainerInfo> _containers = new();
+   // LM-2a: keyed by container + path (see ItemKey) — two containers may hold the same path.
    private readonly Dictionary<string, ItemInfo> _itemsByPath = new();
    private readonly Dictionary<Guid, ItemInfo> _itemsById = new();
    private readonly Dictionary<Guid, ItemDataInfo> _itemData = new();
@@ -71,7 +72,7 @@ public sealed class FileSystemCatalogStore : ICatalogStore
          {
             var item = ToItem(i);
             _itemsById[item.Id] = item;
-            _itemsByPath[item.FullPath] = item;
+            _itemsByPath[ItemKey(item.ContainerId, item.FullPath)] = item;
          }
          foreach (var d in state.ItemData)
          {
@@ -145,8 +146,23 @@ public sealed class FileSystemCatalogStore : ICatalogStore
    public Task<ItemInfo?> GetItemByPathAsync(string path, CancellationToken ct = default)
       => Task.FromResult(GetItemByPath(path));
 
+   /// <summary>
+   /// Legacy, <b>container-blind</b> lookup (LM-2a): the first item with that path in <b>any</b>
+   /// container. It is ambiguous as soon as two containers hold the same path — the container-scoped
+   /// lookup used by <see cref="CreateBranchAsync(string, string?, Guid?, CancellationToken)"/> is the
+   /// correct one.
+   /// </summary>
    public ItemInfo? GetItemByPath(string name)
-      => _itemsByPath.TryGetValue(name ?? string.Empty, out var i) ? i : null;
+      => _itemsById.Values.FirstOrDefault(i =>
+            string.Equals(i.FullPath, name ?? string.Empty, StringComparison.OrdinalIgnoreCase));
+
+   /// <summary>LM-2a: the item index key — <b>container + path</b>, so two containers may share a path.</summary>
+   private static string ItemKey(Guid containerId, string? path)
+      => containerId.ToString("N") + "|" + (path ?? string.Empty);
+
+   /// <summary>Find an item <b>inside</b> a container — never another container's.</summary>
+   private ItemInfo? FindItem(Guid containerId, string? path)
+      => _itemsByPath.TryGetValue(ItemKey(containerId, path), out var item) ? item : null;
 
    public Task<IReadOnlyList<ItemInfo>> GetContainerItemsAsync(Guid containerId, CancellationToken ct = default)
       => Task.FromResult<IReadOnlyList<ItemInfo>>(_itemsById.Values.Where(i => i.ContainerId == containerId).OrderBy(i => i.FullPath).ToList());
@@ -176,7 +192,7 @@ public sealed class FileSystemCatalogStore : ICatalogStore
    public async Task<ItemInfo> AddItemAsync(ItemInfo item, CancellationToken ct = default)
    {
       _itemsById[item.Id] = item;
-      _itemsByPath[item.FullPath] = item;
+      _itemsByPath[ItemKey(item.ContainerId, item.FullPath)] = item;
       Save();
       return item;
    }
@@ -185,7 +201,11 @@ public sealed class FileSystemCatalogStore : ICatalogStore
 
    public Task<ItemInfo> CreateBranchAsync(string path, string? description = null, Guid? containerId = null, CancellationToken ct = default)
    {
-      var existing = GetItemByPath(path);
+      // LM-2a: an existing branch is matched INSIDE the given container — a path that exists in
+      // another container must not satisfy this one (that was the PE-3 cross-container defect).
+      var existing = containerId is null
+         ? GetItemByPath(path)
+         : FindItem(containerId.Value, path);
       if (existing is not null) return Task.FromResult(existing);
       var name = Path.GetFileName(path.TrimEnd('/'));
       var item = new ItemInfo(Guid.NewGuid(), containerId ?? Guid.Empty, path, string.IsNullOrEmpty(name) ? path : name, description, ItemType.Branch, DateTimeOffset.UtcNow, DateTimeOffset.UtcNow);
@@ -202,7 +222,7 @@ public sealed class FileSystemCatalogStore : ICatalogStore
    {
       if (!_itemsById.TryGetValue(itemId, out var it)) return false;
       _itemsById.Remove(itemId);
-      _itemsByPath.Remove(it.FullPath);
+      _itemsByPath.Remove(ItemKey(it.ContainerId, it.FullPath));
       Save();
       return true;
    }

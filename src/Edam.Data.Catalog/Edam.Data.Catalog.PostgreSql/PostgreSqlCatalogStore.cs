@@ -207,6 +207,28 @@ public sealed class PostgreSqlCatalogStore : ICatalogStore
 
     public ItemInfo? GetItemByPath(string name) => GetItemByPathAsync(name).GetAwaiter().GetResult();
 
+    /// <summary>
+    /// LM-2a: the <b>container-scoped</b> lookup — the correct way to ask "does <i>this</i> container
+    /// have that path?".
+    /// <para>
+    /// <b>Known limitation (LM-2b, deferred):</b> the table's primary key is still global
+    /// (<c>resource_path</c>), so two containers cannot yet <i>hold</i> the same path in PostgreSQL —
+    /// that needs a composite key (<c>container_id, resource_path</c>) and a migration, and is deferred
+    /// until the database can be exercised. The scoped lookup already prevents one container from being
+    /// satisfied by another container's item.
+    /// </para>
+    /// </summary>
+    private async Task<ItemInfo?> FindItemAsync(Guid containerId, string path, CancellationToken ct)
+    {
+        using var conn = await OpenAsync(ct);
+        using var cmd = conn.CreateCommand();
+        cmd.CommandText = ItemSelect + " WHERE container_id = @c AND full_path = @p LIMIT 1";
+        cmd.Parameters.AddWithValue("c", containerId);
+        cmd.Parameters.AddWithValue("p", path);
+        using var r = await cmd.ExecuteReaderAsync(ct);
+        return await r.ReadAsync(ct) ? ReadItem(r) : null;
+    }
+
     public async Task<IReadOnlyList<ItemInfo>> GetContainerItemsAsync(Guid containerId, CancellationToken ct = default)
     {
         using var conn = await OpenAsync(ct);
@@ -270,7 +292,11 @@ public sealed class PostgreSqlCatalogStore : ICatalogStore
     public async Task<ItemInfo> CreateBranchAsync(string path, string? description = null, Guid? containerId = null, CancellationToken ct = default)
     {
         var cid = containerId ?? Guid.Empty;
-        var existing = await GetItemByPathAsync(path, ct);
+        // LM-2a: match INSIDE the container — a path that exists in another container must not
+        // satisfy this one (the PE-3 cross-container defect).
+        var existing = containerId is null
+            ? await GetItemByPathAsync(path, ct)
+            : await FindItemAsync(cid, path, ct);
         if (existing is not null) return existing;
         var name = System.IO.Path.GetFileName(path.TrimEnd('/'));
         var item = new ItemInfo(Guid.NewGuid(), cid, path, string.IsNullOrEmpty(name) ? path : name, description, ItemType.Branch, DateTimeOffset.UtcNow, DateTimeOffset.UtcNow);
