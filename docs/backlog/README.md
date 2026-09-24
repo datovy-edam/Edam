@@ -148,10 +148,10 @@
 
 | ID | Title | Type | Priority | Effort | Status |
 |---|---|---|---|---|---|
-| LM-0 | Settings/seed debt cleanup: sanitize the seed source ✅, **re-wire the packaged seed** (`ApplicationData\**` no longer exists) ⏳, collapse the 13 duplicated copies ⏳ — data/build only | Cleanup / hygiene | **High** | S | **In Progress** — seed source sanitized 2026-09-24; wiring pending on the in-flight `app-data` move |
+| LM-0 | Settings/seed debt: sanitize the seed source ✅, **re-wire the packaged seed** ✅, collapse the duplicated copies → **moved to LM-3** | Cleanup / hygiene | **High** | S | **Done (a)+(b) 2026-09-24** — seed source sanitized; seed wired via `app-data/**` → packaged layout and **verified** (byte-identical, no machine paths/secrets, Templates 23/23, TextMaps 8/8); (c) re-scoped with the measured divergence table |
 | LM-1 | **The address core**: `CatalogAddress` (`container + path`, `catalog://…`, parse/format/`TryResolve`) + the `project:`/`app:` alias table | Architecture / contracts | **High** | M | **Done 2026-09-24** — `address` conformance group **ALL CONFORM (19 checks)**, no regressions, purely additive |
 | LM-2 | Container-scoped content keys (`(container, path)`), drop the `/<collectionId>/` path prefix | Provider / migration | Medium | L | Planned (after LM-1) |
-| LM-3 | Settings schema (`collections[]`, aliases, `secrets{}`) + **compatibility reader** for every legacy key | Configuration | **High** | M | Planned |
+| LM-3 | Settings schema (`collections[]`, aliases, `secrets{}`) + **compatibility reader** for every legacy key + **collapse the 12 duplicated `appsettings.json` location-key copies** (moved from LM-0) | Configuration | **High** | M | Planned |
 | LM-4 | Bindings: one statement per container (config/env/DI), credentials as vault references, documented precedence | Configuration / security | **High** | M | Planned |
 | LM-5 | Seed `app-data` into a container; app-level locations (`Templates`/`TextMaps`/`Samples`) as catalog items | Capability | Medium | M | Planned |
 | LM-6 | Consumer migration (AppSettings/ConfigurationHelper/AppData, Studio bridge, args resolution, deprecated `Project` surface) | Refactor | Medium | L | Planned |
