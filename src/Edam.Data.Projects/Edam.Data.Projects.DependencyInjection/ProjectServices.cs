@@ -107,6 +107,10 @@ public static class ProjectServices
       services.AddSingleton<IProjectResources>(sp =>
          new FileSystemProjectResources(root, sp.GetRequiredService<IProjectCatalog>()));
 
+      // LM-5: seeding is a separate, replaceable capability from scaffolding (structure-only).
+      services.AddSingleton<IProjectSeeder>(sp =>
+         new FileSystemProjectSeeder(root, sp.GetRequiredService<IProjectResources>()));
+
       return services;
    }
 
@@ -176,6 +180,14 @@ public static class ProjectServices
       {
          var surfaces = ResolveSurfaces(provider);
          return new CatalogProjectResources(surfaces.Containers, surfaces.Items, surfaces.Content);
+      });
+
+      // LM-5: seeding is a separate, replaceable capability from scaffolding (structure-only).
+      services.AddSingleton<IProjectSeeder>(provider =>
+      {
+         var surfaces = ResolveSurfaces(provider);
+         return new CatalogProjectSeeder(surfaces.Content,
+            provider.GetRequiredService<IProjectResources>());
       });
 
       return services;

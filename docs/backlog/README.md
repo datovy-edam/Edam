@@ -153,7 +153,7 @@
 | LM-2 | Container-scoped content keys (`(container, path)`), drop the `/<collectionId>/` path prefix | Provider / migration | Medium | L | Planned (after LM-1) |
 | LM-3 | Settings schema (`ProjectSettings` reader: ADR-0011 shape + **compatibility translation** + reporting) — **core done**; the 12-copy collapse follows as hosts adopt it (LM-6) | Configuration | **High** | M | **Core done 2026-09-24** — `settings` conformance group **ALL CONFORM (12 checks)**; `AddProjectServices` consumes the reader; DI groups unchanged |
 | LM-4 | **Bindings** (one statement per container: folder / credential name / service URI) + `EDAM_ROOT` / `EDAM_COLLECTION_<ID>__{ROOT\|TARGET\|CREDENTIAL}` overrides | Configuration / security | **High** | M | **Done 2026-09-24** — `binding` group **ALL CONFORM (9 checks)**, incl. the payoff test (same settings, two bindings, same address, each backend's own content) |
-| LM-5 | Seed `app-data` into a container; app-level locations (`Templates`/`TextMaps`/`Samples`) as catalog items | Capability | Medium | M | Planned |
+| LM-5 | **Seeding**: `IProjectSeeder` (structure stays scaffolding; content is read from an address) + `CatalogFolderSeeder` (seed a container from a folder — `app-data` as a seed source) | Capability | Medium | M | **Done 2026-09-24** — `seeding` group **ALL CONFORM (6 checks)**: structure-only scaffolding, legacy `<project>.<template>` naming restored, folder→container seeding |
 | LM-6 | Consumer migration (AppSettings/ConfigurationHelper/AppData, Studio bridge, args resolution, deprecated `Project` surface) | Refactor | Medium | L | Planned |
 | LM-7 | Delete legacy keys + duplicated settings copies + the helpers that existed only for them | Cleanup | Medium | M | Planned |
 
