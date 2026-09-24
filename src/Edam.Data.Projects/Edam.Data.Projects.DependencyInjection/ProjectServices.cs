@@ -91,11 +91,13 @@ public static class ProjectServices
    private static IServiceCollection AddFileSystem(
       IServiceCollection services, ProjectSettingsInfo settings)
    {
-      var root = settings.Root;
+      // LM-4: the BINDING says where the storage is; the project settings only name locations.
+      var root = settings.DefaultBinding?.Location;
+      if (string.IsNullOrWhiteSpace(root)) root = settings.Root;
       if (string.IsNullOrWhiteSpace(root))
          throw new InvalidOperationException(
-            $"A project root is required: set {ProjectSettings.ROOT_KEY} " +
-            $"(or the legacy {ProjectSettings.LEGACY_CONSOLE_PATH_KEY}).");
+            $"A project root is required: set {ProjectSettings.ROOT_KEY}, a binding location " +
+            $"({ProjectSettings.BINDINGS_SECTION}:<id>:Location) or {ProjectSettings.ENV_ROOT}.");
 
       var collections = settings.Collections;
 
@@ -111,8 +113,50 @@ public static class ProjectServices
    private static IServiceCollection AddCatalog(
       IServiceCollection services, IConfiguration config, ProjectSettingsInfo settings)
    {
+      // LM-4: switching a collection from a folder to PostgreSQL changes ONLY the binding — the
+      // project locations (and every address a consumer holds) stay identical.
+      var overrides = new Dictionary<string, string?>();
+      var binding = settings.DefaultBinding;
+
+      if (binding is not null)
+      {
+         switch (ProjectSettings.NormalizeTarget(binding.Target))
+         {
+            case "filesystem":
+               overrides["Edam:Catalog:Target"] = "filesystem";
+               if (!string.IsNullOrWhiteSpace(binding.Location))
+                  overrides["Edam:Catalog:FileSystemRoot"] = binding.Location;
+               break;
+
+            case "postgres":
+               overrides["Edam:Catalog:Target"] = "postgres";
+               var credential = ResolveCredential(config, binding.Credential);
+               if (!string.IsNullOrWhiteSpace(credential))
+                  overrides["ConnectionStrings:catalog"] = credential;
+               break;
+
+            case "service":
+               throw new NotSupportedException(
+                  "A 'service' binding (remote catalog) is not wired by the project composition root " +
+                  "yet: resolve ICatalogClient, await InitializeClientAsync(...), then use the " +
+                  "catalog-backed providers directly — the same limitation recorded for the remote " +
+                  "catalog in PE-4.");
+
+            default:
+               throw new InvalidOperationException(
+                  $"Unknown binding target '{binding.Target}' for collection '{binding.CollectionId}' " +
+                  "— expected filesystem, postgres or service (the PROVIDER family is chosen " +
+                  $"separately by {ProjectSettings.TARGET_KEY}).");
+         }
+      }
+
+      var effective = overrides.Count == 0
+         ? config
+         : new ConfigurationBuilder().AddConfiguration(config)
+            .AddInMemoryCollection(overrides).Build();
+
       // the catalog composition root supplies the local ICatalogStore/IContentStore for this target
-      services.AddCatalogServices(config);
+      services.AddCatalogServices(effective);
 
       var defaultCollection = settings.DefaultCollectionId;
 
@@ -135,6 +179,27 @@ public static class ProjectServices
       });
 
       return services;
+   }
+
+   /// <summary>
+   /// Resolve a credential <b>name</b> into its value. A <c>vault://</c> reference is deliberately
+   /// <b>not</b> resolved here — the platform holds no vault — so the host must supply the value
+   /// (for example through <c>EDAM_COLLECTION_&lt;ID&gt;__CREDENTIAL</c>); the error says so, rather
+   /// than failing obscurely later.
+   /// </summary>
+   private static string? ResolveCredential(IConfiguration config, string? credential)
+   {
+      if (string.IsNullOrWhiteSpace(credential)) return null;
+
+      if (ProjectSettings.IsCredentialReference(credential))
+         throw new NotSupportedException(
+            $"The credential '{credential}' is a vault reference and cannot be resolved by the project " +
+            "composition root (no vault is wired here). Supply the value instead — for example " +
+            "EDAM_COLLECTION_<ID>__CREDENTIAL=<value> — or resolve it in the host before adding the " +
+            "project services.");
+
+      // a configuration KEY (e.g. ConnectionStrings:catalog) is looked up; anything else IS the value
+      return config[credential!] ?? credential;
    }
 
    /// <summary>The three catalog surfaces the project providers drive.</summary>

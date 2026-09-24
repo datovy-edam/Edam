@@ -1,6 +1,6 @@
 # Location Model (LM) — the Catalog as the single place project locations are stated
 
-> **Status:** Started — **LM-1 DONE** (address core; 19 checks) · **LM-3 core DONE 2026-09-24** (`ProjectSettings` reader + the composition root consumes it; 12 checks, DI groups unchanged) · **LM-0 done (a)+(b)** · next: **LM-4** (bindings), **LM-5** (seeding), **LM-2** (needs the 2a/2b call), **LM-6** (consumer migration — which is where the 12 duplicated settings copies collapse as hosts adopt the reader).
+> **Status:** Started — **LM-1 DONE** (address core, 19 checks) · **LM-3 core DONE** (settings reader + legacy translation, 12 checks) · **LM-4 DONE 2026-09-24** (bindings + environment overrides, 9 checks incl. the payoff test) · **LM-0 done (a)+(b)** · next: **LM-5** (seed + template seeding), then **LM-2** (needs the 2a/2b call), **LM-6** (consumer migration — where the 12 duplicated settings copies collapse), **LM-7**.
 > **Goal:** replace the multiple divergent location settings with **one declaration per container** plus **URI addresses**, so a file-system container and a catalog container are configured *identically* — the point of ADR-0009.
 > **Decision record:** **ADR-0011** (the location model). Related: **ADR-0010** (WinUI packaged app-data — the host-level instance of the same rule: no Documents/OneDrive, no machine paths or secrets in the shipped seed), ADR-0009, `Projects-Enhancements.md` (Area PE).
 > **Scope note:** this is about **where things are**, not about project semantics (Collection = container, Project = branch stays).
@@ -49,7 +49,7 @@ The right-hand column is the *only* thing that varies; everything else is derive
 | **LM-1** *(start here)* | **The address core** — ✅ **DONE 2026-09-24**: `CatalogAddress` (container + `ProjectPath`, `Parse`/`TryParse`, `ToString()` → `catalog://<container>/<path>`, `Combine`/`Parent`/`TryResolve`) and `ProjectLocations` (the `project:`/`app:` alias table) in `Edam.Data.Projects.Contracts` | addresses round-trip; a `./Archive/x.xsd` reference resolves against its scope **inside the same container**; drive paths, other schemes, empty containers, unknown aliases and cross-container references are rejected | **`address` conformance group — ALL CONFORM (19 checks)** in `Edam.Data.Projects.Conformance`, plus no regressions in the other groups | **none** — purely additive |
 | **LM-2** | **Container-scoped artifact addressing:** the container must be part of the address/key for **items *and* content** `(container, path)`; drop the `/<collectionId>/` path-prefix convention | two containers may hold identical paths — for **any** artifact, not just projects — and existing single-container content still resolves | conformance with two containers sharing paths (file-system + Postgres) | **medium-high** — provider change with migration implications; needs a documented compat rule |
 | **LM-3** | **Settings schema + compatibility reader** — ✅ **CORE DONE 2026-09-24**: `ProjectSettings.Read(config)` (in `Edam.Data.Projects.DependencyInjection`) resolves the ADR-0011 shape (`Edam:Projects:Root`, declared collections `Edam:Projects:Collections:<name>`, `DefaultCollection`, `WorkingRoot`), **translates** the legacy keys with a direct equivalent (`AppSettings:AssetConsolePath`, `ConsolePath`), and **reports** those that land in a later step (`AssetProjectsPath`, `AssetDataPath`, `DefaultInPath`/`OutPath`, `DefaultTextMapFolder`, the connection string) so nothing is silently dropped; `AddProjectServices` now consumes this one reader. ⏳ Remaining: the 12-copy collapse is the **consumer** half — it follows as hosts adopt the reader (LM-6) | legacy and new spellings resolve to the **same** root; translated keys are reported; recognized-but-pending keys are reported; the composition root still fails fast with no root | **`settings` conformance group — ALL CONFORM (12 checks)** + the two DI groups unchanged (behaviour-preserving refactor) | low |
-| **LM-4** | **Bindings:** one statement per container (config / environment / DI), credentials as vault references; document precedence (defaults → user file → environment → command line) and the `EDAM_ROOT` / `EDAM_COLLECTION_<id>__ROOT` overrides | no storage location in project settings; switching a container from file-system to Postgres/service changes **only** the binding | **the payoff test:** the same settings file drives both targets in conformance | low-medium |
+| **LM-4** | **Bindings + environment overrides** — ✅ **DONE 2026-09-24**: `ProjectBindingInfo(CollectionId, Target, Location, Credential, IsDefault)` resolved by `ProjectSettings.Read` from `Edam:Projects:Bindings:<id>:{Target\|Location\|Credential}` (or derived from today's keys), overridden by the environment, and consumed by `AddProjectServices` — see "LM-4 in detail" | **only the binding changes** when a collection moves storage; the credential is a **name**, never a value; the composition root refuses what it cannot honour, with guidance | **`binding` conformance group — ALL CONFORM (9 checks)**, incl. the **payoff test**; all other groups unchanged | low-medium |
 | **LM-5** | **Seed `app-data` into a container; app-level locations as items; reconcile the scaffolder:** `Templates`/`TextMaps`/`Samples` (and any other family) become catalog artifacts, with a file-system-backed container for development; **restore template seeding through addresses** (`Templates/<template>` → `Projects/<name>/Arguments/<name>.<template>`) and keep the platform scaffolder structure-only | dev and production differ only by binding; the repo folder is never itself a configured location; creating a project yields a **seeded** `Arguments/` folder again, without app-settings or CWD | import/export conformance (exists) + a dev binding + a scaffolding check (folders + seeded template) | low |
 | **LM-6** | **Consumer migration:** `AppSettings`/`ConfigurationHelper`/`AppData` path helpers, the Studio bridge (`ProjectServicesHelper`), args resolution and the deprecated static `Project` surface move to the resolver; legacy keys warn | no consumer resolves a path itself; `Directory.SetCurrentDirectory` unused; the PE-5d `CS0618` set shrinks | builds + conformance + Studio (runtime, user) | medium |
 | **LM-7** | **Delete the legacy keys + the duplicated settings copies**, and the helpers that existed only for them; republish affected feed packages if the settings/`[Obsolete]` surface changed | one settings file for locations; grep proves no legacy key remains | builds + conformance | low |
@@ -73,6 +73,45 @@ Measured 2026-09-24 across every `appsettings.json` in the repo (18 files; **12*
 3. **The duplication is a symptom of having no single authoritative source.** Collapsing the files without the layering would just move the divergence; the honest fix is **LM-3** (one settings schema + a compatibility reader for the legacy keys) and **LM-4** (bindings/overrides, e.g. `EDAM_ROOT`), after which the 12 copies reduce to overrides — or disappear.
 
 **Recorded as the LM-3 deliverable:** one authoritative settings set, the legacy-key compatibility reader, *and* the collapse of these 12 copies (kept deliberately as an explicit step rather than a silent fixture edit).
+
+## LM-4 in detail — bindings (where the storage is) vs locations (what things are called)
+
+**Two different questions, deliberately separate** (conflating them was the bug the conformance caught):
+
+| Question | Answer lives in |
+|---|---|
+| Which **provider family** should the project surface use? | `Edam:Projects:Target` = `filesystem` \| `catalog` (a *composition* choice) |
+| **Where is a container's storage?** | its **binding**: `filesystem` (a folder) \| `postgres` (a credential name) \| `service` (a base URI) |
+
+**Schema — one statement per container:**
+```jsonc
+"Edam": { "Projects": {
+  "DefaultCollection": "edam.studio",
+  "Bindings": {
+    "edam.studio": { "Target": "filesystem", "Location": "/data/edam" },
+    "company":     { "Target": "postgres", "Credential": "ConnectionStrings:catalog" },
+    "remote":      { "Target": "service",  "Location": "https://catalog.example/",
+                     "Credential": "vault://edam.catalog" }
+  }
+}}
+```
+- **`Location` is never a secret** — a folder, or a base URI.
+- **`Credential` is a *name*** — a configuration key (`ConnectionStrings:catalog`) or a `vault://` reference — **never the secret itself**. The platform holds no vault, so a `vault://` reference is **recognized, kept as a reference and refused with guidance** at composition time; the host resolves it (or supplies the value through `EDAM_COLLECTION_<ID>__CREDENTIAL`).
+
+**Environment overrides — environment wins over configuration** (documented precedence: *defaults → configuration → environment*, with a host's command-line values passed in as configuration):
+
+| Variable | Effect |
+|---|---|
+| `EDAM_ROOT` | the default collection's location |
+| `EDAM_COLLECTION_<ID>__ROOT` | a named collection's location |
+| `EDAM_COLLECTION_<ID>__TARGET` | a named collection's storage kind (`fs`, `postgres`, `service`, …) |
+| `EDAM_COLLECTION_<ID>__CREDENTIAL` | a named collection's credential name — or the literal value, so CI never edits files |
+
+`<ID>` is the collection id upper-cased with every non-alphanumeric character replaced by `_` (so `edam.studio` → `EDAM_COLLECTION_EDAM_STUDIO__ROOT`). Applied overrides are **reported** in `ProjectSettingsInfo.EnvironmentOverrides` so a host can log them.
+
+**What is refused, with guidance (never silently wrong):** a `service` binding (the remote catalog needs a host-initialized `ICatalogClient` — the same PE-4 limitation), and a `vault://` credential (no vault in the platform).
+
+**The payoff, verified:** the **same settings** — same collection, same project, same resource path — drive two bindings (a folder and the catalog), and each backend returns **its own** content for the identical consumer-facing address (`binding` group: *"Same settings, two bindings: each backend keeps its own content at the SAME address"*). Switching storage is therefore a **binding** change, which is exactly ADR-0011's claim. *(Known residual: the catalog provider still embeds the collection id in its internal path — that skew is LM-2's target; the consumer-facing `ProjectPath` is already identical.)*
 
 ## LM-2 in detail — where does the container live?
 
