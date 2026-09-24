@@ -148,8 +148,8 @@
 
 | ID | Title | Type | Priority | Effort | Status |
 |---|---|---|---|---|---|
-| LM-0 | Settings/seed debt cleanup: sanitize the seed source (machine paths + connection string), fix `ConsolePath`, **re-wire the packaged seed** (`ApplicationData\**` no longer exists), collapse the 13 duplicated copies — data/build only | Cleanup / hygiene | **High** | S | **Ready** — do alongside LM-1 |
-| LM-1 | **The address core**: `container + path` value type, well-known locations, alias expansion, relative resolution against a referring address | Architecture / contracts | **High** | M | **Ready — start here** |
+| LM-0 | Settings/seed debt cleanup: sanitize the seed source ✅, **re-wire the packaged seed** (`ApplicationData\**` no longer exists) ⏳, collapse the 13 duplicated copies ⏳ — data/build only | Cleanup / hygiene | **High** | S | **In Progress** — seed source sanitized 2026-09-24; wiring pending on the in-flight `app-data` move |
+| LM-1 | **The address core**: `CatalogAddress` (`container + path`, `catalog://…`, parse/format/`TryResolve`) + the `project:`/`app:` alias table | Architecture / contracts | **High** | M | **Done 2026-09-24** — `address` conformance group **ALL CONFORM (19 checks)**, no regressions, purely additive |
 | LM-2 | Container-scoped content keys (`(container, path)`), drop the `/<collectionId>/` path prefix | Provider / migration | Medium | L | Planned (after LM-1) |
 | LM-3 | Settings schema (`collections[]`, aliases, `secrets{}`) + **compatibility reader** for every legacy key | Configuration | **High** | M | Planned |
 | LM-4 | Bindings: one statement per container (config/env/DI), credentials as vault references, documented precedence | Configuration / security | **High** | M | Planned |
@@ -157,7 +157,7 @@
 | LM-6 | Consumer migration (AppSettings/ConfigurationHelper/AppData, Studio bridge, args resolution, deprecated `Project` surface) | Refactor | Medium | L | Planned |
 | LM-7 | Delete legacy keys + duplicated settings copies + the helpers that existed only for them | Cleanup | Medium | M | Planned |
 
-> **Plan + model:** `Location-Model.md` (**ADR-0011**, building on **ADR-0010**) — address = `catalog://<container>/<path>`; locations stated **once per container**; sub-paths **computed**; bindings separate; relative refs resolve against the **referring artifact's address**; physical paths only in the materialized working folder. **Start at LM-1** (additive, headlessly verifiable) with **LM-0** (data/build only).
+> **Plan + model:** `Location-Model.md` (**ADR-0011**, building on **ADR-0010**) — address = `catalog://<container>/<path>`; locations stated **once per container**; sub-paths **computed**; bindings separate; relative refs resolve against the **scope root** (the project root for `*.Args.json`) and stay in the same container; physical paths only in the materialized working folder. **LM-1 DONE** (address core + 19 conformance checks); **next: LM-0 wiring + LM-3/LM-4**, with **LM-2** gated on the 2a/2b decision.
 
 
 ## Suggested sequencing

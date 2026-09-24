@@ -238,7 +238,10 @@ try
          await AssetConsoleAdapterScenario.ProbeRealConsoleAsync(work));
    }
 
-   // ---- 10. a REAL end-to-end process attempt (PE-5c) — INFORMATIONAL ------------------------
+   // ---- 10. the address core (LM-1, ADR-0011) ------------------------------------------------
+   all["address"] = AddressScenario.Run();
+
+   // ---- 11. a REAL end-to-end process attempt (PE-5c) — INFORMATIONAL ------------------------
    //      Reports what the legacy pipeline actually does; deliberately not a pass/fail, so the
    //      remaining gap (the console needs real project data to yield assets) stays visible.
    {
