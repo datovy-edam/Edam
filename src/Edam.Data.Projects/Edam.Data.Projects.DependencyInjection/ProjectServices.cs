@@ -30,16 +30,17 @@ namespace Edam.Data.Projects.DependencyInjection;
 /// </summary>
 public static class ProjectServices
 {
-   public const string TARGET_KEY = "Edam:Projects:Target";
-   public const string ROOT_KEY = "Edam:Projects:Root";
-   public const string COLLECTIONS_SECTION = "Edam:Projects:Collections";
-   public const string DEFAULT_COLLECTION_KEY = "Edam:Projects:DefaultCollection";
+   // Aliases of the LM-3 settings keys, so there is exactly one definition of each key name.
+   public const string TARGET_KEY = ProjectSettings.TARGET_KEY;
+   public const string ROOT_KEY = ProjectSettings.ROOT_KEY;
+   public const string COLLECTIONS_SECTION = ProjectSettings.COLLECTIONS_SECTION;
+   public const string DEFAULT_COLLECTION_KEY = ProjectSettings.DEFAULT_COLLECTION_KEY;
 
    /// <summary>Where the runner materializes inputs for a process (default: the temp folder).</summary>
-   public const string WORKING_ROOT_KEY = "Edam:Projects:WorkingRoot";
+   public const string WORKING_ROOT_KEY = ProjectSettings.WORKING_ROOT_KEY;
 
-   /// <summary>Today's app-data root key — the fallback for <see cref="ROOT_KEY"/>.</summary>
-   public const string CONSOLE_PATH_KEY = "AppSettings:AssetConsolePath";
+   /// <summary>Today's app-data root key — the legacy fallback for <see cref="ROOT_KEY"/>.</summary>
+   public const string CONSOLE_PATH_KEY = ProjectSettings.LEGACY_CONSOLE_PATH_KEY;
 
    /// <summary>
    /// Register the project surface from a flat key/value map — for hosts (like the WinUI desktop or
@@ -57,18 +58,22 @@ public static class ProjectServices
       if (services is null) throw new ArgumentNullException(nameof(services));
       if (config is null) throw new ArgumentNullException(nameof(config));
 
-      var target = (config[TARGET_KEY] ?? "filesystem").Trim().ToLowerInvariant();
+      // LM-3: one settings reader — the ADR-0011 shape, with the legacy keys translated and
+      // everything else reported (never silently dropped).
+      var settings = ProjectSettings.Read(config);
+
+      var target = settings.Target ?? "filesystem";
       switch (target)
       {
          case "filesystem" or "fs" or "folder":
-            AddFileSystem(services, config);
+            AddFileSystem(services, settings);
             break;
          case "catalog" or "cat":
-            AddCatalog(services, config);
+            AddCatalog(services, config, settings);
             break;
          default:
             throw new InvalidOperationException(
-               $"Unknown {TARGET_KEY} '{target}' — expected 'filesystem' or 'catalog'.");
+               $"Unknown {ProjectSettings.TARGET_KEY} '{target}' — expected 'filesystem' or 'catalog'.");
       }
 
       // The runner is provider-independent (it works through IProjectResources). A bound
@@ -76,22 +81,23 @@ public static class ProjectServices
       services.AddSingleton<IProjectRunner>(provider => new ProjectArgumentRunner(
          provider.GetRequiredService<IProjectResources>(),
          (IProjectProcess?)provider.GetService<IProjectProcess>() ?? new UnboundProjectProcess(),
-         config[WORKING_ROOT_KEY]));
+         settings.WorkingRoot));
 
       return services;
    }
 
    // ---------------------------------------------------------------------
 
-   private static IServiceCollection AddFileSystem(IServiceCollection services, IConfiguration config)
+   private static IServiceCollection AddFileSystem(
+      IServiceCollection services, ProjectSettingsInfo settings)
    {
-      var root = config[ROOT_KEY];
-      if (string.IsNullOrWhiteSpace(root)) root = config[CONSOLE_PATH_KEY];
+      var root = settings.Root;
       if (string.IsNullOrWhiteSpace(root))
          throw new InvalidOperationException(
-            $"A project root is required: set {ROOT_KEY} (or {CONSOLE_PATH_KEY}).");
+            $"A project root is required: set {ProjectSettings.ROOT_KEY} " +
+            $"(or the legacy {ProjectSettings.LEGACY_CONSOLE_PATH_KEY}).");
 
-      var collections = ReadCollections(config);
+      var collections = settings.Collections;
 
       services.AddSingleton(_ => new FileSystemProjectCatalog(root, collections));
       services.AddSingleton<IProjectCatalog>(sp => sp.GetRequiredService<FileSystemProjectCatalog>());
@@ -102,12 +108,13 @@ public static class ProjectServices
       return services;
    }
 
-   private static IServiceCollection AddCatalog(IServiceCollection services, IConfiguration config)
+   private static IServiceCollection AddCatalog(
+      IServiceCollection services, IConfiguration config, ProjectSettingsInfo settings)
    {
       // the catalog composition root supplies the local ICatalogStore/IContentStore for this target
       services.AddCatalogServices(config);
 
-      var defaultCollection = config[DEFAULT_COLLECTION_KEY];
+      var defaultCollection = settings.DefaultCollectionId;
 
       services.AddSingleton<IProjectCatalog>(provider =>
       {
@@ -153,15 +160,4 @@ public static class ProjectServices
       return (store, store, content);
    }
 
-   /// <summary>Extra file-system collections: <c>Edam:Projects:Collections:&lt;name&gt; = &lt;uri&gt;</c>.</summary>
-   private static List<ProjectCollectionInfo> ReadCollections(IConfiguration config)
-   {
-      var collections = new List<ProjectCollectionInfo>();
-      foreach (var child in config.GetSection(COLLECTIONS_SECTION).GetChildren())
-      {
-         if (string.IsNullOrWhiteSpace(child.Value)) continue;
-         collections.Add(new ProjectCollectionInfo(child.Key, child.Key, child.Value!));
-      }
-      return collections;
-   }
 }
