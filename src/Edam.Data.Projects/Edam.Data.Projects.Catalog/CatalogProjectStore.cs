@@ -49,14 +49,17 @@ public sealed class CatalogProjectStore : IProjectStore
       var container = await CatalogProjectSupport
          .RequireContainerAsync(_containers, collectionId, ct).ConfigureAwait(false);
 
-      var projectPath = CatalogProjectSupport.ProjectBranch(container.ContainerId, name);
+      var projectPath = CatalogProjectSupport.ProjectBranch(name);
 
-      // idempotent: an existing project is returned as-is
+      // idempotent: an existing project is returned as-is — but only one that lives in THIS container
+      // (LM-2c: the lookup is container-blind, so a stale or foreign item at the same path must not be
+      // mistaken for this container's project; the path prefix used to hide this).
       var existing = _items.GetItemByPath(projectPath.Value);
-      if (existing is not null) return CatalogProjectCatalog.ToProject(existing, container);
+      if (existing is not null && existing.ContainerId == container.Id)
+         return CatalogProjectCatalog.ToProject(existing, container);
 
       await _items.CreateBranchAsync(
-         CatalogProjectSupport.ProjectsRoot(container.ContainerId), "Projects", container.Id, ct)
+         CatalogProjectSupport.ProjectsRoot, "Projects", container.Id, ct)
          .ConfigureAwait(false);
 
       var project = await _items.CreateBranchAsync(
@@ -85,7 +88,7 @@ public sealed class CatalogProjectStore : IProjectStore
       var container = await CatalogProjectSupport
          .RequireContainerAsync(_containers, collectionId, ct).ConfigureAwait(false);
 
-      var projectPath = CatalogProjectSupport.ProjectBranch(container.ContainerId, name);
+      var projectPath = CatalogProjectSupport.ProjectBranch(name);
 
       // index the folder INTO the project branch; content keys are full paths (no collisions)
       var indexed = await FolderCatalogIndexer.IndexDetailedAsync(
@@ -111,7 +114,9 @@ public sealed class CatalogProjectStore : IProjectStore
       var target = Path.GetFullPath(targetLocation);
       Directory.CreateDirectory(target);
 
-      foreach (var item in _items.GetBranch(project.Path.Value))
+      // LM-2c: only THIS container's items (GetBranch is container-blind)
+      foreach (var item in _items.GetBranch(project.Path.Value)
+                  .Where(i => i.ContainerId == container.Id))
       {
          ct.ThrowIfCancellationRequested();
 
@@ -149,6 +154,7 @@ public sealed class CatalogProjectStore : IProjectStore
 
       // deepest first, so deleting a branch never strands its children
       foreach (var item in _items.GetBranch(project.Path.Value)
+                  .Where(i => i.ContainerId == container.Id)
                   .OrderByDescending(i => i.FullPath.Length))
       {
          if (item.Type == ItemType.Leaf)
@@ -158,7 +164,7 @@ public sealed class CatalogProjectStore : IProjectStore
       }
 
       var root = _items.GetItemByPath(project.Path.Value);
-      if (root is not null && _items.DeleteItem(root.Id)) removed = true;
+      if (root is not null && root.ContainerId == container.Id && _items.DeleteItem(root.Id)) removed = true;
 
       return removed;
    }

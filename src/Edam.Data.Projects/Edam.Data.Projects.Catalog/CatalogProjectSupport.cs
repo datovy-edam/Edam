@@ -14,16 +14,21 @@ internal static class CatalogProjectSupport
    internal const string ProjectsFolder = "Projects";
 
    /// <summary>
-   /// The branch that holds a collection's projects — <b>scoped by the collection id</b>. Catalog
-   /// item paths are global (not container-scoped: <c>GetItemByPath</c> ignores the container), so
-   /// two collections would otherwise collide on <c>/Projects/&lt;name&gt;</c>.
+   /// The branch that holds a container's projects: <c>/Projects</c>.
+   /// <para>
+   /// <b>LM-2c:</b> the container is <b>no longer embedded in the path</b>. It used to be
+   /// <c>/&lt;collectionId&gt;/Projects</c> because catalog item paths were global
+   /// (<c>GetItemByPath</c> ignored the container) and content keys were path-only, so two collections
+   /// would have collided on the same path. Both are now <b>container-scoped</b> (LM-2a items, LM-2b
+   /// content, LM-2b-ii providers and wire), so a project's address is identical in <b>every</b>
+   /// provider — <c>/Projects/&lt;name&gt;</c>, exactly as the file-system provider already had it.
+   /// </para>
    /// </summary>
-   internal static string ProjectsRoot(string collectionId)
-      => "/" + (collectionId ?? string.Empty).Trim('/') + "/" + ProjectsFolder;
+   internal static string ProjectsRoot => "/" + ProjectsFolder;
 
-   /// <summary>The branch of a project within its collection.</summary>
-   internal static ProjectPath ProjectBranch(string collectionId, string projectName)
-      => ProjectPath.Parse(ProjectsRoot(collectionId)).Combine(projectName);
+   /// <summary>The branch of a project inside its container.</summary>
+   internal static ProjectPath ProjectBranch(string projectName)
+      => ProjectPath.Parse(ProjectsRoot).Combine(projectName);
 
    /// <summary>The catalog (full) path of a project-relative resource.</summary>
    internal static string Full(ProjectInfo project, ProjectPath path)

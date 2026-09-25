@@ -66,7 +66,7 @@ public sealed class CatalogProjectCatalog : IProjectCatalog
       try { container = await CatalogProjectSupport.RequireContainerAsync(_containers, collectionId, ct); }
       catch (InvalidOperationException) { return projects; }
 
-      var prefix = CatalogProjectSupport.ProjectsRoot(container.ContainerId) + "/";
+      var prefix = CatalogProjectSupport.ProjectsRoot + "/";
       foreach (var item in _items.GetContainerItems(container.Id))
       {
          // a project is a DIRECT branch child of /Projects

@@ -165,10 +165,10 @@ public static class ProjectScenario
       Add("Catalog enumerates the projects", projects.Count == 2,
          string.Join(",", projects.Select(p => p.Name)));
 
-      // 11 — projects are addressed as <collection>/Projects/<name> in every provider
-      //      (the collection prefix keeps two collections from colliding on the same path)
-      Add("Project path is <collection>/Projects/<name>",
-         project.Path.Value.EndsWith("/Projects/Datovy.HC.CD", StringComparison.OrdinalIgnoreCase) &&
+      // 11 — projects are addressed as /Projects/<name> in EVERY provider (LM-2c): the container is
+      //      part of the ADDRESS, not of the path, so file-system and catalog providers agree.
+      Add("Project path is /Projects/<name> in every provider",
+         project.Path.Value == "/Projects/Datovy.HC.CD" &&
          project.Path.Name == "Datovy.HC.CD",
          project.Path.Value);
 

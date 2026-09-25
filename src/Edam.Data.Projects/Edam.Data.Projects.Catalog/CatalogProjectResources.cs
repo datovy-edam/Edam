@@ -73,9 +73,12 @@ public sealed class CatalogProjectResources : IProjectResources
    public async Task<bool> ExistsAsync(
       ProjectInfo project, ProjectPath path, CancellationToken ct = default)
    {
-      await CatalogProjectSupport.RequireContainerAsync(_containers, project.CollectionId, ct)
-         .ConfigureAwait(false);
-      return _items.GetItemByPath(CatalogProjectSupport.Full(project, path)) is not null;
+      var container = await CatalogProjectSupport
+         .RequireContainerAsync(_containers, project.CollectionId, ct).ConfigureAwait(false);
+
+      // LM-2c: the item must live in THIS container (the lookup itself is container-blind)
+      var item = _items.GetItemByPath(CatalogProjectSupport.Full(project, path));
+      return item is not null && item.ContainerId == container.Id;
    }
 
    public async Task<Stream?> OpenReadAsync(
@@ -125,7 +128,7 @@ public sealed class CatalogProjectResources : IProjectResources
 
       var full = CatalogProjectSupport.Full(project, path);
       var item = _items.GetItemByPath(full);
-      var itemDeleted = item is not null && _items.DeleteItem(item.Id);
+      var itemDeleted = item is not null && item.ContainerId == container.Id && _items.DeleteItem(item.Id);
       var contentDeleted = await Content(container).DeleteAsync(full, ct).ConfigureAwait(false);
 
       return itemDeleted || contentDeleted;

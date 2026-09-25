@@ -42,7 +42,7 @@ public static class AssetConsoleAdapterScenario
       File.WriteAllText(Path.Combine(working, "Archive", "sample.ddl"), "CREATE TABLE dbo.Sample (Id INT);");
 
       var context = new ProjectProcessContext(
-         new ProjectInfo("1", "Datovy.HC.CD", "v1r0", "collection", ProjectPath.Parse("/collection/Projects/Datovy.HC.CD")),
+         new ProjectInfo("1", "Datovy.HC.CD", "v1r0", "collection", ProjectPath.Parse("/Projects/Datovy.HC.CD")),
          ProjectPath.Parse("/Arguments/Run.Args.json"),
          working,
          new[] { ProjectPath.Parse("/Archive/sample.ddl") });
@@ -110,7 +110,7 @@ public static class AssetConsoleAdapterScenario
       File.WriteAllText(Path.Combine(working, "Arguments", "Run.Args.json"), ArgsJson);
 
       var context = new ProjectProcessContext(
-         new ProjectInfo("1", "Probe", "v1r0", "collection", ProjectPath.Parse("/collection/Projects/Probe")),
+         new ProjectInfo("1", "Probe", "v1r0", "collection", ProjectPath.Parse("/Projects/Probe")),
          ProjectPath.Parse("/Arguments/Run.Args.json"),
          working,
          Array.Empty<ProjectPath>());
