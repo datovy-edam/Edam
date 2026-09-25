@@ -1,4 +1,4 @@
-﻿using System;
+using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Text;
@@ -256,6 +256,21 @@ namespace Edam.Application.Settings
          var jsonText = JsonSerializer.Serialize<EdamSettings>(edamSettings);
          if (jsonText != null)
          {
+            if (String.IsNullOrWhiteSpace(fpath))
+            {
+               throw new InvalidOperationException(
+                  "A settings path is required to persist application settings.");
+            }
+
+            // The settings file lives in app data, whose folder may not exist yet — a packaged app
+            // creates its app-data folder on first run. Create it here rather than failing the write,
+            // which otherwise kills startup housekeeping (e.g. VerifySetConnectionString).
+            var folder = Path.GetDirectoryName(fpath);
+            if (!String.IsNullOrWhiteSpace(folder) && !Directory.Exists(folder))
+            {
+               Directory.CreateDirectory(folder);
+            }
+
             File.WriteAllText(fpath, jsonText);
          }
       }
