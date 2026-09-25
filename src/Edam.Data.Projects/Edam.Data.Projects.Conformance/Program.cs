@@ -253,8 +253,8 @@ try
    // ---- 10e. the consumer story from configuration only (LM-6, ADR-0011) ---------------------
    all["host (LM-6)"] = await HostScenario.RunAsync(Path.Combine(temp, "host"));
 
-   // ---- 10f. container-scoped item index (LM-2a, ADR-0011) -----------------------------------
-   all["scoping (LM-2a)"] = await ScopingScenario.RunAsync(Path.Combine(temp, "scoping"));
+   // ---- 10f. container-scoped item index + content (LM-2a/LM-2b, ADR-0011) -------------------
+   all["scoping (LM-2a/2b)"] = await ScopingScenario.RunAsync(Path.Combine(temp, "scoping"), dsn);
 
    // ---- 11. a REAL end-to-end process attempt (PE-5c) — INFORMATIONAL ------------------------
    //      Reports what the legacy pipeline actually does; deliberately not a pass/fail, so the
