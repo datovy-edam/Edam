@@ -1,4 +1,4 @@
-﻿using System;
+using System;
 using System.Collections.Generic;
 
 // -----------------------------------------------------------------------------
@@ -128,6 +128,21 @@ namespace Edam.Data
       {
          DataConnection c = new DataConnection();
          DataSourceInfo source = Application.Session.GetDataSource(key);
+
+         // A missing data source is a CONFIGURATION gap, not a programming error: say which key is
+         // unconfigured and where it was looked for, instead of failing later with a NullReference.
+         if (source == null || String.IsNullOrWhiteSpace(source.GetConnectionString()))
+         {
+            string defaultKey = DataSources.GetDefaultDatabaseKey();
+            throw new InvalidOperationException(
+               $"Data source '{key}' has no connection string: it is not in the session's data " +
+               $"sources and the application settings define no 'ConnectionStrings:{key}'. " +
+               $"Configure that connection string (or add the data source) and retry." +
+               (String.IsNullOrWhiteSpace(defaultKey)
+                  ? String.Empty
+                  : $" The configured default data source key is '{defaultKey}'."));
+         }
+
          c.CreateConnection(source.GetConnectionString());
          return c;
       }
