@@ -162,6 +162,12 @@ public static class ProjectServices
       // the catalog composition root supplies the local ICatalogStore/IContentStore for this target
       services.AddCatalogServices(effective);
 
+      // LM-2b-ii: content is addressed by CONTAINER + path. The container is the content store's
+      // instance scope, and the policy is the SAME one the service uses — so local and remote access
+      // to a container's content share one namespace.
+      IProjectContentStoreResolver contentResolver =
+         new ProjectContentStoreResolver(CatalogScopedContent.Factory(effective));
+
       var defaultCollection = settings.DefaultCollectionId;
 
       services.AddSingleton<IProjectCatalog>(provider =>
@@ -174,12 +180,13 @@ public static class ProjectServices
          var surfaces = ResolveSurfaces(provider);
          return new CatalogProjectStore(
             provider.GetRequiredService<IProjectCatalog>(),
-            surfaces.Containers, surfaces.Items, surfaces.Content);
+            surfaces.Containers, surfaces.Items, surfaces.Content, contentResolver);
       });
       services.AddSingleton<IProjectResources>(provider =>
       {
          var surfaces = ResolveSurfaces(provider);
-         return new CatalogProjectResources(surfaces.Containers, surfaces.Items, surfaces.Content);
+         return new CatalogProjectResources(
+            surfaces.Containers, surfaces.Items, surfaces.Content, contentResolver);
       });
 
       // LM-5: seeding is a separate, replaceable capability from scaffolding (structure-only).

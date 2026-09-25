@@ -1,6 +1,11 @@
 using Edam.Data.Catalog.Contracts;
+using Edam.Data.Catalog.DependencyInjection;
 using Edam.Data.Catalog.FileSystem;
 using Edam.Data.Catalog.PostgreSql;
+using Edam.Data.Projects.Catalog;
+using Edam.Data.Projects.Contracts;
+using Edam.Data.Projects.DependencyInjection;
+using Microsoft.Extensions.Configuration;
 
 namespace Edam.Data.Projects.Conformance;
 
@@ -66,6 +71,41 @@ public static class ScopingScenario
       Check("The legacy container-blind lookup still resolves (ambiguous, kept for compatibility)",
          store.GetItemByPath(shared) is not null,
          store.GetItemByPath(shared)?.ContainerId.ToString()[..8] ?? "<null>");
+
+      // ---- LM-2b-ii: the PROJECTS layer uses the container-scoped store ------------------------
+      {
+         var root = Path.Combine(workRoot, "projects-scope");
+         Directory.CreateDirectory(root);
+
+         var catalog = new FileSystemCatalogStore(root);
+         var unscoped = new FileSystemContentStore(root);      // the fallback
+         catalog.EnlistContainer("scoped.a", "LM-2b-ii A", null, ContainerType.FileSystem);
+         catalog.EnlistContainer("scoped.b", "LM-2b-ii B", null, ContainerType.FileSystem);
+
+         var resolver = new ProjectContentStoreResolver(CatalogScopedContent.Factory(
+            new ConfigurationBuilder().AddInMemoryCollection(new Dictionary<string, string>
+            {
+               ["Edam:Catalog:Target"] = "filesystem",
+               ["Edam:Catalog:FileSystemRoot"] = root,
+            }).Build()));
+
+         var resources = new CatalogProjectResources(catalog, catalog, unscoped, resolver);
+
+         // the SAME project path in two containers (no prefix convention involved)
+         var path = ProjectPath.Parse("/Projects/Same.Name/Documents/out.txt");
+         var projectA = new ProjectInfo("a", "Same.Name", "v1r0", "scoped.a", ProjectPath.Root);
+         var projectB = new ProjectInfo("b", "Same.Name", "v1r0", "scoped.b", ProjectPath.Root);
+
+         await resources.WriteAsync(projectA, path, Bytes("A bytes"), ct).ConfigureAwait(false);
+         await resources.WriteAsync(projectB, path, Bytes("B bytes"), ct).ConfigureAwait(false);
+
+         var readProjectA = await ReadAsync(resources, projectA, path, ct).ConfigureAwait(false);
+         var readProjectB = await ReadAsync(resources, projectB, path, ct).ConfigureAwait(false);
+
+         Check("The PROJECTS layer keeps two containers' identical paths apart (LM-2b-ii)",
+            readProjectA == "A bytes" && readProjectB == "B bytes",
+            $"a='{readProjectA}' b='{readProjectB}'");
+      }
 
       // ---- LM-2b: the CONTENT namespace is container-scoped (file system) ----------------------
       var contentRoot = Path.Combine(workRoot, "content");
@@ -151,6 +191,16 @@ public static class ScopingScenario
 
    private static MemoryStream Bytes(string text)
       => new(System.Text.Encoding.UTF8.GetBytes(text));
+
+   private static async Task<string?> ReadAsync(
+      IProjectResources resources, ProjectInfo project, ProjectPath path, CancellationToken ct)
+   {
+      using var stream = await resources.OpenReadAsync(project, path, ct).ConfigureAwait(false);
+      if (stream is null) return null;
+
+      using var reader = new StreamReader(stream);
+      return await reader.ReadToEndAsync(ct).ConfigureAwait(false);
+   }
 
    private static async Task<string?> ReadAsync(
       IContentStore content, string path, CancellationToken ct)

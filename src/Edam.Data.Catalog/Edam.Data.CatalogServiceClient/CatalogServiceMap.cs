@@ -21,11 +21,24 @@ public class CatalogServiceMap
 {
    private readonly ICatalogStore store;
    private readonly IContentStore? content;
+   private readonly Func<string, IContentStore?>? contentForContainer;
 
-   public CatalogServiceMap(WebApplication app, ICatalogStore store, IContentStore? content = null)
+   /// <param name="app">The web application to map the routes onto.</param>
+   /// <param name="store">The catalog metadata store.</param>
+   /// <param name="content">The (unscoped) content store; its routes are mapped when configured.</param>
+   /// <param name="contentForContainer">
+   /// LM-2b-ii: a factory that returns a <b>container-scoped</b> content store, so content is addressed by
+   /// <b>container + path</b>. Returning <c>null</c> (or no factory at all) falls back to the unscoped
+   /// store — which is also what the sentinel container <c>default</c> means, keeping content written
+   /// before container scoping reachable.
+   /// </param>
+   public CatalogServiceMap(
+      WebApplication app, ICatalogStore store, IContentStore? content = null,
+      Func<string, IContentStore?>? contentForContainer = null)
    {
       this.store = store;
       this.content = content;
+      this.contentForContainer = contentForContainer;
 
       #region -- 1.50 - Initialization and Session Management
 
@@ -235,19 +248,26 @@ public class CatalogServiceMap
       {
          var contentStore = content;   // non-nullable local — safe to capture in the handlers
 
+         // LM-2b-ii: content is addressed by CONTAINER + path. The container is optional on the wire
+         // (a client that sends none — or the sentinel 'default' — keeps the legacy unscoped namespace).
+         IContentStore For(string? containerId)
+            => string.IsNullOrWhiteSpace(containerId)
+               ? contentStore
+               : contentForContainer?.Invoke(containerId!) ?? contentStore;
+
          // content descriptor (existence) at a resource path
          app.MapGet("/catalogservice/content/info", async (
-            string sessionId, string resourcePath) =>
+            string sessionId, string resourcePath, string? containerId) =>
          {
-            var exists = await contentStore.ExistsAsync(resourcePath);
+            var exists = await For(containerId).ExistsAsync(resourcePath);
             return new ContentInfo(resourcePath, exists);
          });
 
          // content payload at a resource path (base64; Exists=false when absent)
          app.MapGet("/catalogservice/content/item", async (
-            string sessionId, string resourcePath) =>
+            string sessionId, string resourcePath, string? containerId) =>
          {
-            using var stream = await contentStore.OpenReadAsync(resourcePath);
+            using var stream = await For(containerId).OpenReadAsync(resourcePath);
             if (stream is null)
                return new ContentInfo(resourcePath, false);
 
@@ -260,26 +280,26 @@ public class CatalogServiceMap
 
          // write/replace content at a resource path
          app.MapPost("/catalogservice/content/item", async (
-            string sessionId, ContentInfo payload) =>
+            string sessionId, string? containerId, ContentInfo payload) =>
          {
             if (payload.ContentBase64 is null)
                return new ContentInfo(payload.ResourcePath, false);
 
             using var ms = new MemoryStream(
                System.Convert.FromBase64String(payload.ContentBase64));
-            await contentStore.WriteAsync(payload.ResourcePath, ms);
+            await For(containerId).WriteAsync(payload.ResourcePath, ms);
             return new ContentInfo(
                payload.ResourcePath, true, ms.Length, payload.ContentType);
          });
 
          // delete content at a resource path
          app.MapDelete("/catalogservice/content/item", async (
-            string sessionId, string resourcePath) =>
+            string sessionId, string resourcePath, string? containerId) =>
          {
             RequestResponseInfo response = new RequestResponseInfo();
             try
             {
-               response.Success = await contentStore.DeleteAsync(resourcePath);
+               response.Success = await For(containerId).DeleteAsync(resourcePath);
                response.Status = response.Success
                   ? RequestStatus.Completed : RequestStatus.Failed;
             }

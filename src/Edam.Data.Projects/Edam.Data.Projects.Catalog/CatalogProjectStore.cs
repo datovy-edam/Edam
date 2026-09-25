@@ -21,15 +21,27 @@ public sealed class CatalogProjectStore : IProjectStore
    private readonly ICatalogContainer _containers;
    private readonly ICatalogItem _items;
    private readonly IContentStore _content;
+   private readonly IProjectContentStoreResolver? _contentResolver;
 
+   /// <param name="catalog">The project catalog.</param>
+   /// <param name="containers">The container surface.</param>
+   /// <param name="items">The item surface.</param>
+   /// <param name="content">The (unscoped) content store — the fallback.</param>
+   /// <param name="contentResolver">LM-2b-ii: resolves the <b>container-scoped</b> content store.</param>
    public CatalogProjectStore(
-      IProjectCatalog catalog, ICatalogContainer containers, ICatalogItem items, IContentStore content)
+      IProjectCatalog catalog, ICatalogContainer containers, ICatalogItem items, IContentStore content,
+      IProjectContentStoreResolver? contentResolver = null)
    {
       _catalog = catalog ?? throw new ArgumentNullException(nameof(catalog));
       _containers = containers ?? throw new ArgumentNullException(nameof(containers));
       _items = items ?? throw new ArgumentNullException(nameof(items));
       _content = content ?? throw new ArgumentNullException(nameof(content));
+      _contentResolver = contentResolver;
    }
+
+   /// <summary>LM-2b-ii: the container-scoped store when a resolver is configured, else the injected one.</summary>
+   private IContentStore Content(ContainerInfo container)
+      => _contentResolver?.ForContainer(container) ?? _content;
 
    public async Task<ProjectInfo> CreateAsync(
       string collectionId, string name, string? description = null, CancellationToken ct = default)
@@ -77,7 +89,7 @@ public sealed class CatalogProjectStore : IProjectStore
 
       // index the folder INTO the project branch; content keys are full paths (no collisions)
       var indexed = await FolderCatalogIndexer.IndexDetailedAsync(
-         container.Id, _items, _content, sourceLocation,
+         container.Id, _items, Content(container), sourceLocation,
          indexContent: true, ct: ct, pathPrefix: projectPath.Value).ConfigureAwait(false);
 
       var project = await _catalog.GetProjectAsync(collectionId, name, ct).ConfigureAwait(false)
@@ -89,7 +101,7 @@ public sealed class CatalogProjectStore : IProjectStore
    public async Task ExportAsync(
       string collectionId, string projectName, string targetLocation, CancellationToken ct = default)
    {
-      await CatalogProjectSupport.RequireContainerAsync(_containers, collectionId, ct)
+      var container = await CatalogProjectSupport.RequireContainerAsync(_containers, collectionId, ct)
          .ConfigureAwait(false);
 
       var project = await _catalog.GetProjectAsync(collectionId, projectName, ct).ConfigureAwait(false)
@@ -116,7 +128,7 @@ public sealed class CatalogProjectStore : IProjectStore
          var parent = Path.GetDirectoryName(physical);
          if (!string.IsNullOrEmpty(parent)) Directory.CreateDirectory(parent);
 
-         using var stream = await _content.OpenReadAsync(item.FullPath, ct).ConfigureAwait(false);
+         using var stream = await Content(container).OpenReadAsync(item.FullPath, ct).ConfigureAwait(false);
          if (stream is null) continue;
 
          using var file = File.Create(physical);
@@ -127,7 +139,7 @@ public sealed class CatalogProjectStore : IProjectStore
    public async Task<bool> DeleteAsync(
       string collectionId, string projectName, CancellationToken ct = default)
    {
-      await CatalogProjectSupport.RequireContainerAsync(_containers, collectionId, ct)
+      var container = await CatalogProjectSupport.RequireContainerAsync(_containers, collectionId, ct)
          .ConfigureAwait(false);
 
       var project = await _catalog.GetProjectAsync(collectionId, projectName, ct).ConfigureAwait(false);
@@ -140,7 +152,7 @@ public sealed class CatalogProjectStore : IProjectStore
                   .OrderByDescending(i => i.FullPath.Length))
       {
          if (item.Type == ItemType.Leaf)
-            await _content.DeleteAsync(item.FullPath, ct).ConfigureAwait(false);
+            await Content(container).DeleteAsync(item.FullPath, ct).ConfigureAwait(false);
 
          if (_items.DeleteItem(item.Id)) removed = true;
       }

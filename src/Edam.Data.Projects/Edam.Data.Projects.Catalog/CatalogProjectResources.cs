@@ -20,14 +20,28 @@ public sealed class CatalogProjectResources : IProjectResources
    private readonly ICatalogContainer _containers;
    private readonly ICatalogItem _items;
    private readonly IContentStore _content;
+   private readonly IProjectContentStoreResolver? _contentResolver;
 
+   /// <param name="containers">The container surface.</param>
+   /// <param name="items">The item surface.</param>
+   /// <param name="content">The (unscoped) content store — the fallback.</param>
+   /// <param name="contentResolver">
+   /// LM-2b-ii: resolves the <b>container-scoped</b> content store, so two containers may hold the same
+   /// path. Absent (the default) keeps the single injected store, i.e. the behaviour before scoping.
+   /// </param>
    public CatalogProjectResources(
-      ICatalogContainer containers, ICatalogItem items, IContentStore content)
+      ICatalogContainer containers, ICatalogItem items, IContentStore content,
+      IProjectContentStoreResolver? contentResolver = null)
    {
       _containers = containers ?? throw new ArgumentNullException(nameof(containers));
       _items = items ?? throw new ArgumentNullException(nameof(items));
       _content = content ?? throw new ArgumentNullException(nameof(content));
+      _contentResolver = contentResolver;
    }
+
+   /// <summary>LM-2b-ii: the container-scoped store when a resolver is configured, else the injected one.</summary>
+   private IContentStore Content(ContainerInfo container)
+      => _contentResolver?.ForContainer(container) ?? _content;
 
    public async Task<IReadOnlyList<ProjectResourceInfo>> ListAsync(
       ProjectInfo project, ProjectPath folder, string? extension = null, CancellationToken ct = default)
@@ -67,9 +81,10 @@ public sealed class CatalogProjectResources : IProjectResources
    public async Task<Stream?> OpenReadAsync(
       ProjectInfo project, ProjectPath path, CancellationToken ct = default)
    {
-      await CatalogProjectSupport.RequireContainerAsync(_containers, project.CollectionId, ct)
-         .ConfigureAwait(false);
-      return await _content.OpenReadAsync(CatalogProjectSupport.Full(project, path), ct)
+      var container = await CatalogProjectSupport
+         .RequireContainerAsync(_containers, project.CollectionId, ct).ConfigureAwait(false);
+      return await Content(container)
+         .OpenReadAsync(CatalogProjectSupport.Full(project, path), ct)
          .ConfigureAwait(false);
    }
 
@@ -87,7 +102,7 @@ public sealed class CatalogProjectResources : IProjectResources
          FolderCatalogIndexer.DeterministicId(container.Id, full), container.Id, full,
          path.Name, null, ItemType.Leaf, now, now), ct).ConfigureAwait(false);
 
-      await _content.WriteAsync(full, content, ct).ConfigureAwait(false);
+      await Content(container).WriteAsync(full, content, ct).ConfigureAwait(false);
    }
 
    public async Task<ProjectPath> CreateFolderAsync(
@@ -105,13 +120,13 @@ public sealed class CatalogProjectResources : IProjectResources
    public async Task<bool> DeleteAsync(
       ProjectInfo project, ProjectPath path, CancellationToken ct = default)
    {
-      await CatalogProjectSupport.RequireContainerAsync(_containers, project.CollectionId, ct)
+      var container = await CatalogProjectSupport.RequireContainerAsync(_containers, project.CollectionId, ct)
          .ConfigureAwait(false);
 
       var full = CatalogProjectSupport.Full(project, path);
       var item = _items.GetItemByPath(full);
       var itemDeleted = item is not null && _items.DeleteItem(item.Id);
-      var contentDeleted = await _content.DeleteAsync(full, ct).ConfigureAwait(false);
+      var contentDeleted = await Content(container).DeleteAsync(full, ct).ConfigureAwait(false);
 
       return itemDeleted || contentDeleted;
    }

@@ -27,11 +27,19 @@ public sealed class CatalogHttpContent : IContentStore
       _client = client;
    }
 
+   /// <summary>
+   /// LM-2b-ii: the container this client addresses content for. It is sent with every content call, so
+   /// the service can use a <b>container-scoped</b> store; the sentinel <c>default</c> means the legacy,
+   /// unscoped namespace.
+   /// </summary>
+   private string Container => _client.DefaultContainerId;
+
    public async Task<bool> ExistsAsync(string resourcePath, CancellationToken ct = default)
    {
       _client.ResultsLog.Clear();
       var pars = new QueryStringBuilder();
       pars.Add(QueryStringTag.SessionId, _client.LastSessionId);
+      pars.Add(CatalogHttpClient.TAG_CONTAINER_ID, Container);
       pars.Add(CatalogHttpClient.TAG_RESOURCE_PATH, resourcePath);
       var endpoint = CatalogHttpClient.URI_CONTENT_INFO + pars.ToString();
       try
@@ -52,6 +60,7 @@ public sealed class CatalogHttpContent : IContentStore
       _client.ResultsLog.Clear();
       var pars = new QueryStringBuilder();
       pars.Add(QueryStringTag.SessionId, _client.LastSessionId);
+      pars.Add(CatalogHttpClient.TAG_CONTAINER_ID, Container);
       pars.Add(CatalogHttpClient.TAG_RESOURCE_PATH, resourcePath);
       var endpoint = CatalogHttpClient.URI_CONTENT_ITEM + pars.ToString();
       try
@@ -81,6 +90,7 @@ public sealed class CatalogHttpContent : IContentStore
 
       var pars = new QueryStringBuilder();
       pars.Add(QueryStringTag.SessionId, _client.LastSessionId);
+      pars.Add(CatalogHttpClient.TAG_CONTAINER_ID, Container);
       var endpoint = CatalogHttpClient.URI_CONTENT_ITEM + pars.ToString();
       try
       {
@@ -98,6 +108,7 @@ public sealed class CatalogHttpContent : IContentStore
       _client.ResultsLog.Clear();
       var pars = new QueryStringBuilder();
       pars.Add(QueryStringTag.SessionId, _client.LastSessionId);
+      pars.Add(CatalogHttpClient.TAG_CONTAINER_ID, Container);
       pars.Add(CatalogHttpClient.TAG_RESOURCE_PATH, resourcePath);
       var endpoint = CatalogHttpClient.URI_CONTENT_ITEM + pars.ToString();
       try

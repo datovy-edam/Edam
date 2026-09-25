@@ -53,11 +53,14 @@ public static class Program
       app.MapOpenApi();
 
       // setup service container (content is optional — its routes are mapped only when a
-      // content provider resolved for the configured target)
+      // content provider resolved for the configured target).
+      // LM-2b-ii: content is addressed by CONTAINER + path, so the map is given a factory that
+      // builds a container-scoped store; the sentinel 'default' keeps the legacy unscoped namespace.
       CatalogServiceMap map = new(
          app,
          app.Services.GetRequiredService<ICatalogStore>(),
-         app.Services.GetService<IContentStore>());
+         app.Services.GetService<IContentStore>(),
+         CatalogScopedContent.Factory(builder.Configuration));
 
       return app;
    }
