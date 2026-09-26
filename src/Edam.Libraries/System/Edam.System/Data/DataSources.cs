@@ -1,4 +1,4 @@
-﻿using System;
+using System;
 using System.Collections.Generic;
 using System.Xml.Serialization;
 using System.Runtime.Serialization;
@@ -205,20 +205,31 @@ namespace Edam.Data
       }
 
       /// <summary>
+      /// Set once a lookup had to substitute the default data source, so the substitution is reported
+      /// instead of being repeated silently on every call.
+      /// </summary>
+      private static bool m_DefaultSubstitutionReported;
+
+      /// <summary>
       /// Get Data Source related to given configuration string key.  Data
       /// Sources will be tried to be found in the Session DataSourceCollection,
-      /// if not found there then the key will be use to try finding it based on
-      /// the application settings.
+      /// if not found there then the key will be used to try finding it based on the application
+      /// settings, and <b>finally the registered default data source is used</b>.
+      /// <para>
+      /// An application or service must always have <b>at least one</b> database it can resolve, so a
+      /// key that nothing configures must not make the data layer unusable. The substitution is
+      /// reported (once) so the missing configuration can be corrected; only when <i>nothing</i> is
+      /// configured — no default either — does this return <c>null</c> for the caller to report.
+      /// </para>
       /// </summary>
       /// <param name="key">key to use</param>
       /// <param name="addIt">true to add it</param>
-      /// <returns>if found the connection string is returned</returns>
+      /// <returns>if found the data source is returned</returns>
       public static DataSourceInfo GetDataSource(String key, bool addIt = true)
       {
          DataSourceInfo ds = null;
 
          // try to find the key in data sources cache...
-
          DataSourceInfo dsource = Session.DataSourceCollection.Find(key);
          if (dsource != null)
          {
@@ -227,19 +238,37 @@ namespace Edam.Data
 
          // try to get it from app settings...
          string cstring = Settings.GetConnectionString(key);
-         if (String.IsNullOrWhiteSpace(cstring))
-         {
-            return ds;
-         }
-         else
+         if (!String.IsNullOrWhiteSpace(cstring))
          {
             ds = new DataSourceInfo();
             ds.ConnectionString = cstring;
+            ds.Key = key;
             if (addIt)
             {
                Session.DataSourceCollection.Add(key, ds);
             }
+            return ds;
          }
+
+         // LAST RESORT: the registered default, so the data layer always has a database to reach
+         DataSourceInfo fallback =
+            Session.DataSourceCollection.Find(Keys.DefaultDbKeyId)
+            ?? Session.DataSourceCollection.SelectedDataSource;
+
+         if (fallback != null && !String.IsNullOrWhiteSpace(fallback.GetConnectionString()))
+         {
+            if (!m_DefaultSubstitutionReported)
+            {
+               m_DefaultSubstitutionReported = true;
+               System.Diagnostics.Debug.WriteLine(
+                  $"Data source '{key}' is not configured; the default data source " +
+                  $"'{fallback.Key}' is being used instead. Configure the connection string for " +
+                  $"'{key}' to remove this substitution.");
+            }
+            return fallback;
+         }
+
+         // nothing at all is configured — the caller reports the key that could not be resolved
          return ds;
       }
 
@@ -254,7 +283,11 @@ namespace Edam.Data
       {
          string dkey = String.IsNullOrWhiteSpace(key) ? 
             Keys.DefaultDbKeyId : key;
-         var item = Session.DataSourceCollection.Find(key) as DataSourceInfo;
+
+         // look up the key that is about to be used: previously the caller's key was used, which is
+         // null/empty exactly in the default case, so the lookup always missed and a duplicate
+         // "Default" entry was added.
+         var item = Session.DataSourceCollection.Find(dkey) as DataSourceInfo;
          if (item != null)
          {
             item.ConnectionString = connectionString;
