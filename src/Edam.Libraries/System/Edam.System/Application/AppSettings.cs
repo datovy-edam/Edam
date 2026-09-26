@@ -1,4 +1,4 @@
-﻿using System;
+using System;
 using System.IO;
 using Microsoft.Extensions.Configuration;
 
@@ -23,16 +23,38 @@ namespace Edam.Application
 
       public static string ApplicationDataFolder { get; private set; }
       public static string ApplicationFolder { get; private set; }
+
+      /// <summary>
+      /// Set when <c>appsettings.json</c> could not be loaded (for example malformed JSON — remember
+      /// JSON allows <b>no comments and no trailing commas</b>). Reading a setting then fails with this
+      /// reason instead of an opaque <c>TypeInitializationException</c>: a static constructor cannot be
+      /// retried, so the detail has to be captured here.
+      /// </summary>
+      public static string ConfigurationError { get; private set; }
+
       private static IConfiguration m_Configuration;
 
       static AppSettings()
       {
-         m_Configuration = new ConfigurationBuilder()
-            .AddJsonFile(
-               APP_CONFIG_FILE_PATH, optional: true, reloadOnChange: true)
-            .Build();
          ApplicationFolder = AppDomain.CurrentDomain.BaseDirectory;
          ApplicationDataFolder = AppData.GetApplicationDataLocation();
+
+         try
+         {
+            m_Configuration = new ConfigurationBuilder()
+               .AddJsonFile(
+                  APP_CONFIG_FILE_PATH, optional: true, reloadOnChange: true)
+               .Build();
+         }
+         catch (Exception ex)
+         {
+            // keep the reason (and the file that failed) and carry on with an EMPTY configuration, so
+            // the type stays usable and the first read can report precisely what is wrong
+            string path = Path.Combine(ApplicationFolder, APP_CONFIG_FILE_PATH);
+            ConfigurationError =
+               $"Application settings '{path}' could not be loaded: {ex.Message}";
+            m_Configuration = new ConfigurationBuilder().Build();
+         }
       }
 
       /// <summary>
@@ -139,6 +161,13 @@ namespace Edam.Application
       /// <returns>setting value</returns>
       public static String GetString(String keyName)
       {
+         if (ConfigurationError != null)
+         {
+            throw new InvalidOperationException(
+               ConfigurationError + " Fix that file (JSON allows no comments and no trailing " +
+               "commas) and restart the application.");
+         }
+
          String value = m_Configuration[keyName];
          if (String.IsNullOrEmpty(value))
             value = String.Empty;
