@@ -3,6 +3,7 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
+using System.IO;
 using Microsoft.UI.Xaml.Controls;
 
 // -----------------------------------------------------------------------------
@@ -86,12 +87,39 @@ namespace Edam.WinUI.Controls.ViewModels
             return null;
          }
 
-         if (path[path.Length-1]== '/' || path[path.Length-1] == '\\')
+         // The editor's web assets ship WITH THE APPLICATION (…\web\monaco-editor\…), so the base is
+         // the application folder — the caller may pass one, and the app-data folder stays a fallback
+         // for layouts that carry them there. The process current directory is never used (ADR-0011).
+         var relative = url.Replace('\\', '/').TrimStart('/')
+            .Replace('/', Path.DirectorySeparatorChar);
+
+         var bases = new List<string>();
+         if (!String.IsNullOrWhiteSpace(path))
          {
-            path = path.Substring(0, path.Length-1);
+            bases.Add(path);
+         }
+         bases.Add(AppContext.BaseDirectory);
+         bases.Add(ConfigurationHelper.GetAbsoluteAppDataPath(String.Empty));
+
+         foreach (var candidateBase in bases)
+         {
+            if (String.IsNullOrWhiteSpace(candidateBase))
+            {
+               continue;
+            }
+
+            var candidate = Path.Combine(candidateBase.TrimEnd('/', '\\'), relative);
+            if (File.Exists(candidate))
+            {
+               m_CodeEditorPath = ConfigurationHelper.GetAbsoluteFileUri(candidate);
+               return m_CodeEditorPath;
+            }
          }
 
-         m_CodeEditorPath = ConfigurationHelper.GetAbsoluteFileUri(path + url);
+         // not found: still navigate to the application-folder location, so the WebView reports a
+         // clear failure instead of showing nothing at all
+         m_CodeEditorPath = ConfigurationHelper.GetAbsoluteFileUri(
+            Path.Combine(AppContext.BaseDirectory.TrimEnd('/', '\\'), relative));
          return m_CodeEditorPath;
       }
 
