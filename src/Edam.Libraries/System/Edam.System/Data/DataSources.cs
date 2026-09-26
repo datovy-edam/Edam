@@ -75,6 +75,59 @@ namespace Edam.Data
       }
 
       /// <summary>
+      /// Verify that every configured data source can actually be <b>opened</b> and return one message
+      /// per problem (empty when all are reachable).
+      /// <para>
+      /// This is a <b>startup guard</b>: a missing database, or a login without access to it, should be
+      /// reported <b>early and readably</b> instead of surfacing as a provider exception deep inside a
+      /// worker thread. <b>Windows/SSPI authentication is used whenever the connection string asks for
+      /// it</b> (<c>Integrated Security=True</c>); the platform never requires a SQL login. Each probe
+      /// uses a short connect timeout so a stopped server cannot stall startup.
+      /// </para>
+      /// </summary>
+      /// <param name="connectTimeoutSeconds">per-source connect timeout (default 5 seconds)</param>
+      /// <returns>one message per data source that could not be opened</returns>
+      public static IReadOnlyList<String> VerifyDataSources(
+         Int16 connectTimeoutSeconds = 5)
+      {
+         var problems = new List<String>();
+
+         var sources = Session.DataSourceCollection?.Sources;
+         if (sources == null)
+         {
+            return problems;
+         }
+
+         foreach (var source in sources)
+         {
+            var connectionString = source?.GetConnectionString();
+            if (String.IsNullOrWhiteSpace(connectionString))
+            {
+               continue;
+            }
+
+            try
+            {
+               var builder =
+                  new System.Data.SqlClient.SqlConnectionStringBuilder(connectionString);
+               builder.ConnectTimeout = connectTimeoutSeconds;
+
+               using var connection =
+                  new System.Data.SqlClient.SqlConnection(builder.ConnectionString);
+               connection.Open();
+            }
+            catch (Exception ex)
+            {
+               problems.Add(
+                  (String.IsNullOrWhiteSpace(source.Key) ? "(default)" : source.Key) +
+                  ": " + ex.Message.Trim());
+            }
+         }
+
+         return problems;
+      }
+
+      /// <summary>
       /// Get Default connection string...
       /// </summary>
       /// <param name="sources"></param>

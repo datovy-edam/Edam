@@ -157,6 +157,16 @@ namespace Edam.Application.Settings
          SetReferenceDataConnectionString(connectionString);
       }
 
+      private static bool m_DataSourcesVerified;
+
+      /// <summary>
+      /// Problems found by the last <see cref="VerifySetConnectionString"/> run: one message per data
+      /// source that could not be <b>opened</b> (empty when everything is reachable). A host can surface
+      /// this early instead of letting a missing database appear deep inside a worker thread.
+      /// </summary>
+      public static IReadOnlyList<String> DataSourceProblems { get; private set; } =
+         Array.Empty<String>();
+
       /// <summary>
       /// Verify that a Connection String associated with default db keys are 
       /// available.  If not try setting up those.
@@ -197,6 +207,23 @@ namespace Edam.Application.Settings
             if (dstring == null)
             {
                SetReferenceDataConnectionString(cstring);
+            }
+         }
+
+         // ...and PROVE what is configured: a missing database — or a login without access to it — must
+         // be known EARLY and readably, instead of dying deep inside a worker thread later (the death
+         // trap of HANDOFF items 64-70). Windows/SSPI authentication is used whenever the connection
+         // string asks for it (Integrated Security=True); the platform never requires a SQL login.
+         // Probing happens once per process so repeated startup calls stay cheap.
+         if (!m_DataSourcesVerified)
+         {
+            m_DataSourcesVerified = true;
+            DataSourceProblems = data.DataSources.VerifyDataSources();
+
+            if (DataSourceProblems.Count > 0)
+            {
+               System.Diagnostics.Debug.WriteLine(
+                  "Data source problems: " + String.Join("; ", DataSourceProblems));
             }
          }
       }
