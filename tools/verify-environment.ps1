@@ -152,6 +152,16 @@ else {
     else {
         $serverDatabases = @($listed.Text -split "`n" | ForEach-Object { $_.Trim() } | Where-Object { $_ -ne "" })
         Write-Host "     instance has $($serverDatabases.Count) database(s): $($serverDatabases -join ', ')"
+
+        # can this login CREATE a database? (a publish needs sysadmin or dbcreator)
+        $roles = Invoke-Sql "master" "SET NOCOUNT ON; SELECT IS_SRVROLEMEMBER('sysadmin'), IS_SRVROLEMEMBER('dbcreator');"
+        if ($roles.Ok -and $roles.Text -match "^(\d)\s+(\d)") {
+            $sysadmin = $Matches[1]; $dbcreator = $Matches[2]
+            Write-Host "     login roles: sysadmin=$sysadmin dbcreator=$dbcreator"
+            if ($sysadmin -eq "0" -and $dbcreator -eq "0") {
+                $notes += "this login is neither sysadmin nor dbcreator: publishing a database project will need an instance administrator (or a grant of dbcreator)"
+            }
+        }
     }
 }
 
@@ -168,9 +178,9 @@ foreach ($w in $wanted) {
         $hint = if ($projectFor.ContainsKey($db)) {
             "publish $($projectFor[$db])"
         } else {
-            "no database project for it exists in this repository — find its source (backup/script) or point the connection string elsewhere"
+            "no database project for it exists in this repository"
         }
-        $problems += "database '$db' ($($w.Key), $auth) DOES NOT EXIST on '$Server' — $hint"
+        $problems += "database '$db' ($($w.Key), $auth) DOES NOT EXIST on '$Server' — $hint. Note: a database whose data layer creates it on first use (EF 'Database.EnsureCreated()') appears the first time that feature runs, so an absent database is only fatal for code paths that need it immediately (the reference-data path needs 'Edam.Database' at startup)."
         continue
     }
 
