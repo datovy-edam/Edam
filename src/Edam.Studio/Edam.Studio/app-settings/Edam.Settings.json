@@ -3,7 +3,7 @@
     "Defaults": {
       "OrganizationId": "Datovy"
     },
-    "ConsolePath": "C:\\Users\\esobr\\Documents/Edam.Studio/Edam.App.Data/",
+    "ConsolePath": "./app-data/Edam.App.Data/",
     "UriList": [
       {
         "Name": "Default",
@@ -11,14 +11,9 @@
         "UriText": ""
       },
       {
-        "Name": "Edam.Studio",
-        "Type": 1,
-        "UriText": "C:\\prjs\\Datovy.Edam/Edam.App.Data/"
-      },
-      {
         "Name": "Other",
         "Type": 1,
-        "UriText": "C:\\Users\\esobr\\Documents/Edam.Studio/Edam.App.Other/"
+        "UriText": "./app-data/Edam.App.Other/"
       }
     ]
   },

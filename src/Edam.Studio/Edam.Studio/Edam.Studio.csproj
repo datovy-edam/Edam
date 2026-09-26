@@ -11,32 +11,29 @@
     <UseWinUI>true</UseWinUI>
     <EnableMsixTooling>true</EnableMsixTooling>
     <RunPostBuildEvent>Always</RunPostBuildEvent>
-    <PackageCertificateThumbprint>FA07203CA883694B4DCD081E1E038214C5F188B3</PackageCertificateThumbprint>
+    <!-- Development certificate installed in the current user's certificate store. Override
+         PackageCertificateThumbprint for a different signing certificate on another machine. -->
+    <PackageCertificateThumbprint Condition="'$(PackageCertificateThumbprint)' == ''">B5C164EC40289FF1A3A02914EC8EB8613FD1CB5D</PackageCertificateThumbprint>
     <AppxPackageSigningEnabled>True</AppxPackageSigningEnabled>
     <GeneratePackageOnBuild>False</GeneratePackageOnBuild>
-    <GenerateAppInstallerFile>True</GenerateAppInstallerFile>
+    <!-- AppInstallerUri previously pointed at a local path, so publishing could not produce a
+         usable App Installer feed. Local deployment uses the signed MSIX and generated test layout. -->
+    <GenerateAppInstallerFile>False</GenerateAppInstallerFile>
     <AppxPackageSigningTimestampDigestAlgorithm>SHA256</AppxPackageSigningTimestampDigestAlgorithm>
     <AppxAutoIncrementPackageRevision>True</AppxAutoIncrementPackageRevision>
     <AppxSymbolPackageEnabled>False</AppxSymbolPackageEnabled>
     <GenerateTestArtifacts>True</GenerateTestArtifacts>
     <AppxBundle>Never</AppxBundle>
-    <AppInstallerUri>c:/temp/edam.studio.pack</AppInstallerUri>
-    <HoursBetweenUpdateChecks>0</HoursBetweenUpdateChecks>
     <PackageIcon>edam.logo.png</PackageIcon>
     <PlatformTarget>x64</PlatformTarget>
     <SignAssembly>False</SignAssembly>
   </PropertyGroup>
 
-  <!--
-    Debug runs UNPACKAGED so the built exe can be launched directly from the output folder.
-    A packaged WinUI app needs PACKAGE IDENTITY for WinRT/XAML activation: launching the raw exe
-    outside its package fails in Application.Start with 0x80040154 REGDB_E_CLASSNOTREG
-    ("Class not registered"). With WindowsPackageType=None the Windows App SDK bootstrapper
-    initializes the installed runtime instead, so plain "run the exe" works for development.
-    Release keeps the MSIX packaging/signing configuration used for distribution.
-  -->
-  <PropertyGroup Condition="'$(Configuration)' == 'Debug'">
-    <WindowsPackageType>None</WindowsPackageType>
+  <!-- Keep Debug packaged as well as Release. The solution configuration has a Deploy mapping
+       and the WinUI shell needs package identity for framework/XAML activation. To run the raw
+       executable intentionally, pass WindowsPackageType=None on the command line instead. -->
+  <PropertyGroup>
+    <WindowsPackageType>MSIX</WindowsPackageType>
   </PropertyGroup>
   <ItemGroup>
     <Compile Remove="BundleArtifacts\**" />
@@ -48,6 +45,7 @@
     <Content Remove="Assets\edam.logo.png" />
   </ItemGroup>
   <ItemGroup>
+    <None Remove="app-settings\Edam.Settings.json" />
     <None Remove="appsettings.json" />
     <None Remove="Assets\LargeTile.scale-125.png" />
     <None Remove="Assets\LargeTile.scale-150.png" />
@@ -79,8 +77,24 @@
   </ItemGroup>
 
   <ItemGroup>
+    <Content Include="app-settings\Edam.Settings.json">
+      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
+    </Content>
     <Content Include="appsettings.json">
       <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </Content>
+    <!-- LM-0(b) / ADR-0010: the packaged settings seed. `ApplicationHelper.InitializeApplication`
+         copies `<installed>/ApplicationData/Edam.Studio` into a WRITABLE per-user app-data root on
+         first run, so the seed must ship at that layout. The source of record is the repo's
+         `app-data/` folder — the project-local `ApplicationData/` folder it replaced no longer
+         exists, so this include was previously vacuous and a clean build packaged NO seed. -->
+    <Content Include="..\..\..\app-data\Edam.App.Data\**" Link="ApplicationData\Edam.Studio\Edam.App.Data\%(RecursiveDir)%(Filename)%(Extension)">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+      <CopyToPublishDirectory>PreserveNewest</CopyToPublishDirectory>
+    </Content>
+    <Content Include="..\..\..\app-data\Edam.Settings.json" Link="ApplicationData\Edam.Studio\Edam.App.Data\Edam.Settings.json">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+      <CopyToPublishDirectory>PreserveNewest</CopyToPublishDirectory>
     </Content>
     <Content Include="Assets\SplashScreen.scale-200.png" />
     <Content Include="Assets\LockScreenLogo.scale-200.png">
@@ -103,7 +117,7 @@
     <PackageReference Include="Edam.DataObjects" Version="1.0.1" />
     <PackageReference Include="Edam.Language.Python" Version="1.0.0" />
     <PackageReference Include="Edam.Security" Version="1.0.0" />
-    <PackageReference Include="Edam.System" Version="1.0.0" />
+    <PackageReference Include="Edam.System" Version="1.0.1" />
     <PackageReference Include="Microsoft.EntityFrameworkCore.SqlServer" Version="9.0.2" />
     <PackageReference Include="Microsoft.Extensions.Configuration" Version="10.0.11" />
     <PackageReference Include="Microsoft.Extensions.Configuration.Abstractions" Version="10.0.11" />

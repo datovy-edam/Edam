@@ -307,7 +307,8 @@ namespace Edam.WinUI.Controls.Application
          // prepare AppData folder and create/copy AppData folder...
          AppData.InitializeAppData(EDAM_STUDIO);
          AppData.InitializeAppDataCopy(
-            GetApplicationInstalledLocation() + "/" + AppData.APPLICATION_DATA);
+            GetApplicationInstalledLocation() + "/" + AppData.APPLICATION_DATA +
+            "/" + EDAM_STUDIO);
 
          // setup default project
          Project.SetDefaultFullPath();

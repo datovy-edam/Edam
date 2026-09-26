@@ -14,8 +14,8 @@ SELECT 'sqlserver' dbms,
        IS_IDENTITY = cast(
           case when COLUMNPROPERTY(object_id(t.TABLE_SCHEMA+'.'+t.TABLE_NAME), c.COLUMN_NAME, 'IsIdentity') = 1
 		       then 1 else 0 end as bit),
-       PRIVACY_TAG = isnull(Helper.Schema_Property_Value_Get(t.TABLE_SCHEMA,t.TABLE_NAME,c.COLUMN_NAME,'Privacy'),''),
-       TABLE_DESCRIPTION = isnull(Helper.Schema_Property_Value_Get(t.TABLE_SCHEMA,t.TABLE_NAME,c.Column_Name,'MS_Description'),'')
+       PRIVACY_TAG = isnull(Helper.Schema_Property_Value_Get(t.TABLE_SCHEMA,t.TABLE_NAME,c.COLUMN_NAME,'Privacy'),'') --,
+       --TABLE_DESCRIPTION = isnull(Helper.Schema_Property_Value_Get(t.TABLE_SCHEMA,t.TABLE_NAME,c.Column_Name,'MS_Description'),'')
        --COLUMN_DESCRIPTION = isnull(Helper.SchemaPropertyValueGet(t.TABLE_SCHEMA,t.TABLE_NAME,c.COLUMN_NAME,'MS_Description'),'')
   FROM INFORMATION_SCHEMA.TABLES t 
   LEFT JOIN INFORMATION_SCHEMA.COLUMNS c 

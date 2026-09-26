@@ -18,7 +18,9 @@ SELECT @instance InstanceName,
 	   ConstraintType,
        ReferenceTableSchema,
        ReferenceTableName,
-       ReferenceColumnName
+       ReferenceColumnName,
+	   PrivacyTag,
+	   TableDescription
   FROM (
   
 SELECT t.TABLE_SCHEMA SchemaName,
@@ -41,6 +43,10 @@ SELECT t.TABLE_SCHEMA SchemaName,
        isnull(k2.TABLE_SCHEMA,'') ReferenceTableSchema,
        isnull(k2.TABLE_NAME,'') ReferenceTableName,
        isnull(k2.COLUMN_NAME,'') ReferenceColumnName
+
+      --,PrivacyTag = isnull(Helper.Schema_Property_Value_Get(t.TABLE_SCHEMA,t.TABLE_NAME,c.COLUMN_NAME,'Privacy'),''),
+      -- TableDescription = isnull(Helper.Schema_Property_Value_Get(t.TABLE_SCHEMA,t.TABLE_NAME,c.Column_Name,'MS_Description'),'')
+	   
   FROM INFORMATION_SCHEMA.TABLES t 
   LEFT JOIN INFORMATION_SCHEMA.COLUMNS c 
     ON t.TABLE_CATALOG=c.TABLE_CATALOG 
@@ -63,7 +69,7 @@ SELECT t.TABLE_SCHEMA SchemaName,
     ON k.ORDINAL_POSITION=k2.ORDINAL_POSITION 
    AND r.UNIQUE_CONSTRAINT_CATALOG=k2.CONSTRAINT_CATALOG
    AND r.UNIQUE_CONSTRAINT_SCHEMA=k2.CONSTRAINT_SCHEMA 
-   AND r.UNIQUE_CONSTRAINT_NAME=k2.CONSTRAINT_NAME 
+   AND r.UNIQUE_CONSTRAINT_NAME=k2.CONSTRAINT_NAME
 
  UNION
 SELECT r.ROUTINE_SCHEMA SchemaName,
@@ -85,6 +91,10 @@ SELECT r.ROUTINE_SCHEMA SchemaName,
        cast('' as varchar(128)) ReferenceTableSchema,
        cast('' as varchar(128)) ReferenceTableName,
        cast('' as varchar(128)) ReferenceColumnName
+	   
+      ,'' PRIVACY_TAG,
+       '' TABLE_DESCRIPTION
+	   
   FROM INFORMATION_SCHEMA.ROUTINES r
   JOIN INFORMATION_SCHEMA.PARAMETERS p
     ON r.ROUTINE_CATALOG = p.SPECIFIC_CATALOG

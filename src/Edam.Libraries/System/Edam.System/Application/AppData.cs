@@ -18,10 +18,29 @@ namespace Edam.Application
 
       private static string m_FolderPath;
       private static bool m_NeedsAppData = false;
+      private static string m_ApplicationDataLocation;
 
       public static string FolderPath
       {
          get { return m_FolderPath; }
+      }
+
+      /// <summary>
+      /// Override the default application-data root for a host that provides a writable,
+      /// package-scoped location (for example Windows.Storage.ApplicationData.Current.LocalFolder).
+      /// </summary>
+      /// <param name="folderPath">Writable application-data root.</param>
+      public static void SetApplicationDataLocation(string folderPath)
+      {
+         if (String.IsNullOrWhiteSpace(folderPath))
+         {
+            throw new ArgumentException("An application-data location is required.",
+               nameof(folderPath));
+         }
+
+         m_ApplicationDataLocation = folderPath;
+         m_FolderPath = null;
+         m_NeedsAppData = false;
       }
 
       /// <summary>
@@ -63,6 +82,11 @@ namespace Edam.Application
       /// <returns>folder full path is returned</returns>
       public static string GetApplicationDataLocation()
       {
+         if (!String.IsNullOrWhiteSpace(m_ApplicationDataLocation))
+         {
+            return m_ApplicationDataLocation;
+         }
+
          return Environment.GetFolderPath(
             Environment.SpecialFolder.MyDocuments);
       }
@@ -133,6 +157,41 @@ namespace Edam.Application
          if (m_NeedsAppData)
          {
             CopyFolder(sourceFolderPath);
+         }
+         else
+         {
+            CopyMissingFiles(sourceFolderPath, m_FolderPath);
+         }
+      }
+
+      /// <summary>
+      /// Add files introduced by a newer packaged default without overwriting user data.
+      /// </summary>
+      private static void CopyMissingFiles(string sourceFolderPath, string destinationFolderPath)
+      {
+         if (!Directory.Exists(sourceFolderPath))
+         {
+            return;
+         }
+
+         Directory.CreateDirectory(destinationFolderPath);
+
+         foreach (var filePath in Directory.GetFiles(sourceFolderPath))
+         {
+            var destinationPath = Path.Combine(
+               destinationFolderPath, Path.GetFileName(filePath));
+
+            if (!File.Exists(destinationPath))
+            {
+               File.Copy(filePath, destinationPath);
+            }
+         }
+
+         foreach (var directoryPath in Directory.GetDirectories(sourceFolderPath))
+         {
+            CopyMissingFiles(
+               directoryPath,
+               Path.Combine(destinationFolderPath, Path.GetFileName(directoryPath)));
          }
       }
 

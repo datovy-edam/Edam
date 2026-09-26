@@ -76,7 +76,7 @@
       <PackageReference Include="Edam.DataObjects" Version="1.0.1" />
       <PackageReference Include="Edam.Json" Version="1.0.0" />
       <PackageReference Include="Edam.Language.Python" Version="1.0.0" />
-      <PackageReference Include="Edam.System" Version="1.0.0" />
+      <PackageReference Include="Edam.System" Version="1.0.1" />
       <PackageReference Include="Edam.Xml" Version="1.0.0" />
       <PackageReference Include="Jsonata.Net.Native" Version="2.4.1" />
       <PackageReference Include="Microsoft.EntityFrameworkCore" Version="9.0.2" />

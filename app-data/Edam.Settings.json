@@ -1,0 +1,21 @@
+{
+  "App": {
+    "Defaults": {
+      "OrganizationId": "Datovy"
+    },
+    "ConsolePath": "",
+    "UriList": [
+      {
+        "Name": "Default",
+        "Type": 1,
+        "UriText": ""
+      }
+    ]
+  },
+  "Schema": {
+    "Defaults": {
+      "TypePostfix": "_",
+      "DocumentPostfix": "_Document"
+    }
+  }
+}

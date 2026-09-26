@@ -23,6 +23,7 @@ using Windows.Foundation.Collections;
 // and more about our project templates, see: http://aka.ms/winui-project-info.
 using Edam.WinUI.Controls.Application;
 using Edam.WinUI.Helpers;
+using EdamAppData = Edam.Application.AppData;
 
 namespace Edam.Studio
 {
@@ -51,6 +52,9 @@ namespace Edam.Studio
          try
          {
             StartupDiagnostics.Trace("OnLaunched: begin");
+            EdamAppData.SetApplicationDataLocation(
+               Windows.Storage.ApplicationData.Current.LocalFolder.Path);
+            StartupDiagnostics.Trace("OnLaunched: package-local app-data root configured");
             ApplicationHelper.InitializeApplication();
             StartupDiagnostics.Trace("OnLaunched: InitializeApplication completed");
 
