@@ -51,6 +51,33 @@ namespace Edam.WinUI.Controls.DataModels
       /// <summary>Seeding is a capability of its own (LM-5/LM-6): structure stays scaffolding.</summary>
       public static IProjectSeeder Seeder => Services.GetRequiredService<IProjectSeeder>();
 
+      private static Edam.Data.Projects.DependencyInjection.UserConfiguration? m_UserConfiguration;
+
+      /// <summary>
+      /// The user's <b>answers</b> (CF-4 / ADR-0013): the application's own configuration, the per-user
+      /// app-data <b>overlay</b> for answers, and the packaged store for the once-per-installation
+      /// marker. The overlay sits at the app-data <b>root</b> — never inside the copied seed (ADR-0010),
+      /// so a seed refresh can never fight an answer.
+      /// </summary>
+      public static Edam.Data.Projects.DependencyInjection.UserConfiguration UserConfiguration
+      {
+         get
+         {
+            if (m_UserConfiguration is null)
+            {
+               var root = AppData.GetApplicationDataLocation();
+               m_UserConfiguration = new Edam.Data.Projects.DependencyInjection.UserConfiguration(
+                  new ConfigurationBuilder()
+                     .AddJsonFile("appsettings.json", optional: true)
+                     .Build(),
+                  new Edam.Data.Projects.DependencyInjection.FileStateStore(root),
+                  new Edam.WinUI.Controls.Configuration.PackagedStateStore());
+            }
+
+            return m_UserConfiguration;
+         }
+      }
+
       /// <summary>True when the resolved target stores projects on disk (node paths are disk paths).</summary>
       public static bool UsesPhysicalPaths
       {
