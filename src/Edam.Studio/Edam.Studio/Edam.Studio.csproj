@@ -96,6 +96,25 @@
       <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
       <CopyToPublishDirectory>PreserveNewest</CopyToPublishDirectory>
     </Content>
+    <!-- The code editor's web assets (Monaco) are APPLICATION resources: `CodeEditorUrl`
+         (`AppSettings:CodeEditorUrl`) points at `\web\monaco-editor\code-editor.html`, which must
+         resolve inside the installed application. They were previously not deployed at all, so the
+         editor's WebView had nothing to load.
+
+         IMPORTANT: ship ONLY what the page loads. `code-editor.html` references `./min/vs/**`
+         (editor.main.css, loader.js, editor.main.js, and `require.config({paths:{vs:'./min/vs'}})`), so
+         the `min` build is all that is needed. The `dev` and `esm` folders are development/source
+         distributions; `esm` alone is 1,601 files whose deepest path under the MSIX `AppX` layout
+         reaches 292 characters — beyond MAX_PATH (260) — which fails packaging with
+         "DEP1000: Cannot copy file … DirectoryNotFoundException". Do NOT widen this to `web\**`. -->
+    <Content Include="web\monaco-editor\code-editor.html">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+      <CopyToPublishDirectory>PreserveNewest</CopyToPublishDirectory>
+    </Content>
+    <Content Include="web\monaco-editor\min\**">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+      <CopyToPublishDirectory>PreserveNewest</CopyToPublishDirectory>
+    </Content>
     <Content Include="Assets\SplashScreen.scale-200.png" />
     <Content Include="Assets\LockScreenLogo.scale-200.png">
       <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
