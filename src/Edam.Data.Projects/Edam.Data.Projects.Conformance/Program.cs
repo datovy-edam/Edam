@@ -259,6 +259,9 @@ try
    // ---- 10g. configuration states: unset / set / invalid (CF-1, ADR-0013) ---------------------
    all["configuration (CF-1)"] = ConfigurationScenario.Run();
 
+   // ---- 10h. the registry of configurable items (CF-2, ADR-0013) ------------------------------
+   all["registry (CF-2)"] = RegistryScenario.Run();
+
    // ---- 11. a REAL end-to-end process attempt (PE-5c) — INFORMATIONAL ------------------------
    //      Reports what the legacy pipeline actually does; deliberately not a pass/fail, so the
    //      remaining gap (the console needs real project data to yield assets) stays visible.
