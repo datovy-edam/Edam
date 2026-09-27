@@ -1,6 +1,6 @@
 # Area DP — First-run default project (exploration → plan)
 
-> **Status:** **Exploration complete, decision pending (2026-09-27)** — **ADR-0012** is *Proposed*; the gating questions are tracked as **D9** in `Open-Decisions.md`. **Nothing is implemented and no code was written for this area.**
+> **Status:** **Decided (2026-09-27)** — **ADR-0012** is *Accepted* and **D9** is resolved: organization **`Edam`**, the default project is offered as **`Edam.Sample`**, **local binding only**, **delete/rename first**, **sample input shipped in the seed**, and the user is **asked once** rather than surprised. The mechanism it builds on is **ADR-0013** (unset configuration + first-run setup). **Scheduled as Sprint S2** (`Sprint-S2-Configurable-Items-and-FirstRun.md`). **Nothing is implemented and no code has been written for this area.**
 
 ## Why this exists
 

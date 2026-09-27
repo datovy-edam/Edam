@@ -29,7 +29,8 @@
 | **Area W1.1** | `BL-7.x` | **Wave 1.1** — catalog decoupling: UI/EF-independent `Edam.Data.Catalog` platform |
 | **Area PE** | `PE-x` | **Projects Enhancements** — EDAM Projects in the **Catalog** instead of a file system; interface-bound and replaceable (ADR-0009) |
 | **Area LM** | `LM-x` | **Location Model** — the Catalog as the **single place locations are stated**: container + URI addressing, bindings separate from locations (ADR-0011; builds on ADR-0010) |
-| **Area DP** | `DP-x` | **First-run default project** — should the host set up a starter project for the user, and under which gates? Host policy, not platform behaviour (**ADR-0012**, *proposed*; builds on ADR-0011 / ADR-0010) |
+| **Area DP** | `DP-x` | **First-run default project** — a starter project offered to the user, gated: organization **`Edam`**, name **`Edam.Sample`**, local binding only, delete/rename first (**ADR-0012**, *accepted*; builds on ADR-0011 / ADR-0010) |
+| **Area CF** | `CF-x` | **Configurable items & first-run setup** — what the app must **ask** rather than guess: `unset` vs `set` vs `invalid`, a registry with per-item policy, batched ask, user-state overlay, validation at the point of asking (**ADR-0013**, *accepted*) |
 
 ## Backlog index
 
@@ -144,6 +145,10 @@
 | PE-5 | Consumers + execution, in sub-steps: **5a** runner seam ✅ · **5b** asset-console adapter ✅ · **5c** real process (part 1 ✅) + Studio UI via DI (part 2 ✅) · **5d** retire the statics (**option A implemented — opt-in, build-verified**) | Integration | Medium | L | **In Progress** (2026-09-18) — 5a–5c done; 5d: 3 dead members deleted + 5 deprecated, **option A wired** (resolve disk path → run via the platform → derive assets from the captured artifact; `Edam:Projects:Process = runner`); runtime UI validation pending |
 
 > **Overview + decisions:** `Projects-Enhancements.md` (**ADR-0009**). Model agreed: **Collection = container, Project = branch**, artifacts = items + content in the Catalog; filesystem kept as a registered provider during the transition.
+
+### Area CF — Configurable items & first-run setup
+
+> **Plan + decision:** `Sprint-S2-Configurable-Items-and-FirstRun.md` (**ADR-0013**, *accepted*) — some values cannot be invented by the application, and this codebase has learned that **silent fallbacks cost more than they save** and that **`empty` is not `unset`** (the `AssetConsolePath` defect). The pattern: a **registry of configurable items** (id · what it is · storage · **policy**: `silent default` / `ask once when unset` / `required` · default · validator), **batched** asking through **one** surface generated from that registry, a **skippable first-run surface** after the shell is up plus a **lazy ask at first need**, answers in a per-user **app-data overlay** (never the packaged seed), **validation at the point of asking**, and every ask/answer/skip recorded in the **diagnostics panel**. The first instance is the default project name (**Area DP**). **Nothing implemented; no code written.**
 
 ### Area DP — First-run default project (exploration → plan)
 
