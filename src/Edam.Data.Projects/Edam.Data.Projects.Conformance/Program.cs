@@ -262,6 +262,9 @@ try
    // ---- 10h. the registry of configurable items (CF-2, ADR-0013) ------------------------------
    all["registry (CF-2)"] = RegistryScenario.Run();
 
+   // ---- 10i. the answers: overlay + marker + the ask loop (CF-3, ADR-0013) --------------------
+   all["state (CF-3)"] = StateScenario.Run(Path.Combine(temp, "state"));
+
    // ---- 11. a REAL end-to-end process attempt (PE-5c) — INFORMATIONAL ------------------------
    //      Reports what the legacy pipeline actually does; deliberately not a pass/fail, so the
    //      remaining gap (the console needs real project data to yield assets) stays visible.
