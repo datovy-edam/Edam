@@ -29,6 +29,7 @@
 | **Area W1.1** | `BL-7.x` | **Wave 1.1** — catalog decoupling: UI/EF-independent `Edam.Data.Catalog` platform |
 | **Area PE** | `PE-x` | **Projects Enhancements** — EDAM Projects in the **Catalog** instead of a file system; interface-bound and replaceable (ADR-0009) |
 | **Area LM** | `LM-x` | **Location Model** — the Catalog as the **single place locations are stated**: container + URI addressing, bindings separate from locations (ADR-0011; builds on ADR-0010) |
+| **Area DP** | `DP-x` | **First-run default project** — should the host set up a starter project for the user, and under which gates? Host policy, not platform behaviour (**ADR-0012**, *proposed*; builds on ADR-0011 / ADR-0010) |
 
 ## Backlog index
 
@@ -143,6 +144,10 @@
 | PE-5 | Consumers + execution, in sub-steps: **5a** runner seam ✅ · **5b** asset-console adapter ✅ · **5c** real process (part 1 ✅) + Studio UI via DI (part 2 ✅) · **5d** retire the statics (**option A implemented — opt-in, build-verified**) | Integration | Medium | L | **In Progress** (2026-09-18) — 5a–5c done; 5d: 3 dead members deleted + 5 deprecated, **option A wired** (resolve disk path → run via the platform → derive assets from the captured artifact; `Edam:Projects:Process = runner`); runtime UI validation pending |
 
 > **Overview + decisions:** `Projects-Enhancements.md` (**ADR-0009**). Model agreed: **Collection = container, Project = branch**, artifacts = items + content in the Catalog; filesystem kept as a registered provider during the transition.
+
+### Area DP — First-run default project (exploration → plan)
+
+> **Plan + decision:** `Default-Project.md` (**ADR-0012**, *proposed* — gated by **D9**) — the Studio now starts, logs in and edits, but a fresh installation has an **empty project tree**, and everything a first run should demonstrate needs a project. Recommendation: an **explicit empty state first**, plus a **gated, one-time** default project created by the **host** (marker · container empty · local binding · config switch), through the **existing seams** (`IProjectStore` + `IProjectSeeder`), reporting itself to the diagnostics panel — with **project delete/rename as a precondition** (creation is otherwise a one-way door) and a **sample input shipped in the seed** so the starter project can actually run. **Nothing implemented; no code written for this area.**
 
 ### Area LM — Location Model (the Catalog as the single place locations are stated)
 

@@ -20,6 +20,7 @@
 | **D6** | **Observability substrate** (MEL adoption = BL-4.1; OTel/OTLP path) | part of BL-4.9 (crash/telemetry) |
 | **D7** | **Distributed-platform scaffold — .NET Aspire** (decided direction for **Wave 1**: observability first-class) | BL-6.1, BL-6.2, BL-6.3, BL-6.4, BL-6.6, BL-6.7 |
 | **D8** | **~~Python scripting avenue~~ — RESOLVED: dropped** (functionality managed through MCP instead; MCP/AI shaped later on MAF) | ~~BL-6.5~~ → ADR-0004 / ADR-0005 |
+| **D9** | **First-run default project** — should the host create a starter project for the user, and under which gates? (name/prefix · local-only vs any binding · switch default on/off · ship a sample input · delete-before-create · create vs offer) | **Area DP** (`Default-Project.md`, DP-0…DP-5); **ADR-0012** stays *Proposed* until decided |
 
 *Already decided/executing:* **.NET 10** (BL-3.1), diagnostics→MEL (BL-4.1), name-collision (BL-4.2).
 
