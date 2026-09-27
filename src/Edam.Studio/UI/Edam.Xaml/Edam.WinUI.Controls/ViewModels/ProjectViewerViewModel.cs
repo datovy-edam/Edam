@@ -693,10 +693,24 @@ namespace Edam.WinUI.Controls.ViewModels
       }
 
       /// <summary>
-      /// Add a new Project...
+      /// Add a new Project... — asking first about configuration that is still missing (D / ADR-0013): the
+      /// starter project name is needed exactly here, so this is the safety net for a person who was not
+      /// signed in when the shell started, or who deferred the question. Best effort: it can never stop
+      /// the person creating a project.
       /// </summary>
-      public void ProjectAddNew()
+      public async void ProjectAddNew()
       {
+         try
+         {
+            // the same root the app's own dialogs use (see DialogBox)
+            await ProjectServicesHelper.AskForConfigurationIfNeededAsync(
+               Edam.WinUI.Controls.Application.ApplicationHelper.MainWindow?.Content?.XamlRoot);
+         }
+         catch (Exception)
+         {
+            // never block project creation because an ask failed
+         }
+
          DialogBox.ShowDialog(
             PROJECT_DIALOG_NEW, PROJECT, PROJECT_NEW, ProcessNewProjectResult,
             DialogBox.SUBMIT);

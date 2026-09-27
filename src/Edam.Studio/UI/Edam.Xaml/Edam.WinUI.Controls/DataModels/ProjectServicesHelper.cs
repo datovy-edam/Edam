@@ -54,6 +54,40 @@ namespace Edam.WinUI.Controls.DataModels
       private static Edam.Data.Projects.DependencyInjection.UserConfiguration? m_UserConfiguration;
 
       /// <summary>
+      /// Ask about configuration that is <b>still missing</b> (D / ADR-0013) — the lazy safety net for a
+      /// person who was not signed in when the shell started, or who deferred the question. Nothing is
+      /// asked unless the session is signed in and something is genuinely missing, and the ask is
+      /// best-effort: it must never stop the caller from doing its work.
+      /// </summary>
+      /// <param name="root">The XAML root that can host the dialog (null when unavailable).</param>
+      /// <returns>True when at least one answer was saved.</returns>
+      public static async Task<bool> AskForConfigurationIfNeededAsync(
+         Microsoft.UI.Xaml.XamlRoot? root)
+      {
+         try
+         {
+            // fall back to the shell's root — the same one the app's own dialogs use (see DialogBox)
+            root ??= Edam.WinUI.Controls.Application.ApplicationHelper.MainWindow?.Content?.XamlRoot;
+
+            if (root is null ||
+                !Edam.WinUI.Controls.Configuration.ConfigurationReadiness.IsSignedIn)
+            {
+               return false;
+            }
+
+            return await Edam.WinUI.Controls.Configuration.ConfigurationPrompt
+               .ShowIfNeededAsync(root, UserConfiguration);
+         }
+         catch (Exception ex)
+         {
+            Edam.WinUI.Controls.Logging.AppDiagnostics.Write(
+               "Configuration ask failed: " + ex.Message,
+               Microsoft.Extensions.Logging.LogLevel.Warning, "Edam.Studio");
+            return false;
+         }
+      }
+
+      /// <summary>
       /// The user's <b>answers</b> (CF-4 / ADR-0013): the application's own configuration, the per-user
       /// app-data <b>overlay</b> for answers, and the packaged store for the once-per-installation
       /// marker. The overlay sits at the app-data <b>root</b> — never inside the copied seed (ADR-0010),

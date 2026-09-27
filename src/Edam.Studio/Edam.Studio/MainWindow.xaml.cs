@@ -33,6 +33,9 @@ namespace Edam.Studio
       /// <summary>Traces the "no XamlRoot yet" case once, instead of on every signal.</summary>
       private bool m_ConfigurationRootMissingTraced;
 
+      /// <summary>Traces the "waiting for sign-in" case once, instead of on every signal.</summary>
+      private bool m_ConfigurationWaitingTraced;
+
       public MainWindow()
       {
          StartupDiagnostics.Trace("MainWindow ctor: begin");
@@ -63,6 +66,22 @@ namespace Edam.Studio
       {
          if (m_ConfigurationAsked)
          {
+            return;
+         }
+
+         // A (ADR-0013): never ask a person who has not signed in — the answer is a per-user preference
+         // and creating content may need an authenticated session. The one-shot is deliberately NOT
+         // consumed while waiting, so the ask still happens once sign-in completes.
+         if (!Edam.WinUI.Controls.Configuration.ConfigurationReadiness.IsSignedIn)
+         {
+            if (!m_ConfigurationWaitingTraced)
+            {
+               m_ConfigurationWaitingTraced = true;
+               Edam.WinUI.Controls.Logging.AppDiagnostics.Write(
+                  "Configuration check: waiting for sign-in before asking (" +
+                  Edam.WinUI.Controls.Configuration.ConfigurationReadiness.Describe() + ").",
+                  Microsoft.Extensions.Logging.LogLevel.Information, "Edam.Studio");
+            }
             return;
          }
 
