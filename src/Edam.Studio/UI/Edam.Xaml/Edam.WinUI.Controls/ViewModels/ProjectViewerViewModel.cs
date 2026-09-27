@@ -702,9 +702,11 @@ namespace Edam.WinUI.Controls.ViewModels
       {
          try
          {
-            // the same root the app's own dialogs use (see DialogBox)
+            // the same root the app's own dialogs use (see DialogBox); forced, because this IS the moment
+            // the answers are needed — even if this run already asked and the person deferred
             await ProjectServicesHelper.AskForConfigurationIfNeededAsync(
-               Edam.WinUI.Controls.Application.ApplicationHelper.MainWindow?.Content?.XamlRoot);
+               Edam.WinUI.Controls.Application.ApplicationHelper.MainWindow?.Content?.XamlRoot,
+               force: true);
          }
          catch (Exception)
          {

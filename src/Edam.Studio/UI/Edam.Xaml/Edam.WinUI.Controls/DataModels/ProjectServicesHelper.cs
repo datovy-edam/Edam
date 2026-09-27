@@ -61,11 +61,31 @@ namespace Edam.WinUI.Controls.DataModels
       /// </summary>
       /// <param name="root">The XAML root that can host the dialog (null when unavailable).</param>
       /// <returns>True when at least one answer was saved.</returns>
+      private static bool m_ConfigurationAskedThisRun;
+
+      /// <summary>
+      /// Ask about configuration that is <b>still missing</b> (A + D / ADR-0013) — the path to use once a
+      /// person is signed in: from the login completion, from a signed-in navigation, and (unconditionally)
+      /// just before a project is created, where the answers are actually needed.
+      /// <para>
+      /// Nothing is asked unless the session is signed in and something is genuinely missing, the dialog is
+      /// shown <b>at most once per run</b> unless <paramref name="force"/> says otherwise (so a deferral
+      /// never turns into nagging), and the ask is <b>best effort</b>: a failure is logged, never thrown.
+      /// </para>
+      /// </summary>
+      /// <param name="root">The XAML root that can host the dialog (null = resolve the shell's own).</param>
+      /// <param name="force">True to ask again even if this run already asked (the New-Project moment).</param>
+      /// <returns>True when at least one answer was saved.</returns>
       public static async Task<bool> AskForConfigurationIfNeededAsync(
-         Microsoft.UI.Xaml.XamlRoot? root)
+         Microsoft.UI.Xaml.XamlRoot? root, bool force = false)
       {
          try
          {
+            if (!force && m_ConfigurationAskedThisRun)
+            {
+               return false;
+            }
+
             // fall back to the shell's root — the same one the app's own dialogs use (see DialogBox)
             root ??= Edam.WinUI.Controls.Application.ApplicationHelper.MainWindow?.Content?.XamlRoot;
 
@@ -74,6 +94,14 @@ namespace Edam.WinUI.Controls.DataModels
             {
                return false;
             }
+
+            if (UserConfiguration.ToAsk().Count == 0)
+            {
+               return false;
+            }
+
+            // about to show it: remember that this run asked, so a deferral does not nag on every move
+            m_ConfigurationAskedThisRun = true;
 
             return await Edam.WinUI.Controls.Configuration.ConfigurationPrompt
                .ShowIfNeededAsync(root, UserConfiguration);

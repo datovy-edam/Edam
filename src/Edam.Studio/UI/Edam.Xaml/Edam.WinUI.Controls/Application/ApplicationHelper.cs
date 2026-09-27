@@ -163,8 +163,17 @@ namespace Edam.WinUI.Controls.Application
       public static void SetMenuOption(MenuOption option)
       {
          GotoEventArgs a = new GotoEventArgs();
-         a.MenuOption = app.Session.IsUserLogged ? option : MenuOption.Login;
+         Boolean signedIn = app.Session.IsUserLogged;
+         a.MenuOption = signedIn ? option : MenuOption.Login;
          m_ApplicationMenuControl.Goto(m_ApplicationMenuControl, a);
+
+         // CF-4 (A/D): once a SIGNED-IN person is being navigated, the ask may be made (at most once per
+         // run) — this covers login completions that do not pass through the login view model.
+         if (signedIn && option != MenuOption.Login)
+         {
+            _ = Edam.WinUI.Controls.DataModels.ProjectServicesHelper
+               .AskForConfigurationIfNeededAsync(null);
+         }
       }
 
       public static IMenuItem Find(MenuOption option)
