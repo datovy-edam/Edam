@@ -19,6 +19,12 @@ namespace Edam.WinUI.Controls.ViewModels
       private readonly InMemoryLoggerProvider m_Provider;
       private readonly ObservableCollection<IMessageLogEntry> m_Items;
 
+      /// <summary>
+      /// The UI thread this view lives on. The provider is shared application-wide and raises its event on
+      /// the <b>calling</b> thread, so the observable collection must be touched through this queue.
+      /// </summary>
+      private readonly Microsoft.UI.Dispatching.DispatcherQueue m_Dispatcher;
+
       public ObservableCollection<IMessageLogEntry> Items
       {
          get { return m_Items; }
@@ -26,6 +32,7 @@ namespace Edam.WinUI.Controls.ViewModels
 
       public DiagnosticsLogViewModel()
       {
+         m_Dispatcher = Microsoft.UI.Dispatching.DispatcherQueue.GetForCurrentThread();
          m_Items = new ObservableCollection<IMessageLogEntry>();
          m_Provider = InMemoryLoggerProvider.Shared;
          m_Provider.EntryLogged += OnEntryLogged;
@@ -58,7 +65,17 @@ namespace Edam.WinUI.Controls.ViewModels
          entry.Message = e.Message;
          entry.Source = e.Category;
          entry.Severity = ToSeverity(e.Level);
-         m_Items.Add(entry);
+
+         // the provider raises on the CALLING thread (it is shared application-wide), so this UI
+         // collection must be updated on the UI thread
+         if (m_Dispatcher != null && !m_Dispatcher.HasThreadAccess)
+         {
+            m_Dispatcher.TryEnqueue(() => m_Items.Add(entry));
+         }
+         else
+         {
+            m_Items.Add(entry);
+         }
       }
 
       private static SeverityLevel ToSeverity(Microsoft.Extensions.Logging.LogLevel level)
