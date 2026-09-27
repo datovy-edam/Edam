@@ -62,6 +62,13 @@ namespace Edam.WinUI.Controls.DataModels
       /// <param name="root">The XAML root that can host the dialog (null when unavailable).</param>
       /// <returns>True when at least one answer was saved.</returns>
       private static bool m_ConfigurationAskedThisRun;
+      private static string? m_LastConfigurationAskFailure;
+
+      /// <summary>
+      /// True once this run has actually <b>shown</b> the ask. Callers retry until it is true, so a failed
+      /// attempt (for example another dialog being open at that moment) is not mistaken for "asked".
+      /// </summary>
+      public static bool ConfigurationAskedThisRun => m_ConfigurationAskedThisRun;
 
       /// <summary>
       /// Ask about configuration that is <b>still missing</b> (A + D / ADR-0013) — the path to use once a
@@ -100,17 +107,26 @@ namespace Edam.WinUI.Controls.DataModels
                return false;
             }
 
-            // about to show it: remember that this run asked, so a deferral does not nag on every move
-            m_ConfigurationAskedThisRun = true;
-
-            return await Edam.WinUI.Controls.Configuration.ConfigurationPrompt
+            var saved = await Edam.WinUI.Controls.Configuration.ConfigurationPrompt
                .ShowIfNeededAsync(root, UserConfiguration);
+
+            // only NOW is the ask really done: a FAILED attempt must stay retryable (WinUI allows only one
+            // ContentDialog at a time, so asking while another is open throws), which is why the guard is
+            // set after the prompt completes rather than before it
+            m_ConfigurationAskedThisRun = true;
+            return saved;
          }
          catch (Exception ex)
          {
-            Edam.WinUI.Controls.Logging.AppDiagnostics.Write(
-               "Configuration ask failed: " + ex.Message,
-               Microsoft.Extensions.Logging.LogLevel.Warning, "Edam.Studio");
+            // report the FIRST occurrence of a given failure (the retry loop would otherwise repeat it
+            // every couple of seconds), and leave the guard unset so the ask is retried
+            if (!String.Equals(m_LastConfigurationAskFailure, ex.Message, StringComparison.Ordinal))
+            {
+               m_LastConfigurationAskFailure = ex.Message;
+               Edam.WinUI.Controls.Logging.AppDiagnostics.Write(
+                  "Configuration ask failed (will retry): " + ex.Message,
+                  Microsoft.Extensions.Logging.LogLevel.Warning, "Edam.Studio");
+            }
             return false;
          }
       }

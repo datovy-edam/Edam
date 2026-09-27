@@ -21,13 +21,21 @@
       </Grid.RowDefinitions>
 
       <StackPanel Background="#fbfbfb" BorderBrush="LightGray" BorderThickness="1"
+             Orientation="Horizontal"
              Grid.Row="0" Grid.Column="0">
          <AppBarButton Icon="Clear" LabelPosition="Collapsed" Width="34"
                        Click="ClearViewButton_Click" ToolTipService.ToolTip="Clean all Entries"/>
+         <!-- copy the whole log: an entry is selectable too, but this is the quick way to hand the log
+              to someone else for investigation -->
+         <AppBarButton Icon="Copy" LabelPosition="Collapsed" Width="34"
+                       Click="CopyAllButton_Click" ToolTipService.ToolTip="Copy all entries to the clipboard"/>
       </StackPanel>
       
+      <!-- SelectionMode=None so a click/drag goes to the entry's text (selecting to copy) rather than
+           selecting the list row -->
       <ListView ItemsSource="{x:Bind m_ViewModel.Items}" VerticalAlignment="top" 
              HorizontalAlignment="Stretch"
+             SelectionMode="None" IsItemClickEnabled="False"
              ScrollViewer.VerticalScrollBarVisibility="Visible"
              ScrollViewer.VerticalScrollMode="Auto"
              ScrollViewer.HorizontalScrollMode="Auto" CanBeScrollAnchor="True"
@@ -37,10 +45,13 @@
          <ListView.ItemTemplate>
             <DataTemplate x:DataType="diag:IMessageLogEntry">
                <StackPanel Padding="2,4,2,4">
-                  <TextBlock Text="{x:Bind LoggedDateTimeText}"
-                          FontSize="10" Foreground="Gray"/>
-                  <TextBlock Text="{x:Bind ErrorMessage}"
-                          FontSize="12" TextWrapping="WrapWholeWords"/>
+                  <!-- read-only TextBoxes, not TextBlocks: text must be SELECTABLE and COPYABLE -->
+                  <TextBox Text="{x:Bind LoggedDateTimeText}" IsReadOnly="True"
+                           BorderThickness="0" Background="Transparent" Padding="0"
+                           FontSize="10" Foreground="Gray"/>
+                  <TextBox Text="{x:Bind ErrorMessage}" IsReadOnly="True"
+                           TextWrapping="Wrap" BorderThickness="0" Background="Transparent"
+                           Padding="0" FontSize="12" IsSpellCheckEnabled="False"/>
                </StackPanel>
             </DataTemplate>
          </ListView.ItemTemplate>

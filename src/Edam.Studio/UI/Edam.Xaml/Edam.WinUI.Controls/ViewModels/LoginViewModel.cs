@@ -373,11 +373,6 @@ namespace Edam.WinUI.Controls.ViewModels
          // successful login... Goto next screen
          appHelper.ApplicationHelper.ResetApplication();
 
-         // CF-4 (A/D): the person is now fully signed in — this is the moment to ask about the values the
-         // configuration cannot invent. Gated, once per run, and best effort: it can never break login.
-         _ = Edam.WinUI.Controls.DataModels.ProjectServicesHelper
-            .AskForConfigurationIfNeededAsync(null);
-
          SaveRecord();
       }
       public void PersistUser(PinNumber pin, Action<bool> followUpCallBack = null)

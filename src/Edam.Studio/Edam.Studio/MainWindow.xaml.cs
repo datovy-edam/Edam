@@ -27,9 +27,6 @@ namespace Edam.Studio
    /// </summary>
    public sealed partial class MainWindow : Window
    {
-      /// <summary>Guards the one-time configuration ask (CF-4 / ADR-0013).</summary>
-      private bool m_ConfigurationAsked;
-
       /// <summary>Traces the "no XamlRoot yet" case once, instead of on every signal.</summary>
       private bool m_ConfigurationRootMissingTraced;
 
@@ -67,7 +64,8 @@ namespace Edam.Studio
          m_ConfigurationTimer.Interval = System.TimeSpan.FromSeconds(2);
          m_ConfigurationTimer.Tick += (sender, args) =>
          {
-            if (m_ConfigurationAsked || ++m_ConfigurationTicks > 150)
+            if (Edam.WinUI.Controls.DataModels.ProjectServicesHelper.ConfigurationAskedThisRun ||
+                ++m_ConfigurationTicks > 150)
             {
                m_ConfigurationTimer?.Stop();
                return;
@@ -86,7 +84,9 @@ namespace Edam.Studio
       /// </summary>
       private void AskForConfiguration()
       {
-         if (m_ConfigurationAsked)
+         // retry until the ask has REALLY been shown: a failed attempt (for example another ContentDialog
+         // being open at that moment) stays retryable, which is why the shared helper owns the guard
+         if (Edam.WinUI.Controls.DataModels.ProjectServicesHelper.ConfigurationAskedThisRun)
          {
             return;
          }
@@ -119,7 +119,6 @@ namespace Edam.Studio
             return;
          }
 
-         m_ConfigurationAsked = true;
          m_ConfigurationTimer?.Stop();
          _ = AskForConfigurationAsync(root);
       }
