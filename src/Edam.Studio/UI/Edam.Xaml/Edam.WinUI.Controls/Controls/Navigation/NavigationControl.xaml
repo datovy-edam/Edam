@@ -1,8 +1,9 @@
-﻿<UserControl
+<UserControl
    x:Class="Edam.WinUI.Controls.Navigation.NavigationControl"
    xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
    xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
    xmlns:cm="using:Edam.WinUI.Common"
+   xmlns:ctk="using:CommunityToolkit.WinUI.UI.Controls"
    xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
    xmlns:inav="using:Edam.UI.DataModel.ViewModels"
    xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
@@ -34,9 +35,14 @@
       <Grid.RowDefinitions>
          <RowDefinition Height="*" />
       </Grid.RowDefinitions>
+      <!-- The side (diagnostics) panel's WIDTH lives in this column, driven from the panel state by
+           NavigationControl.ApplySidePanelWidth(): while the column was Auto-sized the panel could
+           become Visible and still measure to nothing, so "opening" it changed nothing on screen.
+           Column 1 is the drag handle, so the end user can resize the panel. -->
       <Grid.ColumnDefinitions>
          <ColumnDefinition Width="*" />
-         <ColumnDefinition Width="Auto" />
+         <ColumnDefinition Width="4" />
+         <ColumnDefinition x:Name="SidePanelColumn" Width="34" MinWidth="0" MaxWidth="1200" />
       </Grid.ColumnDefinitions>
       <Frame
          x:Name="NoNavigationContent"
@@ -60,15 +66,27 @@
          Visibility="Collapsed">
          <Frame x:Name="PanelContent" Margin="0,0,0,0" />
       </NavigationView>
+
+      <!-- drag the panel's left border to resize it (hidden while the panel is collapsed) -->
+      <ctk:GridSplitter
+         Grid.Row="0" Grid.Column="1"
+         Width="4"
+         HorizontalAlignment="Stretch"
+         VerticalAlignment="Stretch"
+         Background="#DFDFDF"
+         ResizeDirection="Columns"
+         ResizeBehavior="PreviousAndNext"
+         Visibility="{x:Bind m_ViewModel.Expander.PanelVisibility, Mode=TwoWay}" />
       
-      <Grid Grid.Row="0" Grid.Column="1"
+      <Grid Grid.Row="0" Grid.Column="2"
             Margin="0,1,0,0">
             <Grid.RowDefinitions>
                <RowDefinition Height="59" />
                <RowDefinition Height="*" />
             </Grid.RowDefinitions>
             <Grid.ColumnDefinitions>
-               <ColumnDefinition Width="Auto" />
+               <!-- the diagnostics log fills the panel width instead of collapsing to its content -->
+               <ColumnDefinition Width="*" />
             </Grid.ColumnDefinitions>
 
             <StackPanel Grid.Row="0" Grid.Column="0" Orientation="Vertical">

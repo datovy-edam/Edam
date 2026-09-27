@@ -1,4 +1,4 @@
-﻿using System;
+using System;
 using System.Collections.Generic;
 using System.IO;
 using System.Linq;
@@ -63,6 +63,40 @@ namespace Edam.WinUI.Controls.Navigation
          m_MenuController.SetupInstance(MenuOption.Projects, projectViewer);
 
          ApplicationHelper.SetMenuOption(MenuOption.Login);
+
+         // The diagnostics side panel is shown by default. It used to start collapsed and, because its
+         // column was Auto-sized, "opening" it changed nothing on screen (see ApplySidePanelWidth).
+         m_ViewModel.Expander.TogglePanelVisibility();
+         ApplySidePanelWidth();
+      }
+
+      /// <summary>The collapsed width: just the chevron rail, so the panel can always be reopened.</summary>
+      private const double SIDE_PANEL_RAIL_WIDTH = 34;
+
+      /// <summary>The narrowest usable expanded panel; below this it stops being readable.</summary>
+      private const double SIDE_PANEL_MIN_WIDTH = 240;
+
+      /// <summary>The expanded width, remembered so a width the user dragged survives a collapse.</summary>
+      private double m_SidePanelWidth = 360;
+
+      /// <summary>
+      /// Drive the diagnostics panel's width from its state (0-ish when collapsed, the remembered width
+      /// when expanded). The panel used to live in an <c>Auto</c> column, so becoming <c>Visible</c> still
+      /// measured to nothing and the panel appeared never to open. The column is also what the
+      /// <c>GridSplitter</c> resizes, so the end user can drag the panel's left border.
+      /// </summary>
+      private void ApplySidePanelWidth()
+      {
+         var visible = m_ViewModel.Expander.PanelVisibility == Visibility.Visible;
+
+         if (visible && SidePanelColumn.Width.Value > SIDE_PANEL_MIN_WIDTH)
+         {
+            m_SidePanelWidth = SidePanelColumn.Width.Value;
+         }
+
+         SidePanelColumn.MinWidth = visible ? SIDE_PANEL_MIN_WIDTH : 0;
+         SidePanelColumn.Width = new GridLength(
+            visible ? m_SidePanelWidth : SIDE_PANEL_RAIL_WIDTH);
       }
 
       /// <summary>
@@ -186,6 +220,7 @@ namespace Edam.WinUI.Controls.Navigation
       private void SidePanelToggle_Click(object sender, RoutedEventArgs e)
       {
          m_ViewModel.Expander.TogglePanelVisibility();
+         ApplySidePanelWidth();
       }
    }
 

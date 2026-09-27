@@ -7,11 +7,13 @@
     xmlns:diag="using:Edam.Diagnostics"
     xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
     xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
-    mc:Ignorable="d" VerticalAlignment="Stretch">
+    mc:Ignorable="d" VerticalAlignment="Stretch" HorizontalAlignment="Stretch">
 
    <Grid>
+      <!-- the log must FILL the width it is given: an Auto column (and a ListView, which has no
+           intrinsic width while empty) collapsed this panel to nothing, so it appeared never to open -->
       <Grid.ColumnDefinitions>
-         <ColumnDefinition Width="Auto" />
+         <ColumnDefinition Width="*" />
       </Grid.ColumnDefinitions>
       <Grid.RowDefinitions>
          <RowDefinition Height="48"/>
@@ -31,7 +33,6 @@
              ScrollViewer.HorizontalScrollMode="Auto" CanBeScrollAnchor="True"
              BorderBrush="LightGray" BorderThickness="1"
              Grid.Row="1" Grid.Column="0"
-             MaxWidth="600" 
              >
          <ListView.ItemTemplate>
             <DataTemplate x:DataType="diag:IMessageLogEntry">
