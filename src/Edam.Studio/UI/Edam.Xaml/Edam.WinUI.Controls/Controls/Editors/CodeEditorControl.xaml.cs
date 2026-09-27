@@ -18,6 +18,8 @@ using Windows.Foundation.Collections;
 // and more about our project templates, see: http://aka.ms/winui-project-info.
 using Edam.WinUI.Controls.ViewModels;
 using Edam.WinUI.Controls.DataModels;
+using Edam.WinUI.Controls.Logging;
+using Microsoft.Extensions.Logging;
 
 namespace Edam.WinUI.Controls.Editors
 {
@@ -109,23 +111,25 @@ namespace Edam.WinUI.Controls.Editors
             return;
          }
 
-         // "Script error." is deliberately opaque for cross-origin scripts (file:// pages): it is logged
-         // but not presented as a problem, since the editor is demonstrably working once 'ready' arrives.
-         var text = message switch
+         // "Script error." is deliberately opaque for cross-origin scripts: still reported, at Warning.
+         var (text, level) = message switch
          {
-            "ready" => "Code editor loaded (Monaco ready).",
-            "key" => "Code editor is receiving keyboard input.",
+            "ready" => ("Code editor loaded (Monaco ready).", LogLevel.Information),
+            "key" => ("Code editor is receiving keyboard input.", LogLevel.Debug),
             _ when message.StartsWith("error", StringComparison.OrdinalIgnoreCase) =>
                message.IndexOf("script error", StringComparison.OrdinalIgnoreCase) >= 0
-                  ? "Code editor reported a hidden script error (page origin hides the detail)."
-                  : "Code editor problem: " + message,
-            _ => null
+                  ? ("Code editor reported a hidden script error (page origin hides the detail).",
+                     LogLevel.Warning)
+                  : ("Code editor problem: " + message, LogLevel.Error),
+            _ => (null, LogLevel.Information)
          };
 
          if (text != null)
          {
+            // diagnostics belong in the DIAGNOSTICS VIEW — never in the editor's document title
             System.Diagnostics.Debug.WriteLine(text);
-            m_ViewModel.NotifyCodeEditor(text);
+            AppDiagnostics.Write(text, level,
+               "Edam.WinUI.Controls.Editors.CodeEditorControl");
          }
       }
 

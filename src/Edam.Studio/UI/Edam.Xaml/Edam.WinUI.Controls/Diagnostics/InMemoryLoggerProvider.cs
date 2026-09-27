@@ -25,6 +25,14 @@ namespace Edam.WinUI.Controls.Logging
    /// </summary>
    public sealed class InMemoryLoggerProvider : ILoggerProvider
    {
+      /// <summary>
+      /// The provider the WinUI diagnostics view subscribes to. Everything application code logs here
+      /// (see <see cref="AppDiagnostics"/>) appears in the diagnostics panel — no component needs to own
+      /// a private provider, which is what previously left the panel showing nothing but its own startup
+      /// message.
+      /// </summary>
+      public static InMemoryLoggerProvider Shared { get; } = new InMemoryLoggerProvider();
+
       private readonly object m_Sync = new object();
       private readonly List<InMemoryLogEntry> m_Entries = new List<InMemoryLogEntry>();
 

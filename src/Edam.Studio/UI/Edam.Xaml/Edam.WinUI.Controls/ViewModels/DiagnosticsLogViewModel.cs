@@ -27,7 +27,7 @@ namespace Edam.WinUI.Controls.ViewModels
       public DiagnosticsLogViewModel()
       {
          m_Items = new ObservableCollection<IMessageLogEntry>();
-         m_Provider = new InMemoryLoggerProvider();
+         m_Provider = InMemoryLoggerProvider.Shared;
          m_Provider.EntryLogged += OnEntryLogged;
 
          // BL-4.1: bind this log's MEL logger to the thread-safe in-memory provider,
