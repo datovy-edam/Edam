@@ -1,4 +1,4 @@
-﻿using System;
+using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Text;
@@ -296,6 +296,13 @@ namespace Edam.WinUI.Controls.Application
       #region -- 4.00 - Application Initialization support
 
       /// <summary>
+      /// The application's logger factory. It carries the shared in-memory provider, so the diagnostics
+      /// panel and the application log are one and the same. Held statically so the provider chain cannot
+      /// be collected while <c>Edam.Diagnostics.Log</c> still points at a logger created from it.
+      /// </summary>
+      private static Microsoft.Extensions.Logging.ILoggerFactory m_LoggerFactory;
+
+      /// <summary>
       /// First time initialization of the application.
       /// </summary>
       public static void InitializeApplication()
@@ -320,6 +327,26 @@ namespace Edam.WinUI.Controls.Application
          Edam.WinUI.Helpers.DependencyInjectionHelper.
             InitializeDependencyInjectionService();
          app.Session.MessageBox = new Dialogs.DialogMessageBox();
+
+         // Diagnostics: bind the application's logging to the SAME in-memory provider the diagnostics
+         // panel shows, so the legacy Edam.Diagnostics.Log facade — and anything else logging through MEL
+         // — lands in the panel without being routed by hand. (ResultLog instances reach the panel through
+         // the delegate bridge in AppDiagnostics.)
+         if (m_LoggerFactory == null)
+         {
+            m_LoggerFactory = new Microsoft.Extensions.Logging.LoggerFactory(
+               new Microsoft.Extensions.Logging.ILoggerProvider[]
+               {
+                  Edam.WinUI.Controls.Logging.InMemoryLoggerProvider.Shared
+               });
+
+            Edam.Diagnostics.Log.UseLogging(m_LoggerFactory);
+
+            Edam.WinUI.Controls.Logging.AppDiagnostics.Write(
+               "Diagnostics log bound to the application logger.",
+               Microsoft.Extensions.Logging.LogLevel.Information,
+               "Edam.Studio.ApplicationHelper");
+         }
       }
 
       /// <summary>
