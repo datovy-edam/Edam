@@ -64,9 +64,9 @@ namespace Edam.WinUI.Controls.Navigation
 
          ApplicationHelper.SetMenuOption(MenuOption.Login);
 
-         // The diagnostics side panel is shown by default. It used to start collapsed and, because its
-         // column was Auto-sized, "opening" it changed nothing on screen (see ApplySidePanelWidth).
-         m_ViewModel.Expander.TogglePanelVisibility();
+         // The diagnostics side panel starts COLLAPSED: the person expands it if they are interested. It
+         // collapses to the chevron rail (never to nothing), so it stays discoverable, and the width is
+         // applied here so the rail is right from the first layout.
          ApplySidePanelWidth();
       }
 

@@ -365,6 +365,11 @@ namespace Edam.WinUI.Controls.ViewModels
 
          Session.SetUser(user);
 
+         // the login flow IS the reliable "signed in" signal: a local/PIN sign-in never sets
+         // UserLoggedInfo.IsActive (only a database read does), so the readiness gate must not depend on
+         // that flag alone (see ConfigurationReadiness)
+         Edam.WinUI.Controls.Configuration.ConfigurationReadiness.MarkSignedIn();
+
          // successful login... Goto next screen
          appHelper.ApplicationHelper.ResetApplication();
 
