@@ -37,6 +37,14 @@ namespace Edam.WinUI.Controls.ViewModels
          m_Provider = InMemoryLoggerProvider.Shared;
          m_Provider.EntryLogged += OnEntryLogged;
 
+         // Show whatever was logged BEFORE this view existed (startup diagnostics, configuration checks).
+         // Without this, those messages are invisible — which is precisely the "nothing happened" problem
+         // this panel exists to prevent.
+         foreach (var existing in m_Provider.Entries)
+         {
+            AddEntry(existing);
+         }
+
          // BL-4.1: bind this log's MEL logger to the thread-safe in-memory provider,
          // replacing the mutable static ResultLog.LogMessageHandler subscription.
          // (A real LoggerFactory may also AddProvider this provider at the app root.)
@@ -54,7 +62,9 @@ namespace Edam.WinUI.Controls.ViewModels
          Items.Clear();
       }
 
-      private void OnEntryLogged(InMemoryLogEntry e)
+      private void OnEntryLogged(InMemoryLogEntry e) => AddEntry(e);
+
+      private void AddEntry(InMemoryLogEntry e)
       {
          if (e == null)
             return;

@@ -30,6 +30,9 @@ namespace Edam.Studio
       /// <summary>Guards the one-time configuration ask (CF-4 / ADR-0013).</summary>
       private bool m_ConfigurationAsked;
 
+      /// <summary>Traces the "no XamlRoot yet" case once, instead of on every signal.</summary>
+      private bool m_ConfigurationRootMissingTraced;
+
       public MainWindow()
       {
          StartupDiagnostics.Trace("MainWindow ctor: begin");
@@ -38,34 +41,83 @@ namespace Edam.Studio
          Title = "EDAM Studio";
          UIApp.AppSettings.VerifySetConnectionString();
 
-         // CF-4 (ADR-0013): ask about the values the configuration cannot invent — AFTER the shell is up
-         // (a ContentDialog needs a XamlRoot and the UI thread, so it can never run during OnLaunched),
-         // once, and always skippable. An ask that fails must never break startup.
-         Activated += async (sender, args) =>
+         // CF-4 (ADR-0013): ask about the values the configuration cannot invent — AFTER the shell is up.
+         // A ContentDialog needs a XamlRoot and the UI thread, so it can never run during OnLaunched: the
+         // root content's Loaded event is the earliest moment the dialog can actually be shown, and
+         // Activated is kept as a fallback (whichever happens first, once).
+         if (Content is Microsoft.UI.Xaml.FrameworkElement shell)
          {
-            if (m_ConfigurationAsked || Content?.XamlRoot is null)
-            {
-               return;
-            }
-            m_ConfigurationAsked = true;
+            shell.Loaded += (sender, args) => AskForConfiguration();
+         }
 
-            try
-            {
-               await Edam.WinUI.Controls.Configuration.ConfigurationPrompt.ShowIfNeededAsync(
-                  Content.XamlRoot,
-                  Edam.WinUI.Controls.DataModels.ProjectServicesHelper.UserConfiguration);
-            }
-            catch (System.Exception ex)
-            {
-               StartupDiagnostics.Trace("Configuration prompt failed: " + ex.Message);
-            }
-         };
+         Activated += (sender, args) => AskForConfiguration();
 
          StartupDiagnostics.Trace("MainWindow ctor: completed");
       }
 
-      private void myButton_Click(object sender, RoutedEventArgs e)
+      /// <summary>
+      /// Ask once, as soon as the shell can actually host a dialog. Every outcome is reported — to the
+      /// diagnostics panel and the startup trace — so "nothing happened" is never silent.
+      /// </summary>
+      private void AskForConfiguration()
       {
+         if (m_ConfigurationAsked)
+         {
+            return;
+         }
+
+         var root = Content?.XamlRoot;
+         if (root is null)
+         {
+            if (!m_ConfigurationRootMissingTraced)
+            {
+               m_ConfigurationRootMissingTraced = true;
+               StartupDiagnostics.Trace(
+                  "Configuration ask: no XamlRoot yet (waiting for the shell to load)");
+            }
+            return;
+         }
+
+         m_ConfigurationAsked = true;
+         _ = AskForConfigurationAsync(root);
+      }
+
+      /// <summary>Ask, store and report — and never throw into startup.</summary>
+      private async System.Threading.Tasks.Task AskForConfigurationAsync(
+         Microsoft.UI.Xaml.XamlRoot root)
+      {
+         const string category = "Edam.Studio";
+
+         try
+         {
+            var user = Edam.WinUI.Controls.DataModels.ProjectServicesHelper.UserConfiguration;
+            var asks = user.ToAsk();
+
+            if (asks.Count == 0)
+            {
+               Edam.WinUI.Controls.Logging.AppDiagnostics.Write(
+                  "Configuration check: nothing to ask.", 
+                  Microsoft.Extensions.Logging.LogLevel.Information, category);
+               return;
+            }
+
+            Edam.WinUI.Controls.Logging.AppDiagnostics.Write(
+               "Configuration check: " + asks.Count + " item(s) need input: " + asks[0].Item.Id +
+               (asks.Count > 1 ? " (+" + (asks.Count - 1) + " more)" : string.Empty),
+               Microsoft.Extensions.Logging.LogLevel.Information, category);
+
+            var saved = await Edam.WinUI.Controls.Configuration.ConfigurationPrompt
+               .ShowIfNeededAsync(root, user);
+
+            StartupDiagnostics.Trace("Configuration ask: shown, saved=" + saved);
+         }
+         catch (System.Exception ex)
+         {
+            Edam.WinUI.Controls.Logging.AppDiagnostics.Write(
+               "Configuration ask failed: " + ex.Message,
+               Microsoft.Extensions.Logging.LogLevel.Warning, category);
+            StartupDiagnostics.Trace("Configuration ask failed: " + ex.Message);
+         }
       }
    }
 }
