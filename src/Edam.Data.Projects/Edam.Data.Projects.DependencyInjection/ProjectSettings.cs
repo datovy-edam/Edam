@@ -36,6 +36,73 @@ public sealed record ProjectSettingsInfo(
    public ProjectBindingInfo? BindingFor(string collectionId)
       => Bindings.FirstOrDefault(b =>
          string.Equals(b.CollectionId, collectionId, StringComparison.OrdinalIgnoreCase));
+
+   /// <summary>
+   /// Every item the reader looked at, with its <b>state</b> (CF-1 / ADR-0013). This is what makes
+   /// "nothing stated this" distinguishable from "stated as empty" — the distinction a first-run
+   /// prompt depends on.
+   /// </summary>
+   public IReadOnlyList<ConfigurationItemInfo> Items { get; init; } =
+      Array.Empty<ConfigurationItemInfo>();
+
+   /// <summary>The item for a key, or null when the reader did not look at it.</summary>
+   public ConfigurationItemInfo? Item(string key) =>
+      Items.FirstOrDefault(i => string.Equals(i.Key, key, StringComparison.OrdinalIgnoreCase));
+
+   /// <summary>The state of a key (<see cref="ConfigurationState.Unset"/> when not looked at).</summary>
+   public ConfigurationState StateOf(string key) =>
+      Item(key)?.State ?? ConfigurationState.Unset;
+
+   /// <summary>Everything stated but unusable — reported, never silently replaced.</summary>
+   public IReadOnlyList<ConfigurationItemInfo> Problems =>
+      Items.Where(i => i.State == ConfigurationState.Invalid).ToList();
+
+   /// <summary>The items nothing has stated yet (the ones a host may ask about).</summary>
+   public IReadOnlyList<ConfigurationItemInfo> Unset =>
+      Items.Where(i => i.State == ConfigurationState.Unset).ToList();
+}
+
+/// <summary>
+/// The three states configuration can be in (CF-1 / ADR-0013): <b>Unset</b> (nothing stated it),
+/// <b>Set</b> (stated — possibly to an empty value) and <b>Invalid</b> (stated, but unusable).
+/// <para>
+/// Only <c>Unset</c> may cause the application to <i>ask</i> the user. A value that was deliberately
+/// set to <b>empty</b> is respected, and an <b>invalid</b> one is reported rather than silently
+/// replaced — the distinction whose absence caused a real startup defect
+/// (<c>AppSettings:AssetConsolePath</c> is deliberately empty, and code that treated empty as missing
+/// threw).
+/// </para>
+/// </summary>
+public enum ConfigurationState
+{
+   /// <summary>Nothing has stated this value.</summary>
+   Unset,
+
+   /// <summary>Stated — the value may legitimately be empty.</summary>
+   Set,
+
+   /// <summary>Stated, but the value cannot be used; see <see cref="ConfigurationItemInfo.Problem"/>.</summary>
+   Invalid
+}
+
+/// <summary>One configurable item, as the reader found it (CF-1 / ADR-0013).</summary>
+/// <param name="Key">The configuration key of the item (or its logical name, e.g. <c>binding:&lt;id&gt;</c>).</param>
+/// <param name="State">Unset / Set / Invalid.</param>
+/// <param name="Value">The value as stated (null when unset); never a secret.</param>
+/// <param name="Source">What stated it — the item's own key, a translated legacy key, or the environment.</param>
+/// <param name="Problem">Why it is unusable (null unless <see cref="ConfigurationState.Invalid"/>).</param>
+public sealed record ConfigurationItemInfo(
+   string Key,
+   ConfigurationState State,
+   string? Value = null,
+   string? Source = null,
+   string? Problem = null)
+{
+   /// <summary>True when something stated this value (even if it is empty).</summary>
+   public bool IsConfigured => State != ConfigurationState.Unset;
+
+   /// <summary>True when the value can be used.</summary>
+   public bool IsUsable => State != ConfigurationState.Invalid;
 }
 
 /// <summary>
@@ -93,6 +160,15 @@ public static class ProjectSettings
 
    /// <summary>The collection id used for the implicit default binding when none is configured.</summary>
    public const string DEFAULT_BINDING_ID = "(default)";
+
+   /// <summary>
+   /// The <b>provider families</b> a project surface can be built from (a composition choice) — not to be
+   /// confused with a binding's <b>storage kind</b> (see <see cref="STORAGE_KINDS"/>).
+   /// </summary>
+   public static readonly string[] PROVIDER_FAMILIES = { "filesystem", "catalog" };
+
+   /// <summary>The <b>storage kinds</b> a container's binding may name.</summary>
+   public static readonly string[] STORAGE_KINDS = { "filesystem", "postgres", "service" };
 
    // ---- environment overrides (LM-4): environment WINS over configuration ---------------------
 
@@ -194,10 +270,15 @@ public static class ProjectSettings
 
       var bindings = new List<ProjectBindingInfo>();
 
+      // which bindings were DECLARED (as opposed to derived from today's keys) — CF-1 reports the two
+      // differently: a declared binding with no location is Set, a derived one with no location is Unset
+      var declaredIds = new HashSet<string>(StringComparer.OrdinalIgnoreCase);
+
       // the default collection's binding: declared keys win, else derive from today's configuration
       var declaredDefault = ReadBinding(config, defaultBindingId, isDefault: true);
       if (declaredDefault is not null)
       {
+         declaredIds.Add(defaultBindingId);
          bindings.Add(declaredDefault);
       }
       else
@@ -230,7 +311,11 @@ public static class ProjectSettings
       foreach (var collection in collections)
       {
          var declared = ReadBinding(config, collection.CollectionId, isDefault: false);
-         if (declared is not null) bindings.Add(declared);
+         if (declared is not null)
+         {
+            declaredIds.Add(collection.CollectionId);
+            bindings.Add(declared);
+         }
       }
 
       // ---- environment overrides win over configuration --------------------------------------
@@ -276,6 +361,23 @@ public static class ProjectSettings
          .Where(key => !string.IsNullOrWhiteSpace(config[key]))
          .ToList();
 
+      // ---- CF-1 / ADR-0013: state every item the reader looked at -----------------------------
+      // Resolution is deliberately UNCHANGED here — the reader STATES, the host decides what to ask
+      // (ADR-0013 decisions 1 and 4). "Unset" is never conflated with "set to an empty value".
+      var items = new List<ConfigurationItemInfo>
+      {
+         RootItem(config, root, legacy, applied),
+         ReadItem(config, TARGET_KEY, problem: ProviderFamilyProblem(providerTarget)),
+         ReadItem(config, DEFAULT_COLLECTION_KEY),
+         ReadItem(config, WORKING_ROOT_KEY),
+      };
+
+      foreach (var binding in bindings)
+      {
+         items.Add(BindingItem(
+            binding, declaredIds.Contains(binding.CollectionId)));
+      }
+
       return new ProjectSettingsInfo(
          providerTarget,
          string.IsNullOrWhiteSpace(root) ? null : root!.Trim(),
@@ -285,7 +387,135 @@ public static class ProjectSettings
          bindings,
          legacy,
          pending,
-         applied);
+         applied)
+      {
+         Items = items
+      };
+   }
+
+   /// <summary>
+   /// State one configuration item. <b>Presence</b> is what makes it <c>Set</c>: an empty string is a
+   /// stated value, not a missing one (ADR-0013 decision 1).
+   /// </summary>
+   /// <param name="config">configuration to read</param>
+   /// <param name="key">the item's key</param>
+   /// <param name="source">what stated it (defaults to the key itself)</param>
+   /// <param name="problem">the reason it is unusable, when known</param>
+   public static ConfigurationItemInfo ReadItem(
+      IConfiguration config, string key, string? source = null, string? problem = null)
+   {
+      var section = config.GetSection(key);
+      var present = section.Value is not null || section.GetChildren().Any();
+
+      if (problem is not null)
+      {
+         return new ConfigurationItemInfo(
+            key, ConfigurationState.Invalid, section.Value, source ?? key, problem);
+      }
+
+      return present
+         ? new ConfigurationItemInfo(key, ConfigurationState.Set, section.Value, source ?? key)
+         : new ConfigurationItemInfo(key, ConfigurationState.Unset);
+   }
+
+   /// <summary>
+   /// The root item: the ADR-0011 key, a translated legacy key, an environment override, or unset.
+   /// </summary>
+   /// <param name="config">configuration to inspect</param>
+   /// <param name="root">the <b>effective</b> root (after translation and environment precedence)</param>
+   /// <param name="legacy">the legacy keys that were translated</param>
+   /// <param name="applied">the environment variables that were applied</param>
+   private static ConfigurationItemInfo RootItem(
+      IConfiguration config, string? root,
+      IReadOnlyList<string> legacy, IReadOnlyList<string> applied)
+   {
+      // the effective value is what a translated or overridden item must report: reading the item's own
+      // key would report "unset" for a value that a legacy key or the environment actually stated
+      var value = string.IsNullOrWhiteSpace(root) ? root : root!.Trim();
+
+      if (applied.Contains(ENV_ROOT))
+      {
+         return new ConfigurationItemInfo(ROOT_KEY, ConfigurationState.Set, value, ENV_ROOT);
+      }
+
+      if (config.GetSection(ROOT_KEY).Value is not null)
+      {
+         return ReadItem(config, ROOT_KEY);
+      }
+
+      if (legacy.Contains(LEGACY_CONSOLE_PATH_KEY))
+      {
+         return new ConfigurationItemInfo(
+            ROOT_KEY, ConfigurationState.Set, value, LEGACY_CONSOLE_PATH_KEY);
+      }
+
+      if (legacy.Contains(LEGACY_SETTINGS_CONSOLE_PATH_KEY))
+      {
+         return new ConfigurationItemInfo(
+            ROOT_KEY, ConfigurationState.Set, value, LEGACY_SETTINGS_CONSOLE_PATH_KEY);
+      }
+
+      return new ConfigurationItemInfo(ROOT_KEY, ConfigurationState.Unset);
+   }
+
+   /// <summary>What is wrong with a provider family, or null when it is one we know.</summary>
+   public static string? ProviderFamilyProblem(string? family)
+      => string.IsNullOrWhiteSpace(family) ||
+         PROVIDER_FAMILIES.Contains(family, StringComparer.OrdinalIgnoreCase)
+            ? null
+            : $"'{family}' is not a provider family; expected one of " +
+              string.Join(", ", PROVIDER_FAMILIES) +
+              ". A provider family chooses which project surface to build — it is not a storage kind " +
+              "(see a container's binding)";
+
+   /// <summary>What is wrong with a binding, or null when it is usable.</summary>
+   public static string? BindingProblem(ProjectBindingInfo binding)
+   {
+      var kind = NormalizeTarget(binding.Target);
+
+      if (!STORAGE_KINDS.Contains(kind, StringComparer.OrdinalIgnoreCase))
+      {
+         return $"'{binding.Target}' is not a storage kind; expected one of " +
+            string.Join(", ", STORAGE_KINDS);
+      }
+
+      if ((kind == "postgres" || kind == "service") &&
+          string.IsNullOrWhiteSpace(binding.Credential))
+      {
+         return $"a '{kind}' binding needs a credential NAME (a configuration key or a " +
+            "vault:// reference) — the secret itself never lives in configuration";
+      }
+
+      return null;
+   }
+
+   /// <summary>
+   /// State a container's binding. The item's value is the <b>address</b> (a folder or a base URI) —
+   /// never the credential, which is only a name.
+   /// </summary>
+   private static ConfigurationItemInfo BindingItem(
+      ProjectBindingInfo binding, bool declared)
+   {
+      var key = BINDINGS_SECTION + ":" + binding.CollectionId;
+      var problem = BindingProblem(binding);
+
+      if (problem is not null)
+      {
+         return new ConfigurationItemInfo(
+            key, ConfigurationState.Invalid, binding.Location, key, problem);
+      }
+
+      // a DECLARED binding with no address is Set-to-empty; a DERIVED one with no address means
+      // nothing has stated where the storage is yet — the first-run case, which is Unset (pending)
+      if (string.IsNullOrWhiteSpace(binding.Location))
+      {
+         return declared
+            ? new ConfigurationItemInfo(key, ConfigurationState.Set, null, key)
+            : new ConfigurationItemInfo(key, ConfigurationState.Unset);
+      }
+
+      return new ConfigurationItemInfo(
+         key, ConfigurationState.Set, binding.Location, key);
    }
 
    /// <summary>

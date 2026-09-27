@@ -256,6 +256,9 @@ try
    // ---- 10f. container-scoped item index + content (LM-2a/LM-2b, ADR-0011) -------------------
    all["scoping (LM-2a/2b)"] = await ScopingScenario.RunAsync(Path.Combine(temp, "scoping"), dsn);
 
+   // ---- 10g. configuration states: unset / set / invalid (CF-1, ADR-0013) ---------------------
+   all["configuration (CF-1)"] = ConfigurationScenario.Run();
+
    // ---- 11. a REAL end-to-end process attempt (PE-5c) — INFORMATIONAL ------------------------
    //      Reports what the legacy pipeline actually does; deliberately not a pass/fail, so the
    //      remaining gap (the console needs real project data to yield assets) stays visible.

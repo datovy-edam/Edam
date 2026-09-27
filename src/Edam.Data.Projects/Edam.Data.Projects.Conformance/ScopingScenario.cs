@@ -131,9 +131,8 @@ public static class ScopingScenario
       // ---- LM-2b: the CONTENT key is (container, path) in PostgreSQL ---------------------------
       if (string.IsNullOrWhiteSpace(dsn))
       {
-         checks.Add(new ProjectScenario.Check(
-            "PostgreSQL: two containers hold the same content path", false,
-            "no DSN argument — the postgres half could not be exercised"));
+         // No database is available: the PostgreSQL half is simply NOT exercised (the group's check
+         // count shows it). An unavailable dependency must never be reported as a failure.
          return checks;
       }
 
