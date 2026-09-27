@@ -42,19 +42,53 @@ namespace Edam.WinUI.Controls.Editors
          DataContext = m_ViewModel;
          m_ViewModel.CodeEditor = CodeEditor;
          CodeEditor.WebMessageReceived += OnWebMessageReceived;
+
+         // the WebView2 and the page it hosts must be able to take keyboard focus
+         Loaded += (s, e) => CodeEditor.Focus(FocusState.Programmatic);
       }
 
       /// <summary>
-      /// Handle messages posted from the Monaco editor (see code-editor.html).
-      /// A 'save' message (Ctrl-S / Cmd-S) triggers the save command.
+      /// Handle messages posted from the Monaco editor (see code-editor.html):
+      /// <c>save</c> (Ctrl-S) runs the save command, while <c>ready</c> / <c>key</c> / <c>error:…</c> are
+      /// reported back to the host — so an editor that does not work says WHY instead of doing nothing.
       /// </summary>
       private void OnWebMessageReceived(
          WebView2 sender, CoreWebView2WebMessageReceivedEventArgs args)
       {
-         // postMessage('save') arrives as the JSON string "\"save\"".
-         if (args.WebMessageAsJson == "\"save\"")
+         string message;
+         try
+         {
+            message = args.TryGetWebMessageAsString();
+         }
+         catch (Exception)
+         {
+            return;
+         }
+
+         if (String.IsNullOrWhiteSpace(message))
+         {
+            return;
+         }
+
+         if (message == "save")
          {
             m_ViewModel.SaveRequested();
+            return;
+         }
+
+         var text = message switch
+         {
+            "ready" => "Code editor loaded (Monaco ready).",
+            "key" => "Code editor is receiving keyboard input.",
+            _ => message.StartsWith("error", StringComparison.OrdinalIgnoreCase)
+               ? "Code editor problem: " + message
+               : null
+         };
+
+         if (text != null)
+         {
+            System.Diagnostics.Debug.WriteLine(text);
+            m_ViewModel.NotifyCodeEditor(text);
          }
       }
 

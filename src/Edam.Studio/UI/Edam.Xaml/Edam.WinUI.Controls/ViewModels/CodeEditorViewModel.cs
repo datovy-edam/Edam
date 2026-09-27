@@ -57,6 +57,25 @@ namespace Edam.WinUI.Controls.ViewModels
 
       public NotificationEvent NotifyCodeEditorEvent { get; set; }
 
+      /// <summary>
+      /// Report editor status to the host (through <see cref="NotifyCodeEditorEvent"/>), so a code editor
+      /// that does not work says <b>why</b> — that the page loaded, that the keyboard reaches it, or which
+      /// error stopped Monaco.
+      /// </summary>
+      public void NotifyCodeEditor(string message)
+      {
+         if (String.IsNullOrWhiteSpace(message))
+         {
+            return;
+         }
+
+         NotifyCodeEditorEvent?.Invoke(this, new NotificationArgs
+         {
+            Type = NotificationType.AssetDataSetAvailable,
+            MessageText = message
+         });
+      }
+
       public CodeEditorViewModel()
       {
          Navigate(GetDefaultCodeEditorUri());

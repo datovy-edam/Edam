@@ -47,8 +47,9 @@
          <!--</ctk:DockPanel>-->
       </Border>
 
-      <!--<ed:CodeEditorControl x:Name="EditorControl" Grid.Row="1" Grid.Column="0"
-                            KeyDown="EditorControl_KeyDown"/>-->
-      <Frame x:Name="FrameEditor" Grid.Row="1" Grid.Column="0" />
+      <!-- The code editor (a WebView2, i.e. a composition/content-island control) is hosted in a plain
+           layout panel: hosting it in a Frame (built for Page content) left it rendered but unable to
+           take pointer/keyboard input, so nothing could be typed. -->
+      <Grid x:Name="EditorHost" Grid.Row="1" Grid.Column="0" />
    </Grid>
 </UserControl>

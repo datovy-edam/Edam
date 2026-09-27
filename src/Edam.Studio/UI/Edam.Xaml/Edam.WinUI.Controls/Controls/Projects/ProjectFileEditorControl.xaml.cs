@@ -60,7 +60,7 @@ namespace Edam.WinUI.Controls.Projects
          EditorControl = new CodeEditorControl();
          EditorControl.ViewModel.NotifyCodeEditorEvent =
             ManageNotification;
-         FrameEditor.Content = EditorControl;
+         EditorHost.Children.Add(EditorControl);
       }
 
       public void ManageNotification(object sender, NotificationArgs args)

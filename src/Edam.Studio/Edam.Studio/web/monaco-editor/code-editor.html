@@ -25,9 +25,15 @@
 
 		<!-- OR ANY OTHER AMD LOADER HERE INSTEAD OF loader.js -->
 		<script src="./min/vs/loader.js"></script>
-		<script src="./min/vs/editor/editor.main.js"></script>
 		<script>
 			require.config({ paths: { vs: './min/vs' } });
+
+			// post a message to the host (WebView2): the host logs it, so a silent failure is visible
+			function postToHost(text) {
+				if (window.chrome && window.chrome.webview) {
+					window.chrome.webview.postMessage(text);
+				}
+			}
 
 			require(['vs/editor/editor.main'], function () {
 				window.editor = monaco.editor.create(document.getElementById('content'), {
@@ -42,11 +48,27 @@
 				window.editor.addCommand(
 					monaco.KeyMod.CtrlCmd | monaco.KeyCode.KeyS,
 					function () {
-						if (window.chrome && window.chrome.webview) {
-							window.chrome.webview.postMessage('save');
-						}
+						postToHost('save');
 					});
-         });
+
+				// tell the host the editor is up, and whether the keyboard reaches this page at all
+				var keyReported = false;
+				document.addEventListener('keydown', function () {
+					if (!keyReported) {
+						keyReported = true;
+						postToHost('key');
+					}
+				});
+
+				window.editor.focus();
+				postToHost('ready');
+			}, function (error) {
+				postToHost('error: monaco failed to load - ' + error);
+			});
+
+			window.addEventListener('error', function (e) {
+				postToHost('error: ' + e.message);
+			});
 
 			function setEditorText(text, language) {
 				monaco.editor.getModels().forEach(model => model.dispose());
