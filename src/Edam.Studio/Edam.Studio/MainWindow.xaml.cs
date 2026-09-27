@@ -36,6 +36,10 @@ namespace Edam.Studio
       /// <summary>Traces the "waiting for sign-in" case once, instead of on every signal.</summary>
       private bool m_ConfigurationWaitingTraced;
 
+      /// <summary>Signal-independent safety net: ticks until the ask has been made (or gives up).</summary>
+      private Microsoft.UI.Dispatching.DispatcherQueueTimer? m_ConfigurationTimer;
+      private int m_ConfigurationTicks;
+
       public MainWindow()
       {
          StartupDiagnostics.Trace("MainWindow ctor: begin");
@@ -54,6 +58,24 @@ namespace Edam.Studio
          }
 
          Activated += (sender, args) => AskForConfiguration();
+
+         // Two signal-based attempts missed the moment (a XamlRoot that did not exist yet; then a window
+         // that never regained focus after sign-in), so the ask ALSO runs on a small, self-stopping poll:
+         // the readiness gate decides when it is allowed, so no signal can be missed. It stops as soon as
+         // the ask has been made, and gives up after ~5 minutes.
+         m_ConfigurationTimer = DispatcherQueue.CreateTimer();
+         m_ConfigurationTimer.Interval = System.TimeSpan.FromSeconds(2);
+         m_ConfigurationTimer.Tick += (sender, args) =>
+         {
+            if (m_ConfigurationAsked || ++m_ConfigurationTicks > 150)
+            {
+               m_ConfigurationTimer?.Stop();
+               return;
+            }
+
+            AskForConfiguration();
+         };
+         m_ConfigurationTimer.Start();
 
          StartupDiagnostics.Trace("MainWindow ctor: completed");
       }
@@ -98,6 +120,7 @@ namespace Edam.Studio
          }
 
          m_ConfigurationAsked = true;
+         m_ConfigurationTimer?.Stop();
          _ = AskForConfigurationAsync(root);
       }
 

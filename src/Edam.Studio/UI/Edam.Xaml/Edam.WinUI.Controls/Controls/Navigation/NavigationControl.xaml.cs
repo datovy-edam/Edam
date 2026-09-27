@@ -178,6 +178,13 @@ namespace Edam.WinUI.Controls.Navigation
             m_ViewModel.SelectedItem = null;
             PresentPage(item, e, MenuIsVisible);
          }
+
+         // CF-4 (A + D / ADR-0013): every navigation routes through here — including the screen the app
+         // moves to after a successful login — so this is a reliable moment to ask about the values the
+         // configuration cannot invent. The ask itself decides whether it may run (signed in, something
+         // missing, at most once per run), and it is best effort.
+         _ = Edam.WinUI.Controls.DataModels.ProjectServicesHelper
+            .AskForConfigurationIfNeededAsync(null);
       }
 
       public IMenuItem Find(MenuOption option)
