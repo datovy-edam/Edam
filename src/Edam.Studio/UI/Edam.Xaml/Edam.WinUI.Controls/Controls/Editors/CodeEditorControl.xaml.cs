@@ -43,8 +43,41 @@ namespace Edam.WinUI.Controls.Editors
          m_ViewModel.CodeEditor = CodeEditor;
          CodeEditor.WebMessageReceived += OnWebMessageReceived;
 
-         // the WebView2 and the page it hosts must be able to take keyboard focus
-         Loaded += (s, e) => CodeEditor.Focus(FocusState.Programmatic);
+         Loaded += OnEditorLoaded;
+      }
+
+      /// <summary>
+      /// Serve the editor page from a <b>virtual host</b> instead of <c>file://</c>. A file:// page is a
+      /// per-file opaque origin, which makes uncaught script errors unreadable ("Script error.") and
+      /// typically blocks Monaco's web workers; mapped to a virtual host the page is same-origin. If the
+      /// mapping cannot be made, the already-resolved file URI is left in place.
+      /// </summary>
+      private async void OnEditorLoaded(object sender, RoutedEventArgs e)
+      {
+         const string EDITOR_VIRTUAL_HOST = "edam.editor";
+
+         try
+         {
+            await CodeEditor.EnsureCoreWebView2Async();
+
+            var webRoot = CodeEditorViewModel.CodeEditorWebRoot;
+            var virtualUri = CodeEditorViewModel.GetVirtualCodeEditorUri(EDITOR_VIRTUAL_HOST);
+
+            if (CodeEditor.CoreWebView2 != null && !String.IsNullOrWhiteSpace(virtualUri) &&
+                !String.IsNullOrWhiteSpace(webRoot) && Directory.Exists(webRoot))
+            {
+               CodeEditor.CoreWebView2.SetVirtualHostNameToFolderMapping(
+                  EDITOR_VIRTUAL_HOST, webRoot, CoreWebView2HostResourceAccessKind.Allow);
+               m_ViewModel.UrlSource = new Uri(virtualUri);
+            }
+         }
+         catch (Exception ex)
+         {
+            System.Diagnostics.Debug.WriteLine(
+               "Code editor virtual host mapping unavailable: " + ex.Message);
+         }
+
+         CodeEditor.Focus(FocusState.Programmatic);
       }
 
       /// <summary>
@@ -76,13 +109,17 @@ namespace Edam.WinUI.Controls.Editors
             return;
          }
 
+         // "Script error." is deliberately opaque for cross-origin scripts (file:// pages): it is logged
+         // but not presented as a problem, since the editor is demonstrably working once 'ready' arrives.
          var text = message switch
          {
             "ready" => "Code editor loaded (Monaco ready).",
             "key" => "Code editor is receiving keyboard input.",
-            _ => message.StartsWith("error", StringComparison.OrdinalIgnoreCase)
-               ? "Code editor problem: " + message
-               : null
+            _ when message.StartsWith("error", StringComparison.OrdinalIgnoreCase) =>
+               message.IndexOf("script error", StringComparison.OrdinalIgnoreCase) >= 0
+                  ? "Code editor reported a hidden script error (page origin hides the detail)."
+                  : "Code editor problem: " + message,
+            _ => null
          };
 
          if (text != null)

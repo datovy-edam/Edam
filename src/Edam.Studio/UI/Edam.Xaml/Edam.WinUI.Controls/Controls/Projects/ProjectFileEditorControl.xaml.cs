@@ -79,7 +79,12 @@ namespace Edam.WinUI.Controls.Projects
             return;
          }
 
-         m_ViewModel.NotifiedMessageText = "Loaded " + args.MessageText;
+         // Editor status messages ("Code editor …") are shown as-is; other data-set notifications keep the
+         // historical "Loaded …" wording.
+         var message = args.MessageText ?? String.Empty;
+         m_ViewModel.NotifiedMessageText = message.StartsWith("Code editor", StringComparison.Ordinal)
+            ? message
+            : "Loaded " + message;
       }
 
       public void SetEditorText(ProjectItem item, string text)

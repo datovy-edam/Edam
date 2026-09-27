@@ -131,6 +131,7 @@ namespace Edam.WinUI.Controls.ViewModels
             if (File.Exists(candidate))
             {
                m_CodeEditorPath = ConfigurationHelper.GetAbsoluteFileUri(candidate);
+               RememberWebRoot(candidateBase, relative);
                return m_CodeEditorPath;
             }
          }
@@ -139,7 +140,49 @@ namespace Edam.WinUI.Controls.ViewModels
          // clear failure instead of showing nothing at all
          m_CodeEditorPath = ConfigurationHelper.GetAbsoluteFileUri(
             Path.Combine(AppContext.BaseDirectory.TrimEnd('/', '\\'), relative));
+         RememberWebRoot(AppContext.BaseDirectory, relative);
          return m_CodeEditorPath;
+      }
+
+      /// <summary>
+      /// The folder the editor's page is served from (the <c>web</c> folder), and the page path relative to
+      /// it. The WebView2 host maps this folder to a virtual host so the page is <b>same-origin</b>
+      /// instead of <c>file://</c>: that is what stops uncaught script errors from being reported as the
+      /// opaque "Script error." (per-file opaque origins) and what lets Monaco's web workers load.
+      /// </summary>
+      public static string CodeEditorWebRoot { get; private set; }
+      public static string CodeEditorRelativePath { get; private set; }
+
+      /// <summary>The editor page's URL on the given virtual host (same-origin, so errors are readable).</summary>
+      public static string GetVirtualCodeEditorUri(string virtualHost)
+      {
+         if (String.IsNullOrWhiteSpace(virtualHost) ||
+             String.IsNullOrWhiteSpace(CodeEditorRelativePath))
+         {
+            return null;
+         }
+         return "https://" + virtualHost + "/" +
+            CodeEditorRelativePath.Replace('\\', '/').TrimStart('/');
+      }
+
+      private static void RememberWebRoot(string candidateBase, string relative)
+      {
+         // the configured URL is web-root relative (…/web/monaco-editor/code-editor.html), so the
+         // virtual host maps the FIRST segment under the base and the rest is the page path
+         var parts = relative.Split(Path.DirectorySeparatorChar,
+            StringSplitOptions.RemoveEmptyEntries);
+
+         if (parts.Length > 1)
+         {
+            CodeEditorWebRoot = Path.Combine(candidateBase.TrimEnd('/', '\\'), parts[0]);
+            CodeEditorRelativePath = String.Join(Path.DirectorySeparatorChar.ToString(),
+               parts, 1, parts.Length - 1);
+         }
+         else
+         {
+            CodeEditorWebRoot = candidateBase;
+            CodeEditorRelativePath = relative;
+         }
       }
 
       public async Task<ResultLog> SetEditorText(String text, String language)
