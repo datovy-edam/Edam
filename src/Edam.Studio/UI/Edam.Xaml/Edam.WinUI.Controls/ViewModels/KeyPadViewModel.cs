@@ -1,4 +1,4 @@
-﻿using System;
+using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Text;
@@ -201,6 +201,16 @@ namespace Edam.Uwp.ViewModels
                TitleText = GetFailMessage("Match");
                return;
             }
+
+            // The PIN was validated: on this path this IS the completed sign-in — it never reaches
+            // LoginViewModel.PersistUser (and therefore never calls Session.SetUser), which is why the
+            // readiness gate stayed closed and the first-run ask never appeared. Record it here, at the
+            // code that actually completes the login (A + D / ADR-0013).
+            Edam.WinUI.Controls.Configuration.ConfigurationReadiness.MarkSignedIn();
+            Edam.WinUI.Controls.Logging.AppDiagnostics.Write(
+               "Login completed: PIN validated; signed-in marked (sign-in is complete).",
+               Microsoft.Extensions.Logging.LogLevel.Information, "Edam.Studio.Login");
+
             ApplicationHelper.ResetApplication();
          }
          else
