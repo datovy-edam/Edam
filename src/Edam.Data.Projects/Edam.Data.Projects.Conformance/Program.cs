@@ -265,6 +265,9 @@ try
    // ---- 10i. the answers: overlay + marker + the ask loop (CF-3, ADR-0013) --------------------
    all["state (CF-3)"] = StateScenario.Run(Path.Combine(temp, "state"));
 
+   // ---- 10j. the gated default project: gates, the name, and the marker as proof (DP-3) ----------
+   all["default project (DP-3)"] = await DefaultProjectScenario.Run(Path.Combine(temp, "dp3"));
+
    // ---- 11. a REAL end-to-end process attempt (PE-5c) — INFORMATIONAL ------------------------
    //      Reports what the legacy pipeline actually does; deliberately not a pass/fail, so the
    //      remaining gap (the console needs real project data to yield assets) stays visible.

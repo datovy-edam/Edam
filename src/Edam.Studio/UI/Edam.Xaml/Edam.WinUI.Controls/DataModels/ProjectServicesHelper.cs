@@ -71,6 +71,83 @@ namespace Edam.WinUI.Controls.DataModels
       public static bool ConfigurationAskedThisRun => m_ConfigurationAskedThisRun;
 
       /// <summary>
+      /// The host half of the gated default project (DP-3 / ADR-0012): whether the bound collection is
+      /// empty, and how a project is created in it.
+      /// </summary>
+      private sealed class DefaultProjectHost
+         : Edam.Data.Projects.DependencyInjection.IDefaultProjectHost
+      {
+         public async Task<bool> IsContainerEmptyAsync(CancellationToken ct)
+         {
+            var collections = await GetCollectionsAsync(ct);
+            var collection = collections.FirstOrDefault(c => c.IsDefault)
+               ?? collections.FirstOrDefault();
+            if (collection is null)
+            {
+               return false;
+            }
+
+            var projects = await Catalog.GetProjectsAsync(collection.CollectionId, ct);
+            return projects.Count == 0;
+         }
+
+         public async Task<bool> CreateProjectAsync(string name, CancellationToken ct)
+         {
+            var created = await ProjectServicesHelper.CreateProjectAsync(
+               null, name, "Created by the first-run setup.", ct);
+            return created is not null;
+         }
+      }
+
+      /// <summary>The gated default project, wired to this host's collection and binding.</summary>
+      public static Edam.Data.Projects.DependencyInjection.DefaultProjectService
+         BuildDefaultProjectService() =>
+            new(UserConfiguration, new DefaultProjectHost(), UsesPhysicalPaths);
+
+      /// <summary>
+      /// Complete the <b>action</b> behind an answered item (DP-3 / ADR-0012): for the starter-project
+      /// name, create the project in the bound collection. Returns null on success, or why it failed — and
+      /// on failure the marker is <b>not</b> written, so the question stays pending and is asked again
+      /// (ADR-0013 decision 12).
+      /// </summary>
+      public static async Task<string?> CompleteConfigurationActionAsync(
+         Edam.Data.Projects.DependencyInjection.ConfigurableItemInfo item, string value)
+      {
+         try
+         {
+            if (item is null ||
+                item.Id != Edam.Data.Projects.DependencyInjection.ConfigurableItems
+                   .DEFAULT_PROJECT_NAME_KEY)
+            {
+               return null;
+            }
+
+            var outcome = await BuildDefaultProjectService().TryCreateAsync();
+
+            Edam.WinUI.Controls.Logging.AppDiagnostics.Write(
+               outcome.Created
+                  ? "Default project: CREATED '" + outcome.Name + "' (the answer is now complete)."
+                  : "Default project: not created" +
+                    (String.IsNullOrWhiteSpace(outcome.Problem)
+                       ? " (not applicable here)."
+                       : " (" + outcome.Problem + ") — the question stays pending."),
+               outcome.Created
+                  ? Microsoft.Extensions.Logging.LogLevel.Information
+                  : Microsoft.Extensions.Logging.LogLevel.Warning,
+               "Edam.Studio");
+
+            return outcome.Created ? null : outcome.Problem;
+         }
+         catch (Exception ex)
+         {
+            Edam.WinUI.Controls.Logging.AppDiagnostics.Write(
+               "Default project: failed (" + ex.Message + ") — the question stays pending.",
+               Microsoft.Extensions.Logging.LogLevel.Warning, "Edam.Studio");
+            return ex.Message;
+         }
+      }
+
+      /// <summary>
       /// Ask about configuration that is <b>still missing</b> (A + D / ADR-0013) — the path to use once a
       /// person is signed in: from the login completion, from a signed-in navigation, and (unconditionally)
       /// just before a project is created, where the answers are actually needed.
@@ -106,7 +183,8 @@ namespace Edam.WinUI.Controls.DataModels
                return false;
             }
 
-            if (UserConfiguration.ToAsk().Count == 0)
+            var batch = UserConfiguration.ToAsk();
+            if (batch.Count == 0)
             {
                Edam.WinUI.Controls.Logging.AppDiagnostics.Write(
                   "Configuration ask: nothing is missing (nothing to ask).",
@@ -114,13 +192,27 @@ namespace Edam.WinUI.Controls.DataModels
                return false;
             }
 
+            // DP-3 design point: never ask for a name that would not be used. When the only thing to ask
+            // is the starter-project name and the gated starter project is not applicable here (a
+            // shared/remote collection, the switch off, or it was handled before), stay silent.
+            var onlyStarterName = batch.All(a => a.Item.Id ==
+               Edam.Data.Projects.DependencyInjection.ConfigurableItems.DEFAULT_PROJECT_NAME_KEY);
+
+            if (onlyStarterName && !BuildDefaultProjectService().IsApplicable)
+            {
+               Edam.WinUI.Controls.Logging.AppDiagnostics.Write(
+                  "Configuration ask: the starter project is not applicable here (local binding=" +
+                  UsesPhysicalPaths + ") — not asking.",
+                  Microsoft.Extensions.Logging.LogLevel.Information, "Edam.Studio");
+               return false;
+            }
+
             Edam.WinUI.Controls.Logging.AppDiagnostics.Write(
-               "Configuration ask: SHOWING " + UserConfiguration.ToAsk().Count + " item(s): " +
-               UserConfiguration.ToAsk()[0].Item.Id,
+               "Configuration ask: SHOWING " + batch.Count + " item(s): " + batch[0].Item.Id,
                Microsoft.Extensions.Logging.LogLevel.Information, "Edam.Studio");
 
             var saved = await Edam.WinUI.Controls.Configuration.ConfigurationPrompt
-               .ShowIfNeededAsync(root, UserConfiguration);
+               .ShowIfNeededAsync(root, UserConfiguration, CompleteConfigurationActionAsync);
 
             // only NOW is the ask really done: a FAILED attempt must stay retryable (WinUI allows only one
             // ContentDialog at a time, so asking while another is open throws), which is why the guard is

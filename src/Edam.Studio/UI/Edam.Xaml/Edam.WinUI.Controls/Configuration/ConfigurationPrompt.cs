@@ -36,7 +36,15 @@ public static class ConfigurationPrompt
    /// </summary>
    /// <param name="xamlRoot">The shell's XAML root (the dialog cannot be shown without one).</param>
    /// <param name="user">The answers service (registry + overlay + packaged marker).</param>
-   public static async Task<bool> ShowIfNeededAsync(XamlRoot xamlRoot, UserConfiguration user)
+   /// <param name="completeAction">
+   /// Completes the <b>action</b> behind an answered item (DP-3 / ADR-0012) — for the starter project,
+   /// creating it. Returns null on success, or why it failed; on failure the dialog stays open with the
+   /// reason, and because the marker is only written when the action really happened, the question
+   /// remains pending (ADR-0013 decision 12).
+   /// </param>
+   public static async Task<bool> ShowIfNeededAsync(
+      XamlRoot xamlRoot, UserConfiguration user,
+      Func<ConfigurableItemInfo, string, Task<string?>>? completeAction = null)
    {
       if (xamlRoot is null || user is null)
       {
@@ -115,36 +123,74 @@ public static class ConfigurationPrompt
 
       var saved = false;
 
-      dialog.PrimaryButtonClick += (sender, args) =>
+      dialog.PrimaryButtonClick += async (sender, args) =>
       {
-         // validate WHERE the user answered (ADR-0013 decision 7): an unusable answer keeps the dialog
-         // open with the reason, and nothing is written
-         var problems = new List<string>();
+         // validating may await the ACTION, so hold the dialog open across the await
+         var deferral = args.GetDeferral();
 
-         foreach (var entry in entries)
+         try
          {
-            var problem = user.Answer(entry.Ask.Item, entry.Box.Text);
-            if (problem is not null)
+            // validate WHERE the user answered (ADR-0013 decision 7): an unusable answer keeps the dialog
+            // open with the reason, and nothing is written
+            var problems = new List<string>();
+
+            foreach (var entry in entries)
             {
-               problems.Add($"{entry.Ask.Item.Title}: {problem}");
+               var problem = user.Answer(entry.Ask.Item, entry.Box.Text);
+               if (problem is not null)
+               {
+                  problems.Add($"{entry.Ask.Item.Title}: {problem}");
+               }
+            }
+
+            if (problems.Count > 0)
+            {
+               problemText.Text = string.Join("\n", problems);
+               problemText.Visibility = Visibility.Visible;
+               args.Cancel = true;
+               return;
+            }
+
+            // the answer is stored — now attempt the ACTION it implies (DP-3). An action-backed item is
+            // not complete until the action happened: the marker is written by the action, and a failure
+            // here keeps the question pending and tells the person why.
+            if (completeAction is not null)
+            {
+               foreach (var entry in entries)
+               {
+                  if (!entry.Ask.Item.IsActionBacked)
+                  {
+                     continue;
+                  }
+
+                  var actionProblem = await completeAction(entry.Ask.Item, entry.Box.Text);
+                  if (actionProblem is not null)
+                  {
+                     problems.Add($"{entry.Ask.Item.Title}: {actionProblem}");
+                  }
+               }
+            }
+
+            if (problems.Count > 0)
+            {
+               problemText.Text = string.Join("\n", problems);
+               problemText.Visibility = Visibility.Visible;
+               args.Cancel = true;
+               return;
+            }
+
+            saved = true;
+
+            foreach (var entry in entries)
+            {
+               AppDiagnostics.Write(
+                  $"Configuration answered: {entry.Ask.Item.Id} = '{entry.Box.Text}'",
+                  LogLevel.Information, Category);
             }
          }
-
-         if (problems.Count > 0)
+         finally
          {
-            problemText.Text = string.Join("\n", problems);
-            problemText.Visibility = Visibility.Visible;
-            args.Cancel = true;
-            return;
-         }
-
-         saved = true;
-
-         foreach (var entry in entries)
-         {
-            AppDiagnostics.Write(
-               $"Configuration answered: {entry.Ask.Item.Id} = '{entry.Box.Text}'",
-               LogLevel.Information, Category);
+            deferral.Complete();
          }
       };
 
