@@ -99,13 +99,25 @@ namespace Edam.WinUI.Controls.DataModels
             if (root is null ||
                 !Edam.WinUI.Controls.Configuration.ConfigurationReadiness.IsSignedIn)
             {
+               Edam.WinUI.Controls.Logging.AppDiagnostics.Write(
+                  "Configuration ask: WAITING (root=" + (root is null ? "none" : "ok") +
+                  ", " + Edam.WinUI.Controls.Configuration.ConfigurationReadiness.Describe() + ").",
+                  Microsoft.Extensions.Logging.LogLevel.Information, "Edam.Studio");
                return false;
             }
 
             if (UserConfiguration.ToAsk().Count == 0)
             {
+               Edam.WinUI.Controls.Logging.AppDiagnostics.Write(
+                  "Configuration ask: nothing is missing (nothing to ask).",
+                  Microsoft.Extensions.Logging.LogLevel.Information, "Edam.Studio");
                return false;
             }
+
+            Edam.WinUI.Controls.Logging.AppDiagnostics.Write(
+               "Configuration ask: SHOWING " + UserConfiguration.ToAsk().Count + " item(s): " +
+               UserConfiguration.ToAsk()[0].Item.Id,
+               Microsoft.Extensions.Logging.LogLevel.Information, "Edam.Studio");
 
             var saved = await Edam.WinUI.Controls.Configuration.ConfigurationPrompt
                .ShowIfNeededAsync(root, UserConfiguration);
@@ -114,6 +126,11 @@ namespace Edam.WinUI.Controls.DataModels
             // ContentDialog at a time, so asking while another is open throws), which is why the guard is
             // set after the prompt completes rather than before it
             m_ConfigurationAskedThisRun = true;
+
+            Edam.WinUI.Controls.Logging.AppDiagnostics.Write(
+               "Configuration ask: CLOSED (saved=" + saved + ").",
+               Microsoft.Extensions.Logging.LogLevel.Information, "Edam.Studio");
+
             return saved;
          }
          catch (Exception ex)

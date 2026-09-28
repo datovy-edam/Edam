@@ -363,12 +363,22 @@ namespace Edam.WinUI.Controls.ViewModels
          GettingEntriesIndicator = true;
          EditorAreaVisible = Visibility.Visible;
 
+         // trace the login flow, so the diagnostics log shows where the person is in it
+         Edam.WinUI.Controls.Logging.AppDiagnostics.Write(
+            "Login accepted: storing the session user (userId='" + (user?.UserId ?? String.Empty) +
+            "', isActive=" + user?.IsActive.ToString() + ").",
+            Microsoft.Extensions.Logging.LogLevel.Information, "Edam.Studio.Login");
+
          Session.SetUser(user);
 
          // the login flow IS the reliable "signed in" signal: a local/PIN sign-in never sets
          // UserLoggedInfo.IsActive (only a database read does), so the readiness gate must not depend on
          // that flag alone (see ConfigurationReadiness)
          Edam.WinUI.Controls.Configuration.ConfigurationReadiness.MarkSignedIn();
+
+         Edam.WinUI.Controls.Logging.AppDiagnostics.Write(
+            "Login completed: signed-in marked; resetting the application (next screen).",
+            Microsoft.Extensions.Logging.LogLevel.Information, "Edam.Studio.Login");
 
          // successful login... Goto next screen
          appHelper.ApplicationHelper.ResetApplication();

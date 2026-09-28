@@ -1,4 +1,6 @@
 using System;
+using System.IO;
+using Edam.Application;
 using Edam.Diagnostics;
 using Microsoft.Extensions.Logging;
 
@@ -18,6 +20,36 @@ namespace Edam.WinUI.Controls.Logging
    public static class AppDiagnostics
    {
       private static Boolean m_ResultLogBridged;
+      private static readonly object FileGate = new object();
+      private static String m_LogFilePath;
+
+      /// <summary>
+      /// Where diagnostics are ALSO written as plain lines — so the log can be opened, copied or attached
+      /// even when the in-app panel cannot be copied, or after the application has closed. Best effort: a
+      /// log file that cannot be written must never disturb the application.
+      /// </summary>
+      public static String LogFilePath
+      {
+         get
+         {
+            if (m_LogFilePath is null)
+            {
+               try
+               {
+                  var root = AppData.GetApplicationDataLocation();
+                  m_LogFilePath = String.IsNullOrWhiteSpace(root)
+                     ? "(no app-data location)"
+                     : Path.Combine(root, "Edam.Diagnostics.log");
+               }
+               catch (Exception)
+               {
+                  m_LogFilePath = "(unavailable)";
+               }
+            }
+
+            return m_LogFilePath;
+         }
+      }
 
       static AppDiagnostics()
       {
@@ -36,9 +68,41 @@ namespace Edam.WinUI.Controls.Logging
             return;
          }
 
+         WriteToFile(level, message, category ?? "Edam.Studio");
+
          InMemoryLoggerProvider.Shared
             .CreateLogger(category ?? "Edam.Studio")
             .Log(level, message);
+      }
+
+      /// <summary>Append one line to <see cref="LogFilePath"/>; never throws, never blocks the caller.</summary>
+      private static void WriteToFile(LogLevel level, String message, String category)
+      {
+         try
+         {
+            var path = LogFilePath;
+            if (String.IsNullOrWhiteSpace(path) || path.StartsWith("(", StringComparison.Ordinal))
+            {
+               return;
+            }
+
+            var folder = Path.GetDirectoryName(path);
+            if (!String.IsNullOrWhiteSpace(folder) && !Directory.Exists(folder))
+            {
+               Directory.CreateDirectory(folder);
+            }
+
+            lock (FileGate)
+            {
+               File.AppendAllText(path,
+                  DateTimeOffset.Now.ToString("yyyy-MM-dd HH:mm:ss.fff") + "  " +
+                  level + "  " + category + "  " + message + Environment.NewLine);
+            }
+         }
+         catch (Exception)
+         {
+            // a log file that cannot be written is never fatal
+         }
       }
 
       /// <summary>

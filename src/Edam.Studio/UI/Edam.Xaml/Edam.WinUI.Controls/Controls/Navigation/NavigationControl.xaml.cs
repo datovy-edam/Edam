@@ -183,6 +183,11 @@ namespace Edam.WinUI.Controls.Navigation
          // moves to after a successful login — so this is a reliable moment to ask about the values the
          // configuration cannot invent. The ask itself decides whether it may run (signed in, something
          // missing, at most once per run), and it is best effort.
+         Edam.WinUI.Controls.Logging.AppDiagnostics.Write(
+            "Navigation: option=" + (e?.MenuOption.ToString() ?? "(none)") +
+            ", signedIn=" + Edam.WinUI.Controls.Configuration.ConfigurationReadiness.IsSignedIn + ".",
+            Microsoft.Extensions.Logging.LogLevel.Information, "Edam.Studio.Navigation");
+
          _ = Edam.WinUI.Controls.DataModels.ProjectServicesHelper
             .AskForConfigurationIfNeededAsync(null);
       }

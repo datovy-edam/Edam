@@ -45,6 +45,10 @@ namespace Edam.WinUI.Controls.Utilities
       {
          var text = new System.Text.StringBuilder();
 
+         // the file mirror is the reliable channel, so name it in the copied text
+         text.AppendLine("--- Edam diagnostics (full log file: " +
+            Edam.WinUI.Controls.Logging.AppDiagnostics.LogFilePath + ") ---");
+
          foreach (var item in m_ViewModel.Items)
          {
             if (item == null)
@@ -66,6 +70,9 @@ namespace Edam.WinUI.Controls.Utilities
             var package = new Windows.ApplicationModel.DataTransfer.DataPackage();
             package.SetText(text ?? String.Empty);
             Windows.ApplicationModel.DataTransfer.Clipboard.SetContent(package);
+
+            // without Flush the content can be lost when the source application closes
+            Windows.ApplicationModel.DataTransfer.Clipboard.Flush();
          }
          catch (Exception)
          {

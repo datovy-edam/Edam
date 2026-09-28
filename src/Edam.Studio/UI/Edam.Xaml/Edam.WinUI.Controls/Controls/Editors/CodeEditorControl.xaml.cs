@@ -117,10 +117,13 @@ namespace Edam.WinUI.Controls.Editors
             "ready" => ("Code editor loaded (Monaco ready).", LogLevel.Information),
             "key" => ("Code editor is receiving keyboard input.", LogLevel.Debug),
             _ when message.StartsWith("error", StringComparison.OrdinalIgnoreCase) =>
-               message.IndexOf("script error", StringComparison.OrdinalIgnoreCase) >= 0
-                  ? ("Code editor reported a hidden script error (page origin hides the detail).",
-                     LogLevel.Warning)
-                  : ("Code editor problem: " + message, LogLevel.Error),
+               message.IndexOf("ResizeObserver", StringComparison.OrdinalIgnoreCase) >= 0
+                  ? ("Code editor: benign ResizeObserver notice (browser layout, not a failure).",
+                     LogLevel.Debug)
+                  : message.IndexOf("script error", StringComparison.OrdinalIgnoreCase) >= 0
+                     ? ("Code editor reported a hidden script error (page origin hides the detail).",
+                        LogLevel.Warning)
+                     : ("Code editor problem: " + message, LogLevel.Error),
             _ => (null, LogLevel.Information)
          };
 
