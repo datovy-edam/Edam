@@ -42,6 +42,7 @@ public sealed class UserConfiguration
    /// </summary>
    public IConfiguration Effective => new ConfigurationBuilder()
       .AddConfiguration(_configuration)
+      .AddInMemoryCollection(_installation.ReadAll())
       .AddInMemoryCollection(_overlay.ReadAll())
       .Build();
 

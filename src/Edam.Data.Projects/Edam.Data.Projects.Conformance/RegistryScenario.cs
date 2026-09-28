@@ -40,12 +40,14 @@ public static class RegistryScenario
                            !string.IsNullOrWhiteSpace(i.Title)),
          $"{registry.Count} item(s) described");
 
-      Check("The starter-project name is asked once when unset, offering Edam.Sample",
+      Check("The starter-project name is ACTION-BACKED: required until the project exists",
          nameItem is not null &&
-         nameItem.Policy == ConfigurationPolicy.AskOnceWhenUnset &&
+         nameItem.Policy == ConfigurationPolicy.Required &&
+         nameItem.IsActionBacked &&
+         nameItem.CompletedByKey == ConfigurableItems.DEFAULT_PROJECT_MARKER_KEY &&
          nameItem.Default == ConfigurableItems.DEFAULT_PROJECT_NAME &&
          nameItem.Storage == ConfigurationStorage.AppDataOverlay,
-         $"{nameItem?.Policy} default='{nameItem?.Default}' storage={nameItem?.Storage}");
+         $"{nameItem?.Policy} completedBy='{nameItem?.CompletedByKey}' default='{nameItem?.Default}'");
 
       Check("The once-per-installation marker is NEVER asked (silent default, packaged settings)",
          markerItem is not null && !markerItem.IsAskable &&
@@ -64,12 +66,24 @@ public static class RegistryScenario
       var stated = ConfigurableItems.ToAsk(Config(
          (ConfigurableItems.DEFAULT_PROJECT_NAME_KEY, "Edam.Sample"),
          (ConfigurableItems.DEFAULT_PROJECT_MARKER_KEY, "true")));
-      Check("A stated, usable value asks NOTHING (ask once, remember, never ask again)",
+      Check("A stated value asks NOTHING once its ACTION is completed too (the marker)",
          stated.Count == 0,
          stated.Count == 0 ? "no asks" : string.Join(", ", stated.Select(a => a.Item.Id)));
 
+      var answeredNotDone = ConfigurableItems.ToAsk(Config(
+         (ConfigurableItems.DEFAULT_PROJECT_NAME_KEY, "Edam.Sample")));
+      Check("An ANSWER alone does NOT end the asking: with the action pending it asks again, PRE-FILLED",
+         answeredNotDone.Count == 1 &&
+         answeredNotDone[0].Item.Id == ConfigurableItems.DEFAULT_PROJECT_NAME_KEY &&
+         answeredNotDone[0].Current == "Edam.Sample" &&
+         !string.IsNullOrWhiteSpace(answeredNotDone[0].Reason),
+         answeredNotDone.Count == 0
+            ? "asked nothing (WRONG: the action was never completed)"
+            : $"asks again, pre-filled '{answeredNotDone[0].Current}': {answeredNotDone[0].Reason}");
+
       var emptyName = ConfigurableItems.ToAsk(Config(
-         (ConfigurableItems.DEFAULT_PROJECT_NAME_KEY, "")));
+         (ConfigurableItems.DEFAULT_PROJECT_NAME_KEY, ""),
+         (ConfigurableItems.DEFAULT_PROJECT_MARKER_KEY, "true")));
       Check("A name stated as EMPTY is not 'unset' — it is stated-but-unusable, so it asks to FIX it",
          emptyName.Count == 1 &&
          emptyName[0].State == ConfigurationState.Invalid &&

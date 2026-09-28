@@ -50,7 +50,16 @@ public static class StateScenario
          overlay.Read(nameItem.Key) == ConfigurableItems.DEFAULT_PROJECT_NAME,
          $"refused='{refused}' file={File.Exists(overlay.Location)} value='{overlay.Read(nameItem.Key)}'");
 
-      Check("The answer makes the item STOP being asked (ask once, remember, never ask again)",
+      Check("The ANSWER alone does NOT stop the asking — the ACTION does (the project must exist first)",
+         user.ToAsk().Count == 1 &&
+         user.ToAsk()[0].Current == ConfigurableItems.DEFAULT_PROJECT_NAME,
+         user.ToAsk().Count == 0
+            ? "asked nothing (WRONG: the action was never completed)"
+            : "still asked, pre-filled '" + user.ToAsk()[0].Current + "'");
+
+      user.MarkStarterProjectOffered();
+
+      Check("Once the ACTION is completed (the marker), the item stops being asked",
          user.ToAsk().Count == 0,
          string.Join(", ", user.ToAsk().Select(a => a.Item.Id)));
 

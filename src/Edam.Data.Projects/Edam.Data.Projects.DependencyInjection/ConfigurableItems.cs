@@ -38,6 +38,12 @@ public enum ConfigurationStorage
 /// <param name="Default">The value offered when asking.</param>
 /// <param name="Storage">Where the answer lives (ADR-0013 decision 6).</param>
 /// <param name="Validate">Returns why a stated value is unusable, or null when it is fine.</param>
+/// <param name="CompletedByKey">
+/// The configuration key that proves this item's <b>action</b> was completed. When set, answering the item
+/// is <b>not</b> completion: the item keeps being asked — with the answer pre-filled — until that key is
+/// stated. An answer to a question that implies an action ("name the starter project") is only valid once
+/// the action (the project exists) has actually happened.
+/// </param>
 public sealed record ConfigurableItemInfo(
    string Id,
    string Key,
@@ -47,10 +53,14 @@ public sealed record ConfigurableItemInfo(
    ConfigurationPolicy Policy,
    string? Default = null,
    ConfigurationStorage Storage = ConfigurationStorage.AppDataOverlay,
-   Func<string?, string?>? Validate = null)
+   Func<string?, string?>? Validate = null,
+   string? CompletedByKey = null)
 {
    /// <summary>True when this item may be put in front of the user.</summary>
    public bool IsAskable => Policy != ConfigurationPolicy.SilentDefault;
+
+   /// <summary>True when the answer is provisional until <see cref="CompletedByKey"/> is stated.</summary>
+   public bool IsActionBacked => !String.IsNullOrWhiteSpace(CompletedByKey);
 }
 
 /// <summary>One item that needs the user's input, and why (CF-2).</summary>
@@ -58,11 +68,13 @@ public sealed record ConfigurableItemInfo(
 /// <param name="State">Unset (nothing stated it) or Invalid (stated but unusable).</param>
 /// <param name="Current">What is stated now — never replaced, only reported.</param>
 /// <param name="Problem">Why a stated value is unusable.</param>
+/// <param name="Reason">Why the item is still being asked about (e.g. its action is not completed).</param>
 public sealed record ConfigurableAsk(
    ConfigurableItemInfo Item,
    ConfigurationState State,
    string? Current,
-   string? Problem);
+   string? Problem,
+   string? Reason = null);
 
 /// <summary>
 /// The <b>registry</b> of configurable items (CF-2 / ADR-0013). Adding a new thing to ask about is a
@@ -109,10 +121,11 @@ public static class ConfigurableItems
             WhatItIs: "The name of the sample project the application offers on a new installation.",
             WhatItAffects: "It becomes the project's address (/Projects/<name>), its folder on a " +
                "file-system collection, and the name of its starter arguments file.",
-            Policy: ConfigurationPolicy.AskOnceWhenUnset,
+            Policy: ConfigurationPolicy.Required,
             Default: DEFAULT_PROJECT_NAME,
             Storage: ConfigurationStorage.AppDataOverlay,
-            Validate: ValidateProjectName),
+            Validate: ValidateProjectName,
+            CompletedByKey: DEFAULT_PROJECT_MARKER_KEY),
 
          new(
             Id: DEFAULT_PROJECT_MARKER_KEY,
@@ -165,16 +178,30 @@ public static class ConfigurableItems
       {
          var state = StateOf(config, item);
 
-         if (state.State == ConfigurationState.Unset)
-         {
-            asks.Add(new ConfigurableAsk(item, ConfigurationState.Unset, null, null));
-            continue;
-         }
-
+         // A stated-but-unusable VALUE outranks everything: the person must fix the value before the
+         // action can even be attempted, so a pending action never masks a validation problem.
          if (state.State == ConfigurationState.Invalid)
          {
             asks.Add(new ConfigurableAsk(
                item, ConfigurationState.Invalid, state.Value, state.Problem));
+            continue;
+         }
+
+         // ACTION-BACKED ITEMS: the answer is provisional. While the key that proves the ACTION is not
+         // stated, the item stays in the batch — with the answer pre-filled, so it is never retyped. This
+         // is what makes "the answer is only valid once the action happened" true rather than a promise.
+         if (item.IsActionBacked &&
+             ProjectSettings.ReadItem(config, item.CompletedByKey!).State == ConfigurationState.Unset)
+         {
+            asks.Add(new ConfigurableAsk(
+               item, ConfigurationState.Unset, state.Value, null,
+               "the action this answer enables has not been completed yet"));
+            continue;
+         }
+
+         if (state.State == ConfigurationState.Unset)
+         {
+            asks.Add(new ConfigurableAsk(item, ConfigurationState.Unset, null, null));
          }
       }
 
