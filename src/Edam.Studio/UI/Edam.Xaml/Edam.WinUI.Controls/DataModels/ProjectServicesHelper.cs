@@ -79,9 +79,9 @@ namespace Edam.WinUI.Controls.DataModels
       {
          public async Task<bool> IsContainerEmptyAsync(CancellationToken ct)
          {
-            var collections = await GetCollectionsAsync(ct);
-            var collection = collections.FirstOrDefault(c => c.IsDefault)
-               ?? collections.FirstOrDefault();
+            // the SAME resolution the creation uses, so the gate can never check one container while the
+            // project is created in another (it honours Edam:Projects:DefaultCollection)
+            var collection = await ResolveCollectionAsync(null, ct).ConfigureAwait(false);
             if (collection is null)
             {
                return false;
@@ -458,6 +458,20 @@ namespace Edam.WinUI.Controls.DataModels
                string.Equals(c.Uri, collectionUri, StringComparison.OrdinalIgnoreCase) ||
                string.Equals(c.Name, collectionUri, StringComparison.OrdinalIgnoreCase));
             if (match is not null) return match;
+         }
+
+         // the CONFIGURED default comes first: `Edam:Projects:DefaultCollection` names the container this
+         // installation is meant to use, and it must win over whatever the provider happens to flag (or
+         // over "the first one") — otherwise the key would say something the application ignores.
+         var preferred = AppSettings.GetString(
+            Edam.Data.Projects.DependencyInjection.ProjectSettings.DEFAULT_COLLECTION_KEY);
+
+         if (!string.IsNullOrWhiteSpace(preferred))
+         {
+            var configured = collections.FirstOrDefault(c =>
+               string.Equals(c.CollectionId, preferred, StringComparison.OrdinalIgnoreCase) ||
+               string.Equals(c.Name, preferred, StringComparison.OrdinalIgnoreCase));
+            if (configured is not null) return configured;
          }
 
          return collections.FirstOrDefault(c => c.IsDefault) ?? collections[0];
