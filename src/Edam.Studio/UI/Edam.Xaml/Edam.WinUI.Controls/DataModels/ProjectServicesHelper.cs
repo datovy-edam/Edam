@@ -102,7 +102,17 @@ namespace Edam.WinUI.Controls.DataModels
       /// <summary>The gated default project, wired to this host's collection and binding.</summary>
       public static Edam.Data.Projects.DependencyInjection.DefaultProjectService
          BuildDefaultProjectService() =>
-            new(UserConfiguration, new DefaultProjectHost(), UsesPhysicalPaths);
+            new(UserConfiguration, new DefaultProjectHost(), IsLocalTarget);
+
+      /// <summary>
+      /// True when this installation is <b>local</b> (ADR-0012's condition for offering the starter
+      /// project): the project target stores on disk, <b>or</b> its catalog names this machine — so a
+      /// localhost PostgreSQL catalog counts as local, while a remote one does not.
+      /// </summary>
+      public static Boolean IsLocalTarget =>
+         UsesPhysicalPaths ||
+         Edam.Data.Projects.DependencyInjection.LocalTarget.IsLocalServer(
+            AppSettings.GetConnectionString("catalog"));
 
       /// <summary>
       /// Complete the <b>action</b> behind an answered item (DP-3 / ADR-0012): for the starter-project

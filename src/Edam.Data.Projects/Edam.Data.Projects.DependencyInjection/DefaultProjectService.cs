@@ -47,14 +47,18 @@ public sealed class DefaultProjectService
 
    private readonly UserConfiguration _user;
    private readonly IDefaultProjectHost _host;
-   private readonly Boolean _localBinding;
+   private readonly Boolean _isLocalTarget;
 
+   /// <param name="isLocalTarget">
+   /// True for a <b>local</b> installation — a file-system binding, or a catalog whose server is this
+   /// machine (see <see cref="LocalTarget"/>) — which is the only place ADR-0012 offers the starter project.
+   /// </param>
    public DefaultProjectService(
-      UserConfiguration user, IDefaultProjectHost host, Boolean localBinding)
+      UserConfiguration user, IDefaultProjectHost host, Boolean isLocalTarget)
    {
       _user = user ?? throw new ArgumentNullException(nameof(user));
       _host = host ?? throw new ArgumentNullException(nameof(host));
-      _localBinding = localBinding;
+      _isLocalTarget = isLocalTarget;
    }
 
    /// <summary>The name to use: what the person stated, else the documented default (`Edam.Sample`).</summary>
@@ -80,7 +84,7 @@ public sealed class DefaultProjectService
    {
       get
       {
-         if (!_localBinding)
+         if (!_isLocalTarget)
          {
             return false;   // ADR-0012: a shared/remote collection is never given a starter project
          }

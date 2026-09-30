@@ -60,8 +60,21 @@ public static class DefaultProjectScenario
       var nameKey = ConfigurableItems.DEFAULT_PROJECT_NAME_KEY;
 
       // ---- the gates that need no I/O ---------------------------------------------------------------
+      Check("A localhost/'.'-style catalog counts as a LOCAL target (so the starter project is offered there too)",
+         LocalTarget.IsLocalServer("Host=localhost;Port=5432;Database=edam") &&
+         LocalTarget.IsLocalServer("Server=.;Database=edam;Integrated Security=True") &&
+         LocalTarget.IsLocalServer(@"Server=.\SQLEXPRESS;Database=edam") &&
+         LocalTarget.IsLocalServer("Server=(local);Database=edam") &&
+         LocalTarget.IsLocalServer("Server=localhost,1433;Database=edam"),
+         "localhost | . | (local) | .\\INSTANCE | host,port all count as local");
+
+      Check("...while a REMOTE server does not, so a shared collection never gets a starter project",
+         !LocalTarget.IsLocalServer("Server=edam-db.corp.example.com;Database=edam") &&
+         !LocalTarget.IsLocalServer("Host=10.20.30.40;Port=5432;Database=edam"),
+         "a remote host is refused");
+
       var remote = Build(root, "remote", (nameKey, "Edam.Sample"));
-      var remoteOutcome = new DefaultProjectService(remote, new StubHost(), localBinding: false);
+      var remoteOutcome = new DefaultProjectService(remote, new StubHost(), isLocalTarget: false);
       Check("A NON-LOCAL binding never offers or creates the starter project",
          !remoteOutcome.IsApplicable &&
          !(await remoteOutcome.TryCreateAsync()).Created,
@@ -69,14 +82,14 @@ public static class DefaultProjectScenario
 
       var switchedOff = new DefaultProjectService(
          Build(root, "off", (nameKey, "Edam.Sample"), (createSwitch, "false")),
-         new StubHost(), localBinding: true);
+         new StubHost(), isLocalTarget: true);
       Check("The switch being off stops it, so an installation can opt out",
          !switchedOff.IsApplicable,
          $"applicable={switchedOff.IsApplicable}");
 
       var handled = new DefaultProjectService(
          Build(root, "handled", (nameKey, "Edam.Sample"), (markerKey, "true")),
-         new StubHost(), localBinding: true);
+         new StubHost(), isLocalTarget: true);
       Check("Once HANDLED (the marker is set), it is NEVER offered or created again — a deleted project stays deleted",
          !handled.IsApplicable && handled.WasAlreadyHandled,
          $"applicable={handled.IsApplicable} handled={handled.WasAlreadyHandled}");
