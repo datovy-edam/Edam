@@ -367,7 +367,19 @@ namespace Edam.WinUI.Controls.ViewModels
          {
             NotifiedMessageText = ex.Message;
          }
+
+         // DP-1: an empty tree explains nothing, so tell the view whether to say so
+         OnPropertyChanged(nameof(EmptyStateVisibility));
       }
+
+      /// <summary>
+      /// DP-1: <b>visible only when the selected location holds no projects</b> — a fresh installation
+      /// shows an empty panel, which reads as a fault rather than as a beginning. The empty state says
+      /// what is true and offers the one action that helps; it is the <b>safe half</b> of the work: it
+      /// writes nothing, applies no gates and opens the existing New-Project dialog.
+      /// </summary>
+      public Visibility EmptyStateVisibility =>
+         ((TreeView?.Children?.Count) ?? 0) == 0 ? Visibility.Visible : Visibility.Collapsed;
 
       public void ManageResults(IResultsLog results)
       {
