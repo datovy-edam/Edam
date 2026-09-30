@@ -20,6 +20,27 @@
   keyed `(container_id, resource_path)`. **Correction recorded:** that composite key needs **no migration**
   in MS-SQL — LM-2b's `ALTER TABLE … ADD PRIMARY KEY` upgraded an existing *PostgreSQL* database, so here
   it is simply part of the create script.
+  **Task 6 — the provider wiring — is DONE too (2026-09-28), so LM-8 is now reachable end to end except
+  for task 5.** Four changes, each in the place the architecture already puts that concern:
+  **(a)** `ContainerType.MsSql = 5` (`Edam.Data.Catalog.Contracts`) — appended, never renumbered;
+  **(b)** the composition root `Edam.Data.Catalog.DependencyInjection/CatalogServices.cs` now registers
+  `stores[ContainerType.MsSql]`/`contents[ContainerType.MsSql]` from `ConnectionStrings:catalog-mssql`,
+  else the shared `ConnectionStrings:catalog` **when the configured target is `mssql`** — and, exactly
+  because one key would otherwise be handed to two engines, **PostgreSQL is no longer registered from that
+  key when the target is `mssql`** (every pre-existing configuration is unaffected, since `mssql` is new);
+  `ParseTarget` accepts `mssql`/`sqlserver`/`sql-server`/`sql server`/`tsql`, and the file's key
+  documentation was updated;
+  **(c)** `CatalogScopedContent` — the container-scoped content factory (LM-2b-ii) — gained the same
+  `mssql` case with its own key preference; and
+  **(d)** the DI project references `Edam.Data.Catalog.MsSql`.
+  **Verified:** `Edam.Data.Catalog.slnx`, `Edam.Data.Projects.slnx` and `Edam.Studio.sln` all build with
+  **0 errors**, and the conformance suite is **ALL CONFORM**. **A finding the run produced, worth
+  remembering:** the first suite run **crashed** with
+  `FileNotFoundException: Could not load file or assembly 'Edam.Data.Catalog.MsSql'` thrown from
+  `CatalogServices.AddCatalogServices` — an **incremental build had left the conformance's output stale**
+  after the new ProjectReference was added; a **forced rebuild of the consumer fixed it** (the same class as
+  the item-65 package-lag lesson). It was caught only because the conformance was actually **run**, which is
+  the argument for running it rather than trusting a green compile.
   **Task 2 — the CATALOG store is DONE too, and it compiles**, which is a real verification rather than a
   claim: `MsSqlCatalogStore` implementing the whole composite contract (every `ICatalogContainer`,
   `ICatalogItem` and `ICatalogItemData` member, each with its blocking wrapper, as the peer has them) — so

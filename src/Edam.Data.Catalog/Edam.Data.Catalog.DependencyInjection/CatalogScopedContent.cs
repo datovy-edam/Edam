@@ -1,5 +1,6 @@
 using Edam.Data.Catalog.Contracts;
 using Edam.Data.Catalog.FileSystem;
+using Edam.Data.Catalog.MsSql;
 using Edam.Data.Catalog.PostgreSql;
 using Microsoft.Extensions.Configuration;
 using System;
@@ -51,6 +52,12 @@ public static class CatalogScopedContent
             case "postgres" or "postgresql" or "pg":
                if (string.IsNullOrWhiteSpace(connection)) return null;
                return cache.GetOrAdd(containerId, id => new PostgreSqlContentStore(connection!, id));
+
+            // LM-8: the MS-SQL peer — its own key wins, else the shared one when the target is mssql
+            case "mssql" or "sqlserver" or "sql-server" or "sql server" or "tsql":
+               var msSql = config["ConnectionStrings:catalog-mssql"] ?? connection;
+               if (string.IsNullOrWhiteSpace(msSql)) return null;
+               return cache.GetOrAdd(containerId, id => new MsSqlContentStore(msSql!, id));
 
             default:
                return null;

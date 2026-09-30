@@ -12,5 +12,6 @@ public enum ContainerType
    DataContext = 1,   // a relational data context (metadata store)
    FileSystem = 2,    // file-system target
    PostgreSql = 3,    // PostgreSQL (Npgsql) target — Wave 1.1 default relational store
-   Service = 4        // remote catalog service (HTTP/REST)
+   Service = 4,       // remote catalog service (HTTP/REST)
+   MsSql = 5          // MS-SQL (Microsoft.Data.SqlClient) target — LM-8 (values are append-only)
 }

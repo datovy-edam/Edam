@@ -1,5 +1,6 @@
 using Edam.Data.Catalog.Contracts;
 using Edam.Data.Catalog.FileSystem;
+using Edam.Data.Catalog.MsSql;
 using Edam.Data.Catalog.PostgreSql;
 using Edam.Data.CatalogServiceClient;
 using Microsoft.Extensions.Configuration;
@@ -18,8 +19,9 @@ namespace Edam.Data.Catalog.DependencyInjection;
 /// (ADR-0006/0007: the back-end is a variable).
 ///
 /// Configuration keys:
-///   Edam:Catalog:Target               = filesystem | postgres | service   (default: postgres)
-///   ConnectionStrings:catalog         = PostgreSQL DSN (or Edam:Catalog:ConnectionString)
+///   Edam:Catalog:Target               = filesystem | postgres | mssql | service   (default: postgres)
+///   ConnectionStrings:catalog         = the DSN of the configured target (or Edam:Catalog:ConnectionString)
+///   ConnectionStrings:catalog-mssql   = an explicit MS-SQL DSN (used when the target is mssql)
 ///   Edam:Catalog:FileSystemRoot       = file-system root dir (or Edam:Catalog:BaseUri)
 ///   Edam:Catalog:ServiceBaseUri        = remote catalog service base URI (registers ICatalogClient)
 /// </summary>
@@ -43,10 +45,22 @@ public static class CatalogServices
 
       var pgConnection = config["ConnectionStrings:catalog"]
                          ?? config["Edam:Catalog:ConnectionString"];
-      if (!string.IsNullOrWhiteSpace(pgConnection))
+
+      // LM-8: with an MS-SQL target the SAME key carries a SQL Server DSN, so PostgreSQL must not
+      // claim it — otherwise one connection string would be handed to two different engines.
+      var msSqlConnection = config["ConnectionStrings:catalog-mssql"]
+                            ?? (defaultTarget == ContainerType.MsSql ? pgConnection : null);
+
+      if (defaultTarget != ContainerType.MsSql && !string.IsNullOrWhiteSpace(pgConnection))
       {
          stores[ContainerType.PostgreSql] = new PostgreSqlCatalogStore(pgConnection);
          contents[ContainerType.PostgreSql] = new PostgreSqlContentStore(pgConnection);
+      }
+
+      if (!string.IsNullOrWhiteSpace(msSqlConnection))
+      {
+         stores[ContainerType.MsSql] = new MsSqlCatalogStore(msSqlConnection);
+         contents[ContainerType.MsSql] = new MsSqlContentStore(msSqlConnection);
       }
 
       var fsRoot = config["Edam:Catalog:FileSystemRoot"]
@@ -87,6 +101,7 @@ public static class CatalogServices
       {
          "filesystem" or "fs" => ContainerType.FileSystem,
          "postgres" or "postgresql" or "pg" => ContainerType.PostgreSql,
+         "mssql" or "sqlserver" or "sql-server" or "sql server" or "tsql" => ContainerType.MsSql,
          "service" or "rest" => ContainerType.Service,
          _ => ContainerType.PostgreSql
       };

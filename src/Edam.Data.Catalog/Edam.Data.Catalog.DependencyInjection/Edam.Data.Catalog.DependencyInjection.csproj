@@ -20,6 +20,7 @@
   <ItemGroup>
     <ProjectReference Include="..\Edam.Data.Catalog.Contracts\Edam.Data.Catalog.Contracts.csproj" />
     <ProjectReference Include="..\Edam.Data.Catalog.PostgreSql\Edam.Data.Catalog.PostgreSql.csproj" />
+    <ProjectReference Include="..\Edam.Data.Catalog.MsSql\Edam.Data.Catalog.MsSql.csproj" />
     <ProjectReference Include="..\Edam.Data.Catalog.FileSystem\Edam.Data.Catalog.FileSystem.csproj" />
     <ProjectReference Include="..\Edam.Data.CatalogServiceClient\Edam.Data.CatalogServiceClient.csproj" />
   </ItemGroup>
