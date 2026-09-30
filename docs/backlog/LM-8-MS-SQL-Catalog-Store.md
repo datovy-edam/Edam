@@ -3,6 +3,28 @@
 - **Status:** **Authorized 2026-09-28** by the user's decision (*"use c"*) — the catalog should be able to
   live in **MS-SQL**, using the installation's existing convention (`Server=.`, integrated security), in
   place of PostgreSQL.
+  **Progress 2026-09-28 — tasks 1 and 4 DONE and build-verified.** **Task 1:** `mssql` is now a storage
+  kind (`STORAGE_KINDS`) with its aliases normalised (`sqlserver`, `sql-server`, `sql server`,
+  `mssqlserver`, `tsql`), and the normaliser's doc updated. **Task 4:** `ProjectServicesHelper.Build()`
+  **no longer pins `postgres`** — it takes the kind from `Edam:Catalog:Target` (default `postgres`,
+  normalised) and also hands a configured `Edam:Catalog:FileSystemRoot` into the bootstrap, which is
+  exactly what option **(b)** (a file-system catalog) was missing. Both solutions build with **0 errors**
+  and the suite is **ALL CONFORM**. **Tasks 2, 3 and 5 remain** (the two stores, the schema, and the
+  `catalog (mssql, local)` group).
+  **Porting facts gathered, so a session can start cold:** the peers live in
+  `src/Edam.Data.Catalog/Edam.Data.Catalog.PostgreSql/` — `PostgreSqlCatalogStore.cs` (**21.7 KB**),
+  `PostgreSqlContentStore.cs` (6 KB), `CatalogProviderResolver.cs`, `CatalogServices.cs` — and implement
+  **`ICatalogStore`** from `Edam.Data.Catalog.Contracts`; the project is `net10.0` with ImplicitUsings +
+  Nullable and references **Npgsql 10.0.0** only. The PostgreSQL schema is five tables —
+  `edam_container`, `edam_item`, `edam_item_data` (uuid primary keys), `edam_content_type`
+  (`type_id text`) and `edam_content` (**`resource_path text` primary key**; LM-2's composite key
+  `(container_id, resource_path)` came from a later migration, so **read the migration path, not only the
+  create script**) — and `CREATE TABLE IF NOT EXISTS` is the idempotency idiom to mirror. The MS-SQL peer
+  should be a **new sibling project `Edam.Data.Catalog.MsSql`** referencing `Edam.Data.Catalog.Contracts`
+  + **`Microsoft.Data.SqlClient` 5.1.6** (already in the NuGet cache, so **no network is required**).
+  **Honest limit:** the MS-SQL stores **cannot** be runtime-verified from the agent sandbox (Windows/SSPI
+  auth is blocked), so they must ship with the `catalog (mssql, local)` group **skipped** when no DSN is
+  supplied and **user-verified** with a SQL-login DSN.
 - **Why:** today the only catalog storages are **PostgreSQL** and the **file system**
   (`ProjectSettings.STORAGE_KINDS = filesystem | postgres | service`), and the Studio's
   `ProjectServicesHelper.Build()` **pins `Edam:Catalog:Target=postgres`** whenever

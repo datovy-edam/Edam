@@ -96,6 +96,26 @@ public static class ConfigurationScenario
             .Contains("storage kind"),
          "problem mentions both vocabularies");
 
+      // LM-8: MS-SQL is a storage kind, and its common spellings normalise to it
+      Check("An 'mssql' storage kind is VALID (LM-8), and its spellings normalise to it",
+         ProjectSettings.STORAGE_KINDS.Contains("mssql", StringComparer.OrdinalIgnoreCase) &&
+         ProjectSettings.NormalizeTarget("mssql") == "mssql" &&
+         ProjectSettings.NormalizeTarget("sqlserver") == "mssql" &&
+         ProjectSettings.NormalizeTarget("SQL Server") == "mssql",
+         string.Join(", ", ProjectSettings.STORAGE_KINDS) +
+            " | 'sqlserver' -> " + ProjectSettings.NormalizeTarget("sqlserver"));
+
+      var mssqlBinding = Read(Config(
+         (ProjectSettings.ROOT_KEY, "/data/edam"),
+         (ProjectSettings.DEFAULT_COLLECTION_KEY, "shared"),
+         (ProjectSettings.BINDINGS_SECTION + ":shared:Target", "mssql"),
+         (ProjectSettings.BINDINGS_SECTION + ":shared:Credential", "ConnectionStrings:catalog")));
+
+      Check("...and an 'mssql' binding is no longer rejected as an unknown storage kind",
+         !(mssqlBinding.Item(ProjectSettings.BINDINGS_SECTION + ":shared")?.Problem ?? string.Empty)
+            .Contains("storage kind", StringComparison.OrdinalIgnoreCase),
+         mssqlBinding.Item(ProjectSettings.BINDINGS_SECTION + ":shared")?.Problem ?? "<no problem>");
+
       var badBinding = Read(Config(
          (ProjectSettings.ROOT_KEY, "/data/edam"),
          (ProjectSettings.DEFAULT_COLLECTION_KEY, "shared"),

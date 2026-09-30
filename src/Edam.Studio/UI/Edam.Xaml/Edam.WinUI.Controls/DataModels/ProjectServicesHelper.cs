@@ -313,10 +313,21 @@ namespace Edam.WinUI.Controls.DataModels
          if (!string.IsNullOrWhiteSpace(connection))
          {
             // projects live in the catalog: the provider family is catalog, and the reader derives the
-            // container's BINDING from the catalog's own keys (LM-4)
+            // container's BINDING from the catalog's own keys (LM-4). The STORAGE kind is CONFIGURED
+            // (`Edam:Catalog:Target`) rather than pinned, so MS-SQL (LM-8) is selectable exactly like
+            // PostgreSQL — and PostgreSQL stays the default for a catalog that does not say.
             values[ProjectSettings.TARGET_KEY] = "catalog";
-            values["Edam:Catalog:Target"] = "postgres";
+            values["Edam:Catalog:Target"] = ProjectSettings.NormalizeTarget(
+               AppSettings.GetString("Edam:Catalog:Target") ?? "postgres");
             values["ConnectionStrings:catalog"] = connection;
+
+            // a file-system-backed catalog states its root the same way (the reader expects these keys in
+            // the bootstrap it is handed, not only in appsettings.json)
+            var catalogRoot = AppSettings.GetString("Edam:Catalog:FileSystemRoot");
+            if (!string.IsNullOrWhiteSpace(catalogRoot))
+            {
+               values["Edam:Catalog:FileSystemRoot"] = catalogRoot!;
+            }
          }
          else
          {

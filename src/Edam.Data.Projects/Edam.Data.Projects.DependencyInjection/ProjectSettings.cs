@@ -168,7 +168,7 @@ public static class ProjectSettings
    public static readonly string[] PROVIDER_FAMILIES = { "filesystem", "catalog" };
 
    /// <summary>The <b>storage kinds</b> a container's binding may name.</summary>
-   public static readonly string[] STORAGE_KINDS = { "filesystem", "postgres", "service" };
+   public static readonly string[] STORAGE_KINDS = { "filesystem", "postgres", "mssql", "service" };
 
    // ---- environment overrides (LM-4): environment WINS over configuration ---------------------
 
@@ -532,7 +532,10 @@ public static class ProjectSettings
       return buffer.ToString();
    }
 
-   /// <summary>Normalise a storage target word to <c>filesystem</c>, <c>postgres</c> or <c>service</c>.</summary>
+   /// <summary>
+   /// Normalise a storage target word to <c>filesystem</c>, <c>postgres</c>, <c>mssql</c> or
+   /// <c>service</c> (LM-8 added <b>MS-SQL</b> as a catalog storage, alongside PostgreSQL).
+   /// </summary>
    public static string NormalizeTarget(string target)
    {
       var value = (target ?? string.Empty).Trim().ToLowerInvariant();
@@ -540,6 +543,8 @@ public static class ProjectSettings
       {
          "fs" or "folder" or "file-system" or "filesystem" => "filesystem",
          "postgresql" or "postgres" or "pg" => "postgres",
+         "mssql" or "sqlserver" or "sql-server" or "sql server" or "mssqlserver" or "tsql"
+            => "mssql",
          "http" or "https" or "rest" or "service" => "service",
          _ => value,
       };
