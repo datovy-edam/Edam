@@ -9,6 +9,7 @@ using System.Net;
 using System.Net.Sockets;
 using Edam.Data.Catalog.Contracts;
 using Edam.Data.Catalog.FileSystem;
+using Edam.Data.Catalog.MsSql;
 using Edam.Data.Catalog.PostgreSql;
 using Edam.Data.Projects.Catalog;
 using Edam.Data.Projects.Conformance;
@@ -21,10 +22,20 @@ using Microsoft.Extensions.DependencyInjection;
 const string ContainerId = "pe3-projects";
 
 // Optional: a PostgreSQL DSN as the first argument adds the postgres targets (the default run is
-// hermetic — file-system + in-process HTTP — so it needs no database).
+// hermetic — file-system + in-process HTTP — so it needs no database). An MS-SQL DSN (LM-8) may be given
+// as the SECOND argument or in EDAM_MSSQL_DSN; its group is added only when one is present, so a missing
+// database SKIPS it rather than failing the run — the same rule the PostgreSQL targets follow.
 var dsn = args.Length > 0 && args[0].StartsWith("Server=", StringComparison.OrdinalIgnoreCase)
    ? args[0]
    : null;
+
+var msSqlDsn = args.Length > 1 && args[1].StartsWith("Server=", StringComparison.OrdinalIgnoreCase)
+   ? args[1]
+   : Environment.GetEnvironmentVariable("EDAM_MSSQL_DSN");
+if (string.IsNullOrWhiteSpace(msSqlDsn))
+{
+   msSqlDsn = null;
+}
 
 var all = new Dictionary<string, List<ProjectScenario.Check>>(StringComparer.OrdinalIgnoreCase);
 var cwdBefore = Directory.GetCurrentDirectory();
@@ -171,6 +182,23 @@ try
             await app.StopAsync();
          }
       }
+   }
+
+   // ---- 5b. MS-SQL target (LM-8): only when an MS-SQL DSN is supplied ------------------------
+   // The same shape as the PostgreSQL local target, which is the point of LM-8: the catalog back-end is
+   // a variable (ADR-0007), so the SAME catalog scenario must pass on SQL Server. A SQL login is
+   // required (the agent sandbox cannot use Windows/SSPI), e.g.
+   //   Server=.;Database=edam;User Id=...;Password=...;Encrypt=False;TrustServerCertificate=True
+   if (msSqlDsn is not null)
+   {
+      var run = Guid.NewGuid().ToString("N")[..8];
+      var store = new MsSqlCatalogStore(msSqlDsn);
+      var content = new MsSqlContentStore(msSqlDsn);
+      var containerId = "pe3-mssql-" + run;
+      store.EnlistContainer(containerId, "PE-3 mssql collection", null, ContainerType.FileSystem);
+
+      all["catalog (mssql, local)"] = await RunCatalogAsync(
+         store, store, content, Path.Combine(temp, "mssql-work"), containerId);
    }
 
    // ---- 6/7/8. through the DI composition root (PE-4) ----------------------------------------

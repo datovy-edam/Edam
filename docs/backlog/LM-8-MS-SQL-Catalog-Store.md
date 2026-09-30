@@ -57,9 +57,30 @@
   without a DSN) and a **new task 6 the port revealed — the provider wiring**: registering the MS-SQL
   stores and teaching the provider resolution to select them by storage kind. `Build()` already chooses
   `catalog` + the kind (`Edam:Catalog:Target`) — task 4 — but the **DI registration/ resolver** side
-  (`CatalogProviderResolver.cs` and `CatalogServices.cs` in the PostgreSQL project, plus
-  `Edam.Data.Catalog.DependencyInjection`) still knows only `postgres`/`filesystem`, so nothing would
-  *construct* `MsSqlCatalogStore` yet.
+  **Task 5 — the conformance group — is DONE, and LM-8 is COMPLETE and RUNTIME-VERIFIED (2026-09-28):**
+  `Edam.Data.Projects.Conformance` gained a **`catalog (mssql, local)`** group mirroring the PostgreSQL
+  local target — the same `RunCatalogAsync` catalog scenario, so the *same* assertions must pass on SQL
+  Server (that is the point of LM-8: the back-end is a variable, ADR-0007). The DSN comes from the second
+  argument or **`EDAM_MSSQL_DSN`**, and the group is added **only when a DSN is present** — so an absent
+  database **skips** it rather than failing the run, exactly as the PostgreSQL targets behave (verified:
+  the hermetic run reports **ALL CONFORM** with the group absent).
+  **Result against the live server:** `--- catalog (mssql, local): ALL CONFORM (16 checks)`, with
+  `Server=.`, `Database=Edam.Database`, the SQL login and
+  `Encrypt=False;TrustServerCertificate=True` — which validates the **whole** feature end to end: the
+  schema DDL actually ran (`MsSqlSchema.EnsureAsync` created the tables on a real server), container
+  enlistment worked, and the item/resource/content assertions passed through `MERGE`, `OUTPUT` and `TOP`.
+  **Correction to an earlier note (accuracy matters):** items 103/104 said a SQL login does **not** lift the
+  sandbox block. That was **incomplete** — the block is about **encryption**, not authentication. With
+  `Encrypt=False;TrustServerCertificate=True` a SQL login connects **from the sandbox**, and the run above
+  proves it. The accurate statement: *an encrypted connection is impossible here; a login plus a
+  non-encrypted, certificate-trusting connection works.*
+  **Also found, and worth remembering:** the SQL client assembly did **not** flow into the conformance
+  output **transitively** through the project reference, so the harness now references
+  `Microsoft.Data.SqlClient` **directly** (legitimate — it exercises the store); and **`/t:Restore` is
+  required after adding a ProjectReference** (this bit twice).
+  **The earlier note below is superseded:** the PostgreSQL project's older seed still knows only
+  `postgres`/`filesystem`, so nothing would *construct* `MsSqlCatalogStore` **through that seed** — the DI
+  registry (task 6) is the path the Studio and AppHost use, and it does.
   **The port inventory, taken from the peer (kept for reference):** `ICatalogStore` is a composite of
   **`ICatalogContainer` + `ICatalogItem` + `ICatalogItemData`**, and the peer implements every member as an
   async method **plus a blocking wrapper** — `EnsureSchemaAsync`, `DescribeStore`; container:

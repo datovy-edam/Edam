@@ -10,6 +10,9 @@
   <ItemGroup>
     <!-- The runner hosts Edam.Data.CatalogService in-process for the remote scenario. -->
     <FrameworkReference Include="Microsoft.AspNetCore.App" />
+    <!-- LM-8: the harness exercises the MS-SQL catalog directly, and the client assembly did not reach
+         this output transitively through the project reference, so it is referenced here as well. -->
+    <PackageReference Include="Microsoft.Data.SqlClient" Version="5.1.6" />
   </ItemGroup>
 
   <ItemGroup>
@@ -22,6 +25,7 @@
     <ProjectReference Include="..\..\Edam.Data.Catalog\Edam.Data.Catalog.Contracts\Edam.Data.Catalog.Contracts.csproj" />
     <ProjectReference Include="..\..\Edam.Data.Catalog\Edam.Data.Catalog.FileSystem\Edam.Data.Catalog.FileSystem.csproj" />
     <ProjectReference Include="..\..\Edam.Data.Catalog\Edam.Data.Catalog.PostgreSql\Edam.Data.Catalog.PostgreSql.csproj" />
+    <ProjectReference Include="..\..\Edam.Data.Catalog\Edam.Data.Catalog.MsSql\Edam.Data.Catalog.MsSql.csproj" />
     <ProjectReference Include="..\..\Edam.Data.Catalog\Edam.Data.CatalogService\Edam.Data.CatalogService.csproj" />
     <ProjectReference Include="..\..\Edam.Data.Catalog\Edam.Data.CatalogServiceClient\Edam.Data.CatalogServiceClient.csproj" />
     <!-- Direct (not transitive): Edam.ServiceDefaults is IsAspireSharedProject, so it does not
