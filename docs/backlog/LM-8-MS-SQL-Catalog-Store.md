@@ -29,6 +29,17 @@
   `AddItemAsync`, `CreateBranchAsync`, `CreateRootItem`, `DeleteItemAsync`; item-data:
   `GetItemDataAsync`, `AddItemAsync(ItemDataInfo)`, `GetDataAsync`, `GetDataByNameAsync`,
   `GetContentTypeAsync`, `CreateDataLeaf` (two overloads), `DeleteDataAsync`, `DeleteItemDataAsync`.
+  **Task 2 — the CONTENT store is DONE and compiled** (`MsSqlContentStore`, `IContentStore`'s four members:
+  `OpenReadAsync`, `WriteAsync`, `DeleteAsync`, `ExistsAsync`): binary content in `varbinary(max)` keyed by
+  **container + resource path** (LM-2b), the **unscoped** namespace being the empty container id `''`, the
+  lazy once-only `EnsureSchemaAsync` idiom, and the SQL translated faithfully — the `ON CONFLICT (… ) DO
+  UPDATE` upsert becoming a **`MERGE`** on the composite key, and `SELECT EXISTS(…)` becoming
+  `SELECT COUNT(1)` (MS-SQL has no bare `SELECT EXISTS`). Compiling against `IContentStore` also
+  **confirms the interface is exactly those four members**, i.e. the seam is smaller than the catalog
+  store's and fully covered. **Task 2 — the CATALOG store (`MsSqlCatalogStore`) REMAINS**, and it is the
+  bulk of the work: the peer is 439 lines with its own row mappers, so the next step is to **read
+  `PostgreSqlCatalogStore.cs`'s mapper/`SchemaSql` regions and port them**, using the inventory and
+  translations below.
   **SQL translations to apply:** `ON CONFLICT (…) DO UPDATE` → **`MERGE`** (or `IF EXISTS … UPDATE ELSE
   INSERT`); `RETURNING` → **`OUTPUT INSERTED.*`**; `LIMIT 1` → **`TOP 1`**; `bytea`/`text` per the mapping
   above; and keep the lazy once-only `EnsureSchemaAsync` idiom (`_initialized` + `Interlocked`), calling
