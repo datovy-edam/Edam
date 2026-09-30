@@ -9,8 +9,30 @@
   **no longer pins `postgres`** — it takes the kind from `Edam:Catalog:Target` (default `postgres`,
   normalised) and also hands a configured `Edam:Catalog:FileSystemRoot` into the bootstrap, which is
   exactly what option **(b)** (a file-system catalog) was missing. Both solutions build with **0 errors**
-  and the suite is **ALL CONFORM**. **Tasks 2, 3 and 5 remain** (the two stores, the schema, and the
-  `catalog (mssql, local)` group).
+  and the suite is **ALL CONFORM**. **Task 3 (the schema) is DONE too:** the new sibling project
+  **`src/Edam.Data.Catalog.MsSql`** (`Edam.Data.Catalog.MsSql.csproj`; `net10.0`, ImplicitUsings +
+  Nullable, `Microsoft.Data.SqlClient` 5.1.6, a ProjectReference to the Contracts, and an entry in
+  `Edam.Data.Catalog.slnx`) contains **`MsSqlSchema`** — the T-SQL peer of the PostgreSQL DDL as ordered
+  **idempotent** batches (the five tables, the container's unique index and the two item indexes), with the
+  type mapping recorded (`uuid` → `uniqueidentifier`; `text` → `nvarchar(max)` **except key and index
+  columns, which must be `nvarchar(450)`** because SQL Server cannot index `nvarchar(max)`;
+  `integer` → `int`; `timestamptz` → `datetimeoffset`; `bytea` → `varbinary(max)`) and the content table
+  keyed `(container_id, resource_path)`. **Correction recorded:** that composite key needs **no migration**
+  in MS-SQL — LM-2b's `ALTER TABLE … ADD PRIMARY KEY` upgraded an existing *PostgreSQL* database, so here
+  it is simply part of the create script. **Tasks 2 (the stores) and 5 (the group) remain.**
+  **The exact remaining port, taken from the peer:** `ICatalogStore` is a composite of
+  **`ICatalogContainer` + `ICatalogItem` + `ICatalogItemData`**, and the peer implements every member as an
+  async method **plus a blocking wrapper** — `EnsureSchemaAsync`, `DescribeStore`; container:
+  `GetContainerAsync(string?)`, `GetContainerAsync(Guid)`, `GetContainer`, `GetContainersAsync`,
+  `EnlistContainerAsync`, `SetContainerAsync`, `DelistContainerAsync`; item: `GetItemAsync(Guid)`,
+  `GetItemByPathAsync`, `GetContainerItemsAsync`, `GetContainerRootItemAsync`, `GetBranchAsync`,
+  `AddItemAsync`, `CreateBranchAsync`, `CreateRootItem`, `DeleteItemAsync`; item-data:
+  `GetItemDataAsync`, `AddItemAsync(ItemDataInfo)`, `GetDataAsync`, `GetDataByNameAsync`,
+  `GetContentTypeAsync`, `CreateDataLeaf` (two overloads), `DeleteDataAsync`, `DeleteItemDataAsync`.
+  **SQL translations to apply:** `ON CONFLICT (…) DO UPDATE` → **`MERGE`** (or `IF EXISTS … UPDATE ELSE
+  INSERT`); `RETURNING` → **`OUTPUT INSERTED.*`**; `LIMIT 1` → **`TOP 1`**; `bytea`/`text` per the mapping
+  above; and keep the lazy once-only `EnsureSchemaAsync` idiom (`_initialized` + `Interlocked`), calling
+  the new `MsSqlSchema.EnsureAsync`.
   **Porting facts gathered, so a session can start cold:** the peers live in
   `src/Edam.Data.Catalog/Edam.Data.Catalog.PostgreSql/` — `PostgreSqlCatalogStore.cs` (**21.7 KB**),
   `PostgreSqlContentStore.cs` (6 KB), `CatalogProviderResolver.cs`, `CatalogServices.cs` — and implement
