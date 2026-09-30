@@ -19,8 +19,27 @@
   `integer` → `int`; `timestamptz` → `datetimeoffset`; `bytea` → `varbinary(max)`) and the content table
   keyed `(container_id, resource_path)`. **Correction recorded:** that composite key needs **no migration**
   in MS-SQL — LM-2b's `ALTER TABLE … ADD PRIMARY KEY` upgraded an existing *PostgreSQL* database, so here
-  it is simply part of the create script. **Tasks 2 (the stores) and 5 (the group) remain.**
-  **The exact remaining port, taken from the peer:** `ICatalogStore` is a composite of
+  it is simply part of the create script.
+  **Task 2 — the CATALOG store is DONE too, and it compiles**, which is a real verification rather than a
+  claim: `MsSqlCatalogStore` implementing the whole composite contract (every `ICatalogContainer`,
+  `ICatalogItem` and `ICatalogItemData` member, each with its blocking wrapper, as the peer has them) — so
+  the compiler proved the interface is **fully** implemented. Only the dialect differs, and the three
+  idiom translations are the ones that matter: **`LIMIT n` → `SELECT TOP n`** (which must sit immediately
+  after `SELECT`, hence the separate `ItemSelectTop`/`DataSelectTop` constants);
+  **`ON CONFLICT … DO UPDATE` → `MERGE`**; **`RETURNING` → `OUTPUT INSERTED.*`** for the insert/upsert and
+  **`OUTPUT DELETED.*`** for the delete (`DelistContainerAsync`). The peer's hard-won semantics were kept
+  deliberately: `EnlistContainerAsync` still returns the **actual** row — `MERGE` updates the matched row,
+  so the existing id survives and `GetContainer(returned.Id)` keeps resolving — `CreateBranchAsync` still
+  matches **inside** the container (the PE-3 cross-container defect), `DeleteItemAsync` still removes
+  children before the item (there is no cascade), and item data is still base64 for the byte[] overload.
+  **Remaining for LM-8:** **task 5** (the `catalog (mssql, local)` group — **skipped, never failed**,
+  without a DSN) and a **new task 6 the port revealed — the provider wiring**: registering the MS-SQL
+  stores and teaching the provider resolution to select them by storage kind. `Build()` already chooses
+  `catalog` + the kind (`Edam:Catalog:Target`) — task 4 — but the **DI registration/ resolver** side
+  (`CatalogProviderResolver.cs` and `CatalogServices.cs` in the PostgreSQL project, plus
+  `Edam.Data.Catalog.DependencyInjection`) still knows only `postgres`/`filesystem`, so nothing would
+  *construct* `MsSqlCatalogStore` yet.
+  **The port inventory, taken from the peer (kept for reference):** `ICatalogStore` is a composite of
   **`ICatalogContainer` + `ICatalogItem` + `ICatalogItemData`**, and the peer implements every member as an
   async method **plus a blocking wrapper** — `EnsureSchemaAsync`, `DescribeStore`; container:
   `GetContainerAsync(string?)`, `GetContainerAsync(Guid)`, `GetContainer`, `GetContainersAsync`,
