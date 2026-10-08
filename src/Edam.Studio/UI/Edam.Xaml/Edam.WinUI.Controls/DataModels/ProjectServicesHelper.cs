@@ -415,6 +415,60 @@ namespace Edam.WinUI.Controls.DataModels
       }
 
       /// <summary>
+      /// <b>Delete a project through the platform</b> (DP-2) — the precondition for ever creating one on
+      /// a person's behalf, and the reason ADR-0012 can promise that a deleted project stays deleted.
+      /// <para>
+      /// A node in the projects tree is a <b>path</b> (a real disk path for a file-system target, a
+      /// catalog path otherwise — LM-6), so the project is matched by <b>name</b> first, by path as a
+      /// fallback, and finally by the path's last segment. The store does the work
+      /// (<see cref="IProjectStore.DeleteAsync"/>); nothing here touches the file system directly.
+      /// </para>
+      /// </summary>
+      /// <returns>True when a project was removed.</returns>
+      public static async Task<Boolean> DeleteProjectAsync(
+         String nameOrPath, CancellationToken ct = default)
+      {
+         var collection = await ResolveCollectionAsync(null, ct).ConfigureAwait(false);
+         if (collection is null)
+         {
+            return false;
+         }
+
+         var projects = await Catalog.GetProjectsAsync(collection.CollectionId, ct)
+            .ConfigureAwait(false);
+
+         var leaf = System.IO.Path.GetFileName((nameOrPath ?? String.Empty).TrimEnd('/'));
+
+         var project = projects.FirstOrDefault(p =>
+                  String.Equals(p.Name, nameOrPath, StringComparison.OrdinalIgnoreCase) ||
+                  String.Equals(p.Path.ToString(), nameOrPath, StringComparison.OrdinalIgnoreCase))
+               ?? projects.FirstOrDefault(p =>
+                  String.Equals(p.Name, leaf, StringComparison.OrdinalIgnoreCase));
+
+         if (project is null)
+         {
+            Edam.WinUI.Controls.Logging.AppDiagnostics.Write(
+               "Project delete: nothing matches '" + nameOrPath + "' in this collection.",
+               Microsoft.Extensions.Logging.LogLevel.Warning, "Edam.Studio");
+            return false;
+         }
+
+         var deleted = await Store.DeleteAsync(collection.CollectionId, project.Name, ct)
+            .ConfigureAwait(false);
+
+         Edam.WinUI.Controls.Logging.AppDiagnostics.Write(
+            deleted
+               ? "Project deleted: '" + project.Name + "'."
+               : "Project NOT deleted: '" + project.Name + "' (the store refused).",
+            deleted
+               ? Microsoft.Extensions.Logging.LogLevel.Information
+               : Microsoft.Extensions.Logging.LogLevel.Warning,
+            "Edam.Studio");
+
+         return deleted;
+      }
+
+      /// <summary>
       /// Create a project through the platform (replaces <c>Project.CreateProject</c>) and return it.
       /// </summary>
       public static async Task<ProjectInfo> CreateProjectAsync(

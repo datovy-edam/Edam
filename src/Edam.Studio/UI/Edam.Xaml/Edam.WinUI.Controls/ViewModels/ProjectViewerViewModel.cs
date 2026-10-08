@@ -546,6 +546,33 @@ namespace Edam.WinUI.Controls.ViewModels
       #region -- 4.00 - Delete Tree View Item
 
       /// <summary>
+      /// <summary>
+      /// DP-2: a <b>direct child of the tree root is a project</b> — <c>GetProjectsTreeAsync</c> adds one
+      /// node per project beneath the collection root, so membership is what separates a project from one
+      /// of its resources (which keep the legacy file delete below).
+      /// </summary>
+      private Boolean IsProjectNode(ProjectItem item) =>
+         TreeView?.Children != null && TreeView.Children.Contains(item);
+
+      /// <summary>
+      /// DP-2: delete through the platform, then reload so the panel reflects reality — including the
+      /// empty state (DP-1) when the last project is the one removed. Best effort: a failure is reported,
+      /// never thrown at the UI.
+      /// </summary>
+      private async System.Threading.Tasks.Task DeleteProjectAndRefreshAsync(String nameOrPath)
+      {
+         try
+         {
+            await ProjectServicesHelper.DeleteProjectAsync(nameOrPath);
+         }
+         catch (Exception ex)
+         {
+            NotifiedMessageText = ex.Message;
+         }
+
+         FetchProjectFolderInfo();
+      }
+
       /// Process Result...
       /// </summary>
       /// <param name="result"></param>
@@ -562,6 +589,17 @@ namespace Edam.WinUI.Controls.ViewModels
             var item = rslt.DataObject as ProjectItem;
             if (item != null)
             {
+               // DP-2: a PROJECT is deleted through the platform — never with System.IO.File.Delete,
+               // which is wrong for a project (a node may be a folder or a catalog path, and the store is
+               // the only thing that knows how to remove it) and would bypass the collection entirely.
+               // The tree is reloaded afterwards so the panel tells the truth — which is also what makes
+               // DP-1's empty state appear the moment the last project goes.
+               if (IsProjectNode(item))
+               {
+                  _ = DeleteProjectAndRefreshAsync(item.Item.NameFull);
+                  return;
+               }
+
                Diagnostics.ResultLog results = new ResultLog();
 
                try
