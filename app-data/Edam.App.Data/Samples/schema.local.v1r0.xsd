@@ -1,0 +1,33 @@
+<?xml version="1.0" encoding="utf-8"?>
+<!--
+  The starter INPUT a new project's arguments expect (DP-4).
+
+  The shipped template Templates/ToAssets.Args.json names it precisely:
+     "InputFile": { "Extension": "xsd", "Name": "schema.local.v1r0.xsd", "Path": "./Files" }
+  so a created project is not runnable until this file sits in the project's Files folder. It is a real,
+  minimal XSD rather than a placeholder: it declares the root element the arguments name
+  ("Reference.Entity", in the et namespace), so the starter recipe has something valid to read.
+-->
+<xs:schema xmlns:xs="http://www.w3.org/2001/XMLSchema"
+           xmlns:et="http://www.datovy.com/et/entity"
+           targetNamespace="http://www.datovy.com/et/entity"
+           elementFormDefault="qualified">
+
+   <xs:element name="Reference.Entity">
+      <xs:complexType>
+         <xs:sequence>
+            <xs:element name="ReferenceData" minOccurs="0" maxOccurs="unbounded">
+               <xs:complexType>
+                  <xs:sequence>
+                     <xs:element name="Id" type="xs:string" />
+                     <xs:element name="Name" type="xs:string" minOccurs="0" />
+                     <xs:element name="Description" type="xs:string" minOccurs="0" />
+                  </xs:sequence>
+               </xs:complexType>
+            </xs:element>
+         </xs:sequence>
+         <xs:attribute name="version" type="xs:string" use="optional" />
+      </xs:complexType>
+   </xs:element>
+
+</xs:schema>

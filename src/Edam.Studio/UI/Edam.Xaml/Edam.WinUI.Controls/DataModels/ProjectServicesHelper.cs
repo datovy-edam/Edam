@@ -102,7 +102,73 @@ namespace Edam.WinUI.Controls.DataModels
 
             var seeded = await SeedArgumentsAsync(project, templateAddress, ct)
                .ConfigureAwait(false);
+
+            // ---- DP-4 (input half) ------------------------------------------------------------------
+            // The starter arguments name their input precisely — ./Files/schema.local.v1r0.xsd, per
+            // Templates/ToAssets.Args.json — so the project is still not runnable until the sample INPUT
+            // sits in Files/. The sample ships in the app-data seed (Samples/), which is file-system content
+            // by design (ADR-0010: the seed is content to import); the WRITE goes through the resources
+            // seam, so the project's content is never written behind the platform's back.
+            try
+            {
+               var sample = FindSampleInput("schema.local.v1r0.xsd");
+               if (sample is not null)
+               {
+                  using var content = System.IO.File.OpenRead(sample);
+                  await Resources.WriteAsync(project,
+                     Edam.Data.Projects.Contracts.ProjectFolders
+                        .Path(Edam.Data.Projects.Contracts.ProjectFolders.Files)
+                        .Combine("schema.local.v1r0.xsd"),
+                     content, ct).ConfigureAwait(false);
+
+                  Edam.WinUI.Controls.Logging.AppDiagnostics.Write(
+                     "Default project: sample input seeded into Files/schema.local.v1r0.xsd.",
+                     Microsoft.Extensions.Logging.LogLevel.Information, "Edam.Studio");
+               }
+            }
+            catch (Exception ex)
+            {
+               Edam.WinUI.Controls.Logging.AppDiagnostics.Write(
+                  "Default project: sample input seeding failed (" + ex.Message + ") — the project has " +
+                  "its recipe but not its data.",
+                  Microsoft.Extensions.Logging.LogLevel.Warning, "Edam.Studio");
+            }
+
             return seeded is not null;
+         }
+
+         /// <summary>
+         /// DP-4: locate the shipped sample input in the app-data seed. The seed's shape differs between a
+         /// packaged run and a development one (<c>Edam.Studio/Edam.App.Data</c> versus <c>Edam.App.Data</c>),
+         /// so both are tried rather than assuming one.
+         /// </summary>
+         private static string? FindSampleInput(string fileName)
+         {
+            try
+            {
+               var root = AppData.GetApplicationDataLocation();
+               if (string.IsNullOrWhiteSpace(root))
+               {
+                  return null;
+               }
+
+               foreach (var shape in new[] { "Edam.Studio/Edam.App.Data", "Edam.App.Data" })
+               {
+                  var candidate = System.IO.Path.Combine(
+                     root!, shape.Replace('/', System.IO.Path.DirectorySeparatorChar),
+                     "Samples", fileName);
+                  if (System.IO.File.Exists(candidate))
+                  {
+                     return candidate;
+                  }
+               }
+            }
+            catch (Exception)
+            {
+               // a missing seed is not fatal: the project is simply seeded without its input
+            }
+
+            return null;
          }
 
          public async Task<bool> IsContainerEmptyAsync(CancellationToken ct)
