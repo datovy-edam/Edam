@@ -77,6 +77,34 @@ namespace Edam.WinUI.Controls.DataModels
       private sealed class DefaultProjectHost
          : Edam.Data.Projects.DependencyInjection.IDefaultProjectHost
       {
+         /// <summary>
+         /// <b>DP-4:</b> seed the project that was just created, through the existing LM-6 helper — so a new
+         /// project has a starter arguments file instead of an empty <c>Arguments</c> folder. Best effort by
+         /// contract: the project exists either way, and the outcome reports a failure rather than hiding it.
+         /// </summary>
+         public async Task<bool> SeedAsync(
+            string projectName, string templateAddress, CancellationToken ct)
+         {
+            var collection = await ResolveCollectionAsync(null, ct).ConfigureAwait(false);
+            if (collection is null)
+            {
+               return false;
+            }
+
+            var projects = await Catalog.GetProjectsAsync(collection.CollectionId, ct)
+               .ConfigureAwait(false);
+            var project = projects.FirstOrDefault(p =>
+               string.Equals(p.Name, projectName, StringComparison.OrdinalIgnoreCase));
+            if (project is null)
+            {
+               return false;
+            }
+
+            var seeded = await SeedArgumentsAsync(project, templateAddress, ct)
+               .ConfigureAwait(false);
+            return seeded is not null;
+         }
+
          public async Task<bool> IsContainerEmptyAsync(CancellationToken ct)
          {
             // the SAME resolution the creation uses, so the gate can never check one container while the
@@ -489,14 +517,14 @@ namespace Edam.WinUI.Controls.DataModels
       /// starter file (it never fails project creation).
       /// </summary>
       public static async Task<ProjectPath?> SeedArgumentsAsync(
-         ProjectInfo project, CancellationToken ct = default)
+         ProjectInfo project, string? templateFileName = null, CancellationToken ct = default)
       {
          if (project is null) return null;
 
          try
          {
-            // the legacy setting names the template (e.g. "Templates/ToAssets.Args.json")
-            var configured = AppSettings.GetString(ArgumentsTemplateKey);
+            // DP-4: the registry's template wins, else the legacy setting, else the shipped default
+            var configured = templateFileName ?? AppSettings.GetString(ArgumentsTemplateKey);
             var fileName = string.IsNullOrWhiteSpace(configured)
                ? "ToAssets.Args.json"
                : Path.GetFileName(configured!);

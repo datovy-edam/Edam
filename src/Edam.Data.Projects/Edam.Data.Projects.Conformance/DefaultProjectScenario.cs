@@ -31,6 +31,21 @@ public static class DefaultProjectScenario
          Created.Add(name);
          return Task.FromResult(true);
       }
+
+      /// <summary>DP-4: records what the platform asked to be seeded, and can refuse.</summary>
+      public bool Seeds { get; set; } = true;
+      public List<string> Seeded { get; } = new();
+
+      public Task<bool> SeedAsync(string projectName, string templateAddress, CancellationToken ct)
+      {
+         if (!Seeds)
+         {
+            return Task.FromResult(false);
+         }
+
+         Seeded.Add(projectName + " <- " + templateAddress);
+         return Task.FromResult(true);
+      }
    }
 
    private static UserConfiguration Build(
@@ -136,6 +151,24 @@ public static class DefaultProjectScenario
          string.Join(", ", good.ToAsk().Select(a => a.Item.Id)));
 
       var goodOutcome = await goodService.TryCreateAsync();
+
+      // ---- DP-4: a created project must not be inert ------------------------------------------------
+      Check("The created project is SEEDED from the registry's template (so it is not inert)",
+         goodHost.Seeded.Count == 1 &&
+         goodHost.Seeded[0] == "Edam.Sample <- " + ConfigurableItems.DEFAULT_TEMPLATE,
+         goodHost.Seeded.Count == 0 ? "nothing was seeded" : goodHost.Seeded[0]);
+
+      var unseeded = Build(root, "unseeded", (nameKey, "Edam.Sample"));
+      var unseededHost = new StubHost { Seeds = false };
+      var unseededOutcome = await new DefaultProjectService(
+         unseeded, unseededHost, true).TryCreateAsync();
+
+      Check("A FAILED seeding still completes the action (the project exists) but is REPORTED, not hidden",
+         unseededOutcome.Created &&
+         !string.IsNullOrWhiteSpace(unseededOutcome.Problem) &&
+         unseeded.Installation.Read(markerKey) == "true",
+         $"created={unseededOutcome.Created} marker='{unseeded.Installation.Read(markerKey)}' " +
+         $"problem='{unseededOutcome.Problem}'");
 
       Check("SUCCESS creates the project and writes the marker (the action really happened)",
          goodOutcome.Created &&

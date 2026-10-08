@@ -95,6 +95,16 @@ public static class ConfigurableItems
    /// </summary>
    public const string DEFAULT_PROJECT_MARKER_KEY = "Edam:Projects:DefaultProjectOffered";
 
+   /// <summary>
+   /// The starter-arguments <b>template</b> a newly created project is seeded from (DP-4) — a configurable
+   /// item with a <b>silent default</b>, because a sane value ships with the application: it is documented
+   /// and overridable, and it never has to ask.
+   /// </summary>
+   public const string DEFAULT_TEMPLATE_KEY = "Edam:Projects:DefaultTemplate";
+
+   /// <summary>The template the packaged seed ships, so a new project is never inert (DP-4).</summary>
+   public const string DEFAULT_TEMPLATE = "Templates/ToAssets.Args.json";
+
    /// <summary>Longest accepted project name (it also becomes a folder and an artifact name).</summary>
    public const int PROJECT_NAME_MAX_LENGTH = 64;
 
@@ -126,6 +136,19 @@ public static class ConfigurableItems
             Storage: ConfigurationStorage.AppDataOverlay,
             Validate: ValidateProjectName,
             CompletedByKey: DEFAULT_PROJECT_MARKER_KEY),
+
+         new(
+            Id: DEFAULT_TEMPLATE_KEY,
+            Key: DEFAULT_TEMPLATE_KEY,
+            Title: "Starter arguments template",
+            WhatItIs: "The template a newly created project's Arguments folder is seeded from.",
+            WhatItAffects: "It becomes the project's starter arguments file — without it a new project " +
+               "has its folder structure but nothing to run, which reads as a broken project rather " +
+               "than an empty one.",
+            Policy: ConfigurationPolicy.SilentDefault,
+            Default: DEFAULT_TEMPLATE,
+            Storage: ConfigurationStorage.AppDataOverlay,
+            Validate: null),
 
          new(
             Id: DEFAULT_PROJECT_MARKER_KEY,

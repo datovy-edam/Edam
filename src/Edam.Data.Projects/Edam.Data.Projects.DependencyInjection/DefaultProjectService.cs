@@ -16,13 +16,20 @@ public interface IDefaultProjectHost
 
    /// <summary>Create the project in the bound collection; false when it could not be created.</summary>
    Task<bool> CreateProjectAsync(string name, CancellationToken ct);
+
+   /// <summary>
+   /// Seed the created project from <paramref name="templateAddress"/> (DP-4). Best effort by contract:
+   /// the project already exists, so a "no" means "created without its starter content" — which the
+   /// outcome reports rather than hiding.
+   /// </summary>
+   Task<bool> SeedAsync(string projectName, string templateAddress, CancellationToken ct);
 }
 
 /// <summary>What an attempt at the default project did — and why not, when it did not.</summary>
 /// <param name="Created">True only when the project really exists (which is when the marker is written).</param>
 /// <param name="Applicable">False when the gates say this host must never offer or create it.</param>
 /// <param name="Name">The name that was (or would have been) used.</param>
-/// <param name="Problem">Why it was not created, or null.</param>
+/// <param name="Problem">Why it was not created — or, when it was, why it is not fully prepared.</param>
 public sealed record DefaultProjectOutcome(
    bool Created,
    bool Applicable,
@@ -137,10 +144,51 @@ public sealed class DefaultProjectService
             false, true, name, "the project could not be created in the collection");
       }
 
+      // ---- DP-4: a project with structure but no content is inert ------------------------------
+      // Seed the Arguments folder from the registry's template. Deliberately AFTER the creation and BEFORE
+      // the marker, and deliberately best effort: the project EXISTS, so the marker (the proof of the
+      // action) stays honest, while a seeding failure is REPORTED rather than swallowed — a created project
+      // whose content is missing must be visible, never silently empty.
+      string? seedProblem = null;
+      var template = Template;
+
+      if (!string.IsNullOrWhiteSpace(template))
+      {
+         try
+         {
+            if (!await _host.SeedAsync(name, template!, ct).ConfigureAwait(false))
+            {
+               seedProblem = "created, but the starter template '" + template + "' was not found";
+            }
+         }
+         catch (Exception ex)
+         {
+            seedProblem = "created, but seeding failed: " + ex.Message;
+         }
+      }
+
       // the action happened: only now is the question COMPLETE, which is what stops the asking
       _user.MarkStarterProjectOffered();
 
-      return new DefaultProjectOutcome(true, true, name);
+      return new DefaultProjectOutcome(true, true, name, seedProblem);
+   }
+
+   /// <summary>
+   /// The template a new project is seeded from (DP-4) — the registry's value, else the shipped default.
+   /// A <b>silent default</b> item: a sane value exists, so it is documented and overridable rather than
+   /// asked about.
+   /// </summary>
+   public String Template
+   {
+      get
+      {
+         var state = ProjectSettings.ReadItem(
+            _user.Effective, ConfigurableItems.DEFAULT_TEMPLATE_KEY);
+
+         return String.IsNullOrWhiteSpace(state.Value)
+            ? ConfigurableItems.DEFAULT_TEMPLATE
+            : state.Value!;
+      }
    }
 
    private Boolean? ReadSwitch()
