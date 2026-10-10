@@ -110,6 +110,46 @@ public static class BindingScenario
          })),
          "NotSupportedException");
 
+      // ---- LM-8 / ADR-0014: MS-SQL is a storage a BINDING may name ------------------------------
+      // The Studio ships this exact shape — no declared binding, the binding DERIVED from the catalog keys
+      // — and it failed at runtime ("Unknown binding target 'mssql' for collection 'default'") because the
+      // composition root accepted the kind everywhere except in this switch. Nothing below talks to a
+      // server: the store is constructed, never opened, so the check needs no database.
+      const string msSqlDsn =
+         "Server=.;Database=edam;Integrated Security=True;Encrypt=False;TrustServerCertificate=True";
+
+      using (var msSql = Build(new Dictionary<string, string>
+      {
+         [ProjectSettings.TARGET_KEY] = "catalog",
+         [ProjectSettings.DEFAULT_COLLECTION_KEY] = "default",
+         ["Edam:Catalog:Target"] = "mssql",
+         ["ConnectionStrings:catalog"] = msSqlDsn,
+      }))
+      {
+         var store = msSql.GetService<ICatalogStore>();
+         Check("An 'mssql' binding DERIVED from the catalog keys builds the composition root (MS-SQL is a storage kind)",
+            store is not null &&
+            string.Equals(store.DescribeStore(), "mssql", StringComparison.OrdinalIgnoreCase) &&
+            msSql.GetService<IProjectStore>() is not null,
+            "store=" + (store?.DescribeStore() ?? "<none>"));
+      }
+
+      using (var declaredMsSql = Build(new Dictionary<string, string>
+      {
+         [ProjectSettings.TARGET_KEY] = "catalog",
+         [ProjectSettings.DEFAULT_COLLECTION_KEY] = "declared",
+         [ProjectSettings.BINDINGS_SECTION + ":declared:Target"] = "mssql",
+         [ProjectSettings.BINDINGS_SECTION + ":declared:Credential"] = "ConnectionStrings:catalog",
+         ["ConnectionStrings:catalog"] = msSqlDsn,
+      }))
+      {
+         Check("An 'mssql' binding DECLARED by name is honoured exactly like postgres",
+            declaredMsSql.GetService<IProjectStore>() is not null &&
+            string.Equals(declaredMsSql.GetService<ICatalogStore>()?.DescribeStore(), "mssql",
+               StringComparison.OrdinalIgnoreCase),
+            declaredMsSql.GetService<ICatalogStore>()?.DescribeStore() ?? "<none>");
+      }
+
       // ---- THE PAYOFF: same settings, two bindings, identical consumer address ----------------
       Directory.CreateDirectory(workRoot);
       var fileSystemRoot = Path.Combine(workRoot, "bound-filesystem");

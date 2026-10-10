@@ -1,13 +1,47 @@
 # LM-9 — Project storage is a deployment fact, and it is always stated
 
-- **Status:** **In progress (2026-10-08)** — the **configuration half is delivered and build-verified**; the
-  **inspection surface (the UI half)** is designed, not built. Authority: **ADR-0014** (*Accepted*), building
-  on **ADR-0007**, **ADR-0009**, **ADR-0010**, **ADR-0011** and **ADR-0013**.
+- **Status:** **In progress (2026-10-08)** — the **configuration half is delivered and build-verified**, and
+  the **first runtime run found and closed a real defect** (`mssql` was never a *binding target*, item 114 of
+  `docs/HANDOFF.md`); the **inspection surface (the UI half)** is designed, not built. Authority:
+  **ADR-0014** (*Accepted*), building on **ADR-0007**, **ADR-0009**, **ADR-0010**, **ADR-0011** and
+  **ADR-0013**.
 - **Why:** a person using the Studio asked *"where is my project data stored? I expect it in the Catalog, on
   MS-SQL"* — and the application could not tell them. The projects were on the **file system** (no catalog
   connection string was configured), and answering the question required reading configuration and code.
   ADR-0014 turns that into a rule: *the storage kind is stated, the binding is a deployment fact, and the app
   says where the data is.*
+
+## The first runtime run (2026-10-08) — a defective assumption, found and closed
+
+The user deployed and ran it. The log is the whole story, and the **missing** line said as much as the
+present ones: there was no container/`seeded` line, and
+
+```
+Projects storage: the collection 'default' could not be ensured: Unknown binding target 'mssql' for
+collection 'default' — expected filesystem, postgres or service (the PROVIDER family is chosen separately
+by Edam:Projects:Target).
+```
+
+**`mssql` was a storage *kind* (LM-8) but never a *binding target*:** `ProjectServices.AddCatalog` switches
+on the binding target (`filesystem` · `postgres` · `service` · `default: throw`) and MS-SQL was missing, so
+`AddProjectServices` **threw while building the provider** and the whole project platform was unreachable.
+**Fixed** — the `mssql` case (identical in shape to `postgres`) plus corrected messages, and **two
+conformance checks** in the `binding` group (**9 → 11**, both PASS, no database needed because the store is
+constructed and never opened):
+
+- *"An `mssql` binding DERIVED from the catalog keys builds the composition root"* → `store=mssql` — the
+  Studio's exact shape, i.e. the path that failed;
+- *"An `mssql` binding DECLARED by name is honoured exactly like postgres"*.
+
+Three secondary defects from the same log are also fixed: the failed composition root is **reported once and
+cached** (it was rebuilt and re-logged on every call — four identical storage lines), the storage line is
+announced **once per distinct resolution**, and a storage/listing failure is now a **diagnostic** (it went to
+the editor's document title, and the panel area claimed "No projects yet" when the truth was "we could not
+look").
+
+**Lesson recorded:** LM-8 was verified against the **catalog** DI and the conformance *groups*, never against
+the **projects** DI binding switch — so a kind accepted in one composition root and refused in the other
+looked verified. A kind must be checked in **every** composition root that names it.
 
 ## Delivered (2026-10-08; `Edam.Studio.sln` x64 builds 0 errors; runtime verification is the user's F5)
 

@@ -139,6 +139,17 @@ public static class ProjectServices
                   overrides["ConnectionStrings:catalog"] = credential;
                break;
 
+            // LM-8 / ADR-0014: MS-SQL is a catalog STORAGE kind exactly like PostgreSQL, so a binding may
+            // name it. It was missing here while the storage kind and the catalog composition root already
+            // accepted it (LM-8), so a `mssql` binding reached the `default:` arm and the composition root
+            // refused to build at all — the defect this case and its conformance check close.
+            case "mssql":
+               overrides["Edam:Catalog:Target"] = "mssql";
+               var msSqlCredential = ResolveCredential(config, binding.Credential);
+               if (!string.IsNullOrWhiteSpace(msSqlCredential))
+                  overrides["ConnectionStrings:catalog"] = msSqlCredential;
+               break;
+
             case "service":
                throw new NotSupportedException(
                   "A 'service' binding (remote catalog) is not wired by the project composition root " +
@@ -149,7 +160,7 @@ public static class ProjectServices
             default:
                throw new InvalidOperationException(
                   $"Unknown binding target '{binding.Target}' for collection '{binding.CollectionId}' " +
-                  "— expected filesystem, postgres or service (the PROVIDER family is chosen " +
+                  "— expected filesystem, postgres, mssql or service (the PROVIDER family is chosen " +
                   $"separately by {ProjectSettings.TARGET_KEY}).");
          }
       }
@@ -237,8 +248,9 @@ public static class ProjectServices
                "client.Container / client.Item / client.Content (PE-5 wires this for the hosts).");
 
          throw new InvalidOperationException(
-            "No local catalog provider resolved. Configure Edam:Catalog:Target (postgres | filesystem) " +
-            "with ConnectionStrings:catalog or Edam:Catalog:FileSystemRoot.");
+            "No local catalog provider resolved. Configure Edam:Catalog:Target " +
+            "(postgres | mssql | filesystem) with ConnectionStrings:catalog or " +
+            "Edam:Catalog:FileSystemRoot.");
       }
 
       return (store, store, content);

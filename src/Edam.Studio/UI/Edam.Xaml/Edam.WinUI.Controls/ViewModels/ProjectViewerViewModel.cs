@@ -283,6 +283,7 @@ namespace Edam.WinUI.Controls.ViewModels
             }
 
             UriItems = l;
+            ClearStorageProblem();
 
             if (UriItems.Count > 0)
             {
@@ -291,8 +292,43 @@ namespace Edam.WinUI.Controls.ViewModels
          }
          catch (Exception ex)
          {
-            NotifiedMessageText = ex.Message;
+            ReportStorageProblem("the project locations could not be listed", ex);
          }
+      }
+
+      private static string? m_StorageProblem;
+
+      /// <summary>
+      /// A storage problem is a <b>diagnostic</b>: it is reported to the <b>diagnostics panel</b> — where the
+      /// storage in use is already stated — and <b>never</b> to the document title, which carries file and
+      /// data-set messages (the rule recorded when the diagnostics were moved).
+      /// <paramref name="blocksListing"/> is true when the failure means the projects could not even be
+      /// <i>looked at</i>: then the panel area says so, because "no projects yet" would be a lie. A failed
+      /// create or delete is reported in the panel only — the area still lists what is really there.
+      /// </summary>
+      private void ReportStorageProblem(string what, Exception ex, bool blocksListing = true)
+      {
+         if (blocksListing)
+         {
+            m_StorageProblem = what + " — see the diagnostics panel.";
+            OnPropertyChanged(nameof(EmptyStateTitle));
+            OnPropertyChanged(nameof(EmptyStateText));
+            OnPropertyChanged(nameof(EmptyStateActionVisibility));
+         }
+
+         Edam.WinUI.Controls.Logging.AppDiagnostics.Write(
+            "Projects: " + what + ": " + ex.Message,
+            Microsoft.Extensions.Logging.LogLevel.Error, "Edam.Studio");
+      }
+
+      private void ClearStorageProblem()
+      {
+         if (m_StorageProblem is null) return;
+
+         m_StorageProblem = null;
+         OnPropertyChanged(nameof(EmptyStateTitle));
+         OnPropertyChanged(nameof(EmptyStateText));
+         OnPropertyChanged(nameof(EmptyStateActionVisibility));
       }
 
       public void SetAssetViewerVisibility(Visibility? visibility)
@@ -362,10 +398,12 @@ namespace Edam.WinUI.Controls.ViewModels
             var ffinfo = await ProjectServicesHelper.GetProjectsTreeAsync(
                SelectedUriItem == null ? null : SelectedUriItem.UriText);
             TreeView = ProjectDataModel.ToObservable(ffinfo);
+            ClearStorageProblem();
          }
          catch (Exception ex)
          {
-            NotifiedMessageText = ex.Message;
+            // a diagnostic, not a document title: the editor's title carries file/data-set messages
+            ReportStorageProblem("the projects could not be listed", ex);
          }
 
          // DP-1: an empty tree explains nothing, so tell the view whether to say so
@@ -377,9 +415,25 @@ namespace Edam.WinUI.Controls.ViewModels
       /// shows an empty panel, which reads as a fault rather than as a beginning. The empty state says
       /// what is true and offers the one action that helps; it is the <b>safe half</b> of the work: it
       /// writes nothing, applies no gates and opens the existing New-Project dialog.
+      /// <para>
+      /// When the tree could not be LOADED the same area says so instead (and the create action is hidden,
+      /// because it could not work either), so "no projects yet" is never shown for "we could not look".
+      /// </para>
       /// </summary>
       public Visibility EmptyStateVisibility =>
          ((TreeView?.Children?.Count) ?? 0) == 0 ? Visibility.Visible : Visibility.Collapsed;
+
+      /// <summary>The empty state's heading — a beginning, or a problem.</summary>
+      public string EmptyStateTitle =>
+         m_StorageProblem is null ? "No projects yet" : "Projects are unavailable";
+
+      /// <summary>The empty state's one sentence.</summary>
+      public string EmptyStateText => m_StorageProblem ??
+         "This location holds no projects. Create one to get its folder structure and a starter arguments file.";
+
+      /// <summary>Creating a project is offered only when listing them actually worked.</summary>
+      public Visibility EmptyStateActionVisibility =>
+         m_StorageProblem is null ? Visibility.Visible : Visibility.Collapsed;
 
       public void ManageResults(IResultsLog results)
       {
@@ -567,7 +621,7 @@ namespace Edam.WinUI.Controls.ViewModels
          }
          catch (Exception ex)
          {
-            NotifiedMessageText = ex.Message;
+            ReportStorageProblem("the project could not be deleted", ex, blocksListing: false);
          }
 
          FetchProjectFolderInfo();
@@ -737,7 +791,7 @@ namespace Edam.WinUI.Controls.ViewModels
             }
             catch (Exception ex)
             {
-               NotifiedMessageText = ex.Message;
+               ReportStorageProblem("the project could not be created", ex, blocksListing: false);
             }
          }
       }

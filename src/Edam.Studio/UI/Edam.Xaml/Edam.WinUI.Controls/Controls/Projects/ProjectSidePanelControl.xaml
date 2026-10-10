@@ -38,14 +38,17 @@
 
       <!-- DP-1: the empty state. A fresh installation has no projects and an empty TreeView explains
            nothing, so say what is true and offer the one action that helps. It reuses the panel's own
-           Add handler, so there is no new write path and no new gate. -->
+           Add handler, so there is no new write path and no new gate. When the tree could not be LOADED
+           the same area says so instead (a storage problem is a diagnostic, never a silent "no projects
+           yet") and the create action is hidden, because it could not work either. -->
       <StackPanel Grid.Column="0" Grid.Row="2" Margin="16,28,16,0" Spacing="6"
                   VerticalAlignment="Top"
                   Visibility="{x:Bind ViewModel.EmptyStateVisibility, Mode=OneWay}">
-         <TextBlock Text="No projects yet" FontSize="16" FontWeight="SemiBold" />
+         <TextBlock Text="{x:Bind ViewModel.EmptyStateTitle, Mode=OneWay}" FontSize="16" FontWeight="SemiBold" />
          <TextBlock TextWrapping="Wrap" FontSize="12" Opacity="0.75"
-                    Text="This location holds no projects. Create one to get its folder structure and a starter arguments file." />
-         <Button Content="Create a project" Margin="0,6,0,0" Click="ProjectAdd_Click" />
+                    Text="{x:Bind ViewModel.EmptyStateText, Mode=OneWay}" />
+         <Button Content="Create a project" Margin="0,6,0,0" Click="ProjectAdd_Click"
+                  Visibility="{x:Bind ViewModel.EmptyStateActionVisibility, Mode=OneWay}" />
       </StackPanel>
 
       <TreeView ScrollViewer.VerticalScrollMode="Auto" Grid.Column="0" Grid.Row="2" Margin="0"

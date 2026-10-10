@@ -385,11 +385,32 @@ namespace Edam.WinUI.Controls.DataModels
          {
             lock (Gate)
             {
+               // a composition root that FAILED is reported once and not rebuilt on every call: its values
+               // come from the application's (static) configuration, so a retry cannot succeed — and a retry
+               // loop both floods the diagnostics log and repeats the same work on every navigation
+               if (m_BuildFailure is not null)
+               {
+                  System.Runtime.ExceptionServices.ExceptionDispatchInfo.Capture(m_BuildFailure).Throw();
+               }
+
                if (m_Provider is null)
                {
-                  var built = Build();
-                  m_Provider = built.Provider;
-                  m_PhysicalPaths = built.PhysicalPaths;
+                  try
+                  {
+                     var built = Build();
+                     m_Provider = built.Provider;
+                     m_PhysicalPaths = built.PhysicalPaths;
+                  }
+                  catch (Exception ex)
+                  {
+                     m_BuildFailure = ex;
+
+                     Edam.WinUI.Controls.Logging.AppDiagnostics.Write(
+                        "Projects storage: the project composition root could not be built — " + ex.Message,
+                        Microsoft.Extensions.Logging.LogLevel.Error, StorageCategory);
+
+                     throw;
+                  }
                }
                return m_Provider;
             }
@@ -446,10 +467,6 @@ namespace Edam.WinUI.Controls.DataModels
          }
 
          var bootstrap = new ConfigurationBuilder().AddInMemoryCollection(values).Build();
-
-         // kept: the storage description and the container-scoped content policy both read the SAME
-         // configuration the composition root was given — one policy, one source (LM-2b-ii)
-         m_StorageConfiguration = bootstrap;
          var settings = ProjectSettings.Read(bootstrap);
 
          // the Studio's own host policy: with nothing configured (and no EDAM_ROOT), its app-data
@@ -470,6 +487,11 @@ namespace Edam.WinUI.Controls.DataModels
             values[ProjectSettings.ROOT_KEY] = settings.Root!;
          }
 
+         // the configuration every policy sees, the root fallback included — ONE source for the composition
+         // root, the storage description and the container-scoped content factory (LM-2b-ii)
+         bootstrap = new ConfigurationBuilder().AddInMemoryCollection(values).Build();
+         m_StorageConfiguration = bootstrap;
+
          // WHERE projects are stored, stated once from the ONE place that resolves it (and kept for the
          // storage-description surface): a storage the application never names is a storage the user has
          // to guess at.
@@ -487,6 +509,9 @@ namespace Edam.WinUI.Controls.DataModels
       // ---------------------------------------------------------------------
 
       private const string StorageCategory = "Edam.Studio";
+
+      private static Exception? m_BuildFailure;
+      private static string? m_LastStorageSummary;
 
       private static string m_StorageTarget = "(not resolved)";
       private static string m_StorageKind = "(not resolved)";
@@ -535,6 +560,11 @@ namespace Edam.WinUI.Controls.DataModels
          m_StorageLocation = Redact(catalog
             ? (string.IsNullOrWhiteSpace(dsn) ? catalogRoot : dsn)
             : root);
+
+         // announced once per distinct resolution: the composition root is built once in practice, but a
+         // failure path can resolve again, and the SAME storage must not be re-announced on every navigation
+         if (String.Equals(m_LastStorageSummary, StorageSummary, StringComparison.Ordinal)) return;
+         m_LastStorageSummary = StorageSummary;
 
          Edam.WinUI.Controls.Logging.AppDiagnostics.Write(
             "Projects storage: " + StorageSummary, Microsoft.Extensions.Logging.LogLevel.Information,
