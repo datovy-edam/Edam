@@ -16,28 +16,28 @@
          <ColumnDefinition Width="*" />
       </Grid.ColumnDefinitions>
       <Grid.RowDefinitions>
-         <RowDefinition Height="48"/>
+         <RowDefinition Height="36"/>
          <RowDefinition Height="*"/>
       </Grid.RowDefinitions>
 
+      <!-- a compact toolbar: anything that does not carry information takes the least room possible -->
       <StackPanel Background="#fbfbfb" BorderBrush="LightGray" BorderThickness="1"
-             Orientation="Horizontal"
+             Orientation="Horizontal" VerticalAlignment="Center"
              Grid.Row="0" Grid.Column="0">
-         <AppBarButton Icon="Clear" LabelPosition="Collapsed" Width="34"
+         <AppBarButton Icon="Clear" LabelPosition="Collapsed" Width="30" Height="30"
                        Click="ClearViewButton_Click" ToolTipService.ToolTip="Clean all Entries"/>
-         <!-- copy the whole log: an entry is selectable too, but this is the quick way to hand the log
-              to someone else for investigation -->
-         <AppBarButton Icon="Copy" LabelPosition="Collapsed" Width="34"
+         <!-- copy ANY combination: tick the messages you want, right-click one, or take the whole log -->
+         <AppBarButton Icon="Copy" LabelPosition="Collapsed" Width="30" Height="30"
                        Click="CopySelectedButton_Click"
                        IsEnabled="{x:Bind m_ViewModel.HasSelection, Mode=OneWay}"
                        ToolTipService.ToolTip="Copy the SELECTED messages to the clipboard"/>
-         <AppBarButton Icon="SelectAll" LabelPosition="Collapsed" Width="34"
+         <AppBarButton Icon="SelectAll" LabelPosition="Collapsed" Width="30" Height="30"
                        Click="CopyAllButton_Click" ToolTipService.ToolTip="Copy every message to the clipboard"/>
-         <!-- what a copy will take: the panel states it, so the clipboard's contents are never a guess -->
-         <TextBlock VerticalAlignment="Center" Margin="6,0,0,0" FontSize="11" Foreground="Gray"
+         <!-- silent while nothing is ticked, so the toolbar stays quiet: the count appears when it means something -->
+         <TextBlock VerticalAlignment="Center" Margin="4,0,0,0" FontSize="11" Foreground="Gray"
                     Text="{x:Bind m_ViewModel.CopySelectionText, Mode=OneWay}"/>
       </StackPanel>
-      
+
       <!-- SelectionMode=None so a click/drag goes to the entry's text (selecting to copy) rather than
            selecting the list row -->
       <ListView ItemsSource="{x:Bind m_ViewModel.Items}" VerticalAlignment="top" 
@@ -51,19 +51,21 @@
              >
          <ListView.ItemTemplate>
             <DataTemplate x:DataType="viewmodels:DiagnosticsEntry">
-               <StackPanel Padding="2,4,2,4">
-                  <!-- tick ONE message to copy it on its own, tick SEVERAL to copy exactly those; the header
-                       says how many are selected (and where nothing is ticked, Copy takes the whole log) -->
-                  <CheckBox MinWidth="0" Padding="0,0,4,0" VerticalAlignment="Top"
-                            IsChecked="{x:Bind IsSelected, Mode=TwoWay}"
-                            ToolTipService.ToolTip="Tick to copy this message on its own"/>
-                  <!-- read-only TextBoxes, not TextBlocks: text must be SELECTABLE and COPYABLE -->
-                  <TextBox Text="{x:Bind LoggedDateTimeText}" IsReadOnly="True"
-                           BorderThickness="0" Background="Transparent" Padding="0"
-                           FontSize="10" Foreground="Gray"/>
+               <StackPanel Padding="2,2,2,2">
+                  <!-- the tick is INLINE with the timestamp and deliberately small: selecting a message must
+                       not cost a line of its own in a panel this narrow, and the entry's text stays
+                       drag-selectable for character-level copying -->
+                  <StackPanel Orientation="Horizontal" Spacing="2">
+                     <CheckBox MinWidth="0" MinHeight="0" Padding="0" Margin="0" Width="24" Height="24"
+                               VerticalAlignment="Center" IsChecked="{x:Bind IsSelected, Mode=TwoWay}"
+                               ToolTipService.ToolTip="Tick to copy this message on its own"/>
+                     <TextBox Text="{x:Bind LoggedDateTimeText}" IsReadOnly="True"
+                              BorderThickness="0" Background="Transparent" Padding="0"
+                              FontSize="10" Foreground="Gray" VerticalAlignment="Center"/>
+                  </StackPanel>
                   <TextBox Text="{x:Bind ErrorMessage}" IsReadOnly="True"
                            TextWrapping="Wrap" BorderThickness="0" Background="Transparent"
-                           Padding="0" FontSize="12" IsSpellCheckEnabled="False"/>
+                           Padding="0" Margin="24,0,0,0" FontSize="12" IsSpellCheckEnabled="False"/>
                   <!-- right-click a message: copy exactly it, without touching the ticks -->
                   <StackPanel.ContextFlyout>
                      <MenuFlyout>

@@ -154,6 +154,10 @@ try
 
          all["catalog (postgres, local)"] = await RunCatalogAsync(
             store, store, content, Path.Combine(temp, "pg-work"), containerId);
+
+         // leave nothing behind in a real database: these containers were showing up in the Studio's
+         // container selector ('pe3-mssql-…'), which is how a person meets a conformance run by accident
+         TryDelist(store, containerId);
       }
 
       // remote over the REST API, service backed by postgres
@@ -182,6 +186,8 @@ try
             all["catalog (postgres, remote HTTP)"] = await RunCatalogAsync(
                client.Container, client.Item, client.Content,
                Path.Combine(temp, "pg-remote-work"), containerId);
+
+            TryDelist(client.Container, containerId);
          }
          finally
          {
@@ -205,6 +211,9 @@ try
 
       all["catalog (mssql, local)"] = await RunCatalogAsync(
          store, store, content, Path.Combine(temp, "mssql-work"), containerId);
+
+      // a conformance run must not leave its container in a real database (see the postgres groups)
+      TryDelist(store, containerId);
    }
 
    // ---- 6/7/8. through the DI composition root (PE-4) ----------------------------------------
@@ -260,6 +269,8 @@ try
 
       all["di (catalog, postgres)"] =
          await RunViaProviderAsync(provider, Path.Combine(temp, "di-pg-work"));
+
+      TryDelist(provider.GetRequiredService<ICatalogStore>(), containerId);
    }
 
    // ---- 9. the asset-console adapter (PE-5b) -------------------------------------------------
@@ -354,6 +365,8 @@ try
          catalog, projectStore, resources, seeder, seed,
          ct => DefaultProjectRunScenario.PrepareCatalogSeedAsync(
             store, store, content, containerId, seed, ct));
+
+      TryDelist(store, containerId);
    }
 
    // ---- 11. a REAL end-to-end process attempt (PE-5c) — INFORMATIONAL ------------------------
@@ -450,6 +463,17 @@ static int GetFreePort()
    var port = ((IPEndPoint)listener.LocalEndpoint).Port;
    listener.Stop();
    return port;
+}
+
+/// <summary>
+/// Delist a container this run created in a <b>database</b>, so a conformance run leaves nothing behind for a
+/// person to meet by accident — these containers were appearing in the Studio's container selector
+/// (<c>pe3-mssql-d3ca8a12</c>), which is exactly how that happens. Best effort: a run's result must not depend
+/// on the cleanup.
+/// </summary>
+static void TryDelist(Edam.Data.Catalog.Contracts.ICatalogContainer containers, string containerId)
+{
+   try { containers.DelistContainer(containerId); } catch (Exception) { }
 }
 
 /// <summary>

@@ -41,15 +41,14 @@ namespace Edam.WinUI.Controls.ViewModels
       public Boolean HasSelection => SelectedCount > 0;
 
       /// <summary>
-      /// What the copy action will do, stated on the panel: a selection, or everything. The person should not
-      /// have to guess what a Copy button will put on the clipboard.
+      /// What the copy action will do, stated on the panel — and <b>silent while nothing is ticked</b>, so a
+      /// narrow toolbar is not filled with a sentence about the obvious. The person should not have to guess
+      /// what a Copy button will put on the clipboard.
       /// </summary>
       public String CopySelectionText =>
          SelectedCount == 0
-            ? "nothing selected — Copy takes every message"
-            : (SelectedCount == 1
-               ? "1 message selected"
-               : SelectedCount + " messages selected");
+            ? String.Empty
+            : (SelectedCount == 1 ? "1 selected" : SelectedCount + " selected");
 
       /// <summary>The currently selected messages, in the order they appear in the log.</summary>
       public IReadOnlyList<DiagnosticsEntry> SelectedItems =>

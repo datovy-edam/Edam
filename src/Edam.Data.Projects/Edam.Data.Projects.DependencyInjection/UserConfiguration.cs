@@ -49,6 +49,32 @@ public sealed class UserConfiguration
    /// <summary>The batch that still needs the user's input — judged <b>after</b> the answers.</summary>
    public IReadOnlyList<ConfigurableAsk> ToAsk() => ConfigurableItems.ToAsk(Effective);
 
+   /// <summary>
+   /// The user's answers as plain key/value pairs — the packaged state first, then the overlay, so the
+   /// overlay wins. A host hands these to its composition root so an answer is actually <b>used</b> and not
+   /// merely stored: an answer that nothing reads is the "configured but inert" defect this area keeps
+   /// producing (an answered container must become the container the store resolves).
+   /// </summary>
+   public IReadOnlyDictionary<string, string> Answers
+   {
+      get
+      {
+         var answers = new Dictionary<string, string>(StringComparer.OrdinalIgnoreCase);
+
+         foreach (var pair in _installation.ReadAll())
+         {
+            if (pair.Value is not null) answers[pair.Key] = pair.Value!;
+         }
+
+         foreach (var pair in _overlay.ReadAll())
+         {
+            if (pair.Value is not null) answers[pair.Key] = pair.Value!;
+         }
+
+         return answers;
+      }
+   }
+
    /// <summary>One item's state, after the answers.</summary>
    public ConfigurationItemInfo StateOf(ConfigurableItemInfo item) =>
       ConfigurableItems.StateOf(Effective, item);
@@ -99,6 +125,20 @@ public sealed class UserConfiguration
    public void MarkStarterProjectOffered(string value = "true")
    {
       var item = ConfigurableItems.Find(ConfigurableItems.DEFAULT_PROJECT_MARKER_KEY);
+      if (item is not null)
+      {
+         Store(item).Write(item.Key, value);
+      }
+   }
+
+   /// <summary>
+   /// Record that the answered <b>container really exists</b> — the proof of the action, which is what ends
+   /// the question (ADR-0013 decision 12). Written to the <b>packaged</b> store, like the starter-project
+   /// marker, so resetting the user's answers cannot re-ask for a container that is already there.
+   /// </summary>
+   public void MarkContainerReady(string value = "true")
+   {
+      var item = ConfigurableItems.Find(ConfigurableItems.CONTAINER_READY_KEY);
       if (item is not null)
       {
          Store(item).Write(item.Key, value);

@@ -32,9 +32,24 @@
                        ToolTipService.ToolTip="Add New Project" Icon="Add" Height="64" />
       </CommandBar>
 
-      <ComboBox Grid.Column="0" Grid.Row="1" ItemsSource="{x:Bind ViewModel.UriItems, Mode=TwoWay}"
-               SelectedItem="{x:Bind ViewModel.SelectedUriItem, Mode=TwoWay}" ToolTipService.ToolTip="Select Projects Location"
-               DisplayMemberPath="Name" Margin="8,0,0,0" />
+      <!-- the container selector, with the info surface beside it: "where does the catalog store my data?"
+           must be answerable FROM the application, not by reading configuration (LM-9 / ADR-0014) -->
+      <StackPanel Grid.Column="0" Grid.Row="1" Orientation="Horizontal" Spacing="4" Margin="8,0,8,0">
+         <ComboBox ItemsSource="{x:Bind ViewModel.UriItems, Mode=TwoWay}" MinWidth="150"
+                  SelectedItem="{x:Bind ViewModel.SelectedUriItem, Mode=TwoWay}"
+                  ToolTipService.ToolTip="Select the catalog container the projects live in"
+                  DisplayMemberPath="Name" />
+         <Button x:Name="StorageInfoButton" Click="StorageInfo_Click" Padding="8,0,8,0"
+                 FontFamily="Segoe MDL2 Assets" Content="&#xE946;"
+                 ToolTipService.ToolTip="Where the catalog stores the data">
+            <Button.Flyout>
+               <Flyout Placement="Bottom">
+                  <TextBlock Text="{x:Bind ViewModel.StorageInfoText, Mode=OneWay}"
+                             TextWrapping="Wrap" MaxWidth="380" FontSize="12" />
+               </Flyout>
+            </Button.Flyout>
+         </Button>
+      </StackPanel>
 
       <!-- DP-1: the empty state. A fresh installation has no projects and an empty TreeView explains
            nothing, so say what is true and offer the one action that helps. It reuses the panel's own

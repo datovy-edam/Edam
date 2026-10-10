@@ -44,6 +44,10 @@ public enum ConfigurationStorage
 /// stated. An answer to a question that implies an action ("name the starter project") is only valid once
 /// the action (the project exists) has actually happened.
 /// </param>
+/// <param name="Applies">
+/// When set, whether the item applies to the configuration at hand at all — a <b>catalog container</b> is
+/// only meaningful when a catalog is configured, so it must not be asked for a file-system installation.
+/// </param>
 public sealed record ConfigurableItemInfo(
    string Id,
    string Key,
@@ -54,13 +58,21 @@ public sealed record ConfigurableItemInfo(
    string? Default = null,
    ConfigurationStorage Storage = ConfigurationStorage.AppDataOverlay,
    Func<string?, string?>? Validate = null,
-   string? CompletedByKey = null)
+   string? CompletedByKey = null,
+   Func<IConfiguration, bool>? Applies = null)
 {
    /// <summary>True when this item may be put in front of the user.</summary>
    public bool IsAskable => Policy != ConfigurationPolicy.SilentDefault;
 
    /// <summary>True when the answer is provisional until <see cref="CompletedByKey"/> is stated.</summary>
    public bool IsActionBacked => !String.IsNullOrWhiteSpace(CompletedByKey);
+
+   /// <summary>
+   /// True when the item is meaningful for this configuration (an item with no condition always is) — so a
+   /// question that does not apply to the installation is never put in front of the user.
+   /// </summary>
+   public bool AppliesTo(IConfiguration? configuration) =>
+      Applies is null || configuration is null || Applies(configuration);
 }
 
 /// <summary>One item that needs the user's input, and why (CF-2).</summary>
@@ -104,6 +116,25 @@ public static class ConfigurableItems
 
    /// <summary>The template the packaged seed ships, so a new project is never inert (DP-4).</summary>
    public const string DEFAULT_TEMPLATE = "Templates/ToAssets.Args.json";
+
+   /// <summary>
+   /// The catalog <b>container</b> (the collection) the projects live in (ADR-0014 decision 1). A name is a
+   /// <b>choice</b>, so it is asked for rather than generated: a container called <c>pe3-mssql-d3ca8a12</c>
+   /// is not a name, and a person should never have to look at one.
+   /// </summary>
+   public const string CONTAINER_KEY = "Edam:Projects:DefaultCollection";
+
+   /// <summary>What is offered when nothing is stated — organization-first, like the starter project.</summary>
+   public const string DEFAULT_CONTAINER_NAME = "Edam.Projects";
+
+   /// <summary>
+   /// Records that the answered container <b>really exists</b> — the proof of the action, so the question
+   /// stops being asked (ADR-0013 decision 12). Kept with the packaged state, like the starter-project marker.
+   /// </summary>
+   public const string CONTAINER_READY_KEY = "Edam:Catalog:ContainerReady";
+
+   /// <summary>Longest accepted container name (it becomes a URI authority and a folder-name-like key).</summary>
+   public const int CONTAINER_NAME_MAX_LENGTH = 64;
 
    /// <summary>Longest accepted project name (it also becomes a folder and an artifact name).</summary>
    public const int PROJECT_NAME_MAX_LENGTH = 64;
@@ -150,6 +181,28 @@ public static class ConfigurableItems
             Storage: ConfigurationStorage.AppDataOverlay,
             Validate: null),
 
+         // ADR-0014 decision 1: the container is the ONE part of the storage binding a person states. It is
+         // asked only when a catalog is configured (Applies), it is asked until the container really EXISTS
+         // (CompletedByKey — an answer is not completion), and a name is validated by the catalog address rule
+         // so a name the prompt accepts can never be refused by the address parser later.
+         new(
+            Id: CONTAINER_KEY,
+            Key: CONTAINER_KEY,
+            Title: "Catalog container",
+            WhatItIs: "The name of the catalog container (the collection) that will hold your projects.",
+            WhatItAffects: "It is the container's address: your projects live at /Projects/<name> inside " +
+               "it, and it is the name you will see when browsing the catalog. The catalog itself was " +
+               "configured for this installation — the container is the part that is yours to name.",
+            Policy: ConfigurationPolicy.Required,
+            Default: DEFAULT_CONTAINER_NAME,
+            Storage: ConfigurationStorage.AppDataOverlay,
+            Validate: ValidateContainerName,
+            CompletedByKey: CONTAINER_READY_KEY,
+            Applies: configuration =>
+               String.Equals((configuration[ProjectSettings.TARGET_KEY] ?? String.Empty).Trim(),
+                  "catalog", StringComparison.OrdinalIgnoreCase) ||
+               !String.IsNullOrWhiteSpace(configuration["ConnectionStrings:catalog"])),
+
          new(
             Id: DEFAULT_PROJECT_MARKER_KEY,
             Key: DEFAULT_PROJECT_MARKER_KEY,
@@ -157,6 +210,20 @@ public static class ConfigurableItems
             WhatItIs: "A marker recording that the starter project was already offered or created.",
             WhatItAffects: "It stops the application from offering the starter project twice, and from " +
                "recreating one the user deleted.",
+            Policy: ConfigurationPolicy.SilentDefault,
+            Default: null,
+            Storage: ConfigurationStorage.PackagedSettings,
+            Validate: null),
+
+         // the proof of the CONTAINER action (ADR-0014): never asked — it records that the container the
+         // person named really exists, which is what stops the container question being asked again
+         new(
+            Id: CONTAINER_READY_KEY,
+            Key: CONTAINER_READY_KEY,
+            Title: "Catalog container ready (marker)",
+            WhatItIs: "A marker recording that the answered catalog container exists.",
+            WhatItAffects: "It stops the application asking for a container name that has already been " +
+               "created — and, because it is packaged state, resetting the answers does not re-ask.",
             Policy: ConfigurationPolicy.SilentDefault,
             Default: null,
             Storage: ConfigurationStorage.PackagedSettings,
@@ -197,7 +264,7 @@ public static class ConfigurableItems
 
       var asks = new List<ConfigurableAsk>();
 
-      foreach (var item in All.Where(i => i.IsAskable))
+      foreach (var item in All.Where(i => i.IsAskable && i.AppliesTo(config)))
       {
          var state = StateOf(config, item);
 
@@ -276,6 +343,52 @@ public static class ConfigurableItems
       if (ReservedProjectNames.Contains(raw, StringComparer.OrdinalIgnoreCase))
       {
          return $"'{raw}' is reserved for a container-level location family";
+      }
+
+      return null;
+   }
+
+   /// <summary>
+   /// The rules a <b>container</b> name must satisfy. They mirror the catalog address rule
+   /// (<c>CatalogAddress.IsValidContainer</c>: letters, digits, <c>.</c>, <c>-</c> and <c>_</c>) and are
+   /// deliberately <b>stricter</b> — a name must start with a letter — so that anything the prompt accepts is
+   /// certain to be accepted by the address parser. A container name is not a file path: separators are
+   /// rejected, so a name cannot describe a location outside the container it names.
+   /// </summary>
+   /// <returns>Why the name is unusable, or null when it is fine.</returns>
+   public static string? ValidateContainerName(string? name)
+   {
+      var raw = name ?? String.Empty;
+
+      if (raw.Length == 0)
+      {
+         return "a container name is required";
+      }
+
+      if (raw != raw.Trim())
+      {
+         return "a container name may not start or end with a space";
+      }
+
+      if (raw.Length > CONTAINER_NAME_MAX_LENGTH)
+      {
+         return $"a container name may be at most {CONTAINER_NAME_MAX_LENGTH} characters";
+      }
+
+      if (!Char.IsLetter(raw[0]))
+      {
+         return "a container name must start with a letter";
+      }
+
+      if (raw.Any(c => !(Char.IsLetterOrDigit(c) || c == '.' || c == '-' || c == '_')))
+      {
+         return "a container name may contain only letters, digits, '.', '-' and '_' " +
+            "(the catalog address rule) — no separators, so it cannot describe a location";
+      }
+
+      if (raw.StartsWith('.') || raw.EndsWith('.'))
+      {
+         return "a container name may not start or end with a dot";
       }
 
       return null;

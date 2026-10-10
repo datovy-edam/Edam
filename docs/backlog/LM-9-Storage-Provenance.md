@@ -1,10 +1,19 @@
 # LM-9 — Project storage is a deployment fact, and it is always stated
 
-- **Status:** **In progress (2026-10-08)** — the **configuration half is delivered and build-verified**, and
-  the **first runtime run found and closed a real defect** (`mssql` was never a *binding target*, item 114 of
-  `docs/HANDOFF.md`); the **inspection surface (the UI half)** is designed, not built. Authority:
-  **ADR-0014** (*Accepted*), building on **ADR-0007**, **ADR-0009**, **ADR-0010**, **ADR-0011** and
-  **ADR-0013**.
+- **Status:** **Delivered (2026-10-10)** — the configuration half, the **container question** (the one part a
+  person names), the **storage info surface** (the ⓘ button) and the deployment fix are all in place and
+  build-verified; the **user's runtime confirmation** and the removal of the test containers already in the
+  database remain. Authority: **ADR-0014** (*Accepted*), building on **ADR-0007**, **ADR-0009**, **ADR-0010**,
+  **ADR-0011** and **ADR-0013**.
+- **Update (2026-10-10):** the container is **asked for** — a registry item
+  (`Edam:Projects:DefaultCollection`, offered as `Edam.Projects`, action-backed on
+  `Edam:Catalog:ContainerReady`, asked **only** when a catalog is configured via the new `Applies` predicate) —
+  and the answer is **used**: `UserConfiguration.Answers` is layered into the composition root, and the
+  container is read **answer first, then deployment**. The **ⓘ button** beside the container selector renders
+  `DescribeStorageAsync` (kind · **redacted** location · container · **source of the value** · local/remote ·
+  what the database holds). The conformance runner now **delists the containers it enlists in a database**, so
+  a run leaves nothing behind for a person to meet by accident (**that** is where `pe3-mssql-d3ca8a12` came
+  from). `registry (CF-2)` **13 → 17 checks ALL CONFORM**.
 - **Why:** a person using the Studio asked *"where is my project data stored? I expect it in the Catalog, on
   MS-SQL"* — and the application could not tell them. The projects were on the **file system** (no catalog
   connection string was configured), and answering the question required reading configuration and code.
@@ -97,23 +106,15 @@ looked verified. A kind must be checked in **every** composition root that names
 
 ## Remaining
 
-- **The inspection surface (the UI half of ADR-0014 decision 8):** a **container info surface** — hover /
-  flyout on the collection selector and the projects tree root — rendering the *same* record the diagnostics
-  already carry: container · storage kind (`MS-SQL` / `PostgreSQL` / `file system` / `a catalog service`) ·
-  **redacted** location · local vs remote · the **source** of the value (configuration · environment · your
-  answer) · project count · "could not verify right now" when the store is unreachable. The value record
-  should be produced by one headless-testable helper (the platform already has `DescribeStore()`,
-  `ProjectBindingInfo` and `ConfigurationItemInfo.Source`); the UI only renders it, because redaction has
-  exactly one definition (ADR-0014 decision 5). Also worth carrying: the same summary **at project level**
-  ("a branch in container X; its files are content in Y").
+- **The user's runtime confirmation** and the **data cleanup**: the containers the earlier verification runs
+  created are still in `Edam.Database` and the selector will list them until they are removed — either
+  `SELECT container_id FROM edam_container;` and delete the `pe3-%` / `di-pg-%` / `dp5-pg-%` rows (with their
+  items and content), or **drop the five `edam_*` tables** and let `MsSqlSchema.EnsureAsync` recreate the schema
+  on the next run (the catalog holds only test data today).
 - **Migration of what is on disk:** switching the target moves nothing. `IProjectStore.ImportAsync` (upload)
-  exists and is exercised only by tests; there is **no import/export UI**. Projects created while the
-  file-system target was active must be imported, or re-created in the catalog.
-- **Runtime verification (user, F5):** after deploying, the diagnostics panel must show
-  `Projects storage: target=catalog storage=mssql collection='default' location=Server=.;Database=Edam.Database;Integrated Security=True;…`
-  followed by the container/`seeded N file(s)` lines; the projects panel must list the catalog collection;
-  and the next first-run creation must land **in the catalog** — with its starter arguments seeded from the
-  container's `/Templates`.
-- **Not verified here (honest):** the Studio's catalog path had never been exercised before this change (the
-  DP-5/conformance runs drive the platform directly). `Edam.Data.Catalog.slnx` and its conformance suite are
-  green, but **this host-side wiring is build-verified only** until the user's F5.
+  exists and is exercised only by tests; there is **no import/export UI**.
+- **The inspection surface could go further** (not required): the same description **per project** ("a branch in
+  container X; its files are content in Y"), and a container **delete/rename** affordance in the UI — today a
+  container can only be removed in the database, which is how the conformance leftovers survived.
+- **Not verified here (honest):** everything above is **build-verified** plus headless conformance; the Studio's
+  catalog path is proven at run time only by the user's F5.

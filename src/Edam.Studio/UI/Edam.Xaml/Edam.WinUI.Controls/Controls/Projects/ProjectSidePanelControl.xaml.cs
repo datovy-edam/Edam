@@ -75,6 +75,17 @@ namespace Edam.WinUI.Controls.Projects
          m_ViewModel.ProjectAddNew();
       }
 
+      /// <summary>
+      /// The <b>info surface</b> (LM-9 / ADR-0014 decision 8): the button's flyout opens on the click, and the
+      /// description is resolved then — the storage kind, the <b>redacted</b> location, whether it is local,
+      /// where the value came from, and what the catalog currently holds. A person must never have to infer
+      /// where their data is.
+      /// </summary>
+      private async void StorageInfo_Click(object sender, RoutedEventArgs e)
+      {
+         await m_ViewModel.LoadStorageInfoAsync();
+      }
+
       private void TreeViewItem_PointerPressed(
          object sender, PointerRoutedEventArgs e)
       {

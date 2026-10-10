@@ -216,8 +216,22 @@ namespace Edam.WinUI.Controls.DataModels
       {
          try
          {
-            if (item is null ||
-                item.Id != Edam.Data.Projects.DependencyInjection.ConfigurableItems
+            if (item is null)
+            {
+               return null;
+            }
+
+            // the CONTAINER the person named (ADR-0014): create it, seed it, and only then record that it
+            // exists — because an answer is not completion (ADR-0013 decision 12)
+            if (string.Equals(
+                   item.Id,
+                   Edam.Data.Projects.DependencyInjection.ConfigurableItems.CONTAINER_KEY,
+                   StringComparison.OrdinalIgnoreCase))
+            {
+               return await CompleteContainerActionAsync(value).ConfigureAwait(true);
+            }
+
+            if (item.Id != Edam.Data.Projects.DependencyInjection.ConfigurableItems
                    .DEFAULT_PROJECT_NAME_KEY)
             {
                return null;
@@ -252,6 +266,116 @@ namespace Edam.WinUI.Controls.DataModels
                "Default project: failed (" + ex.Message + ") — the question stays pending.",
                Microsoft.Extensions.Logging.LogLevel.Warning, "Edam.Studio");
             return ex.Message;
+         }
+      }
+
+      /// <summary>
+      /// Complete the <b>container</b> action (ADR-0014): the answer names a container, so the container is
+      /// made real — enlisted <b>idempotently</b> (an existing container is returned; a seed never rewrites a
+      /// binding) and seeded with the shared locations the starter recipe reads — and only then is the
+      /// "ready" marker written, because the question must keep being asked until the thing exists.
+      /// </summary>
+      private static async Task<string?> CompleteContainerActionAsync(string containerId)
+      {
+         var problem = Edam.Data.Projects.DependencyInjection.ConfigurableItems
+            .ValidateContainerName(containerId);
+         if (problem is not null)
+         {
+            return problem;
+         }
+
+         try
+         {
+            var store = Services.GetService<Edam.Data.Catalog.Contracts.ICatalogStore>();
+            if (store is null)
+            {
+               return "the catalog storage is not available (" + StorageSummary + ")";
+            }
+
+            var kind = Edam.Data.Catalog.DependencyInjection.CatalogServices.ParseTarget(
+               AppSettings.GetString("Edam:Catalog:Target"));
+
+            var container = store.EnlistContainer(containerId, "EDAM Studio projects", null, kind);
+
+            Edam.WinUI.Controls.Logging.AppDiagnostics.Write(
+               "Projects storage: collection '" + container.ContainerId + "' created (or already present, " +
+               "which is the same thing here) as '" + kind + "' — projects live at /Projects/<name> inside it.",
+               Microsoft.Extensions.Logging.LogLevel.Information, StorageCategory);
+
+            // the answered container IS the container from now on: re-ensure against it, seed it, and only
+            // then mark it ready (so a failure leaves the question pending rather than pretending)
+            await SeedSharedLocationsAsync(store, container.Id, containerId, default).ConfigureAwait(true);
+
+            UserConfiguration.MarkContainerReady();
+            m_ContainerEnsured = true;
+            m_EnsuredContainerId = containerId;
+            m_LastContainerFailure = null;
+
+            return null;
+         }
+         catch (Exception ex)
+         {
+            return ExplainFailure(ex);
+         }
+      }
+
+      /// <summary>
+      /// <b>Where the catalog will store this installation's data</b>, in one readable block for the info
+      /// surface: the storage kind, the location (<b>redacted</b> — a password never reaches a screen),
+      /// whether it is local, <b>where the value came from</b> (the deployment, or the person's own answer),
+      /// and what the catalog currently holds. Assembled here, never in the UI: redaction and provenance have
+      /// exactly one definition (ADR-0014 decisions 5 and 8).
+      /// </summary>
+      public static async Task<string> DescribeStorageAsync(
+         string? collectionUri = null, CancellationToken ct = default)
+      {
+         try
+         {
+            var answered = UserConfiguration.Answers.ContainsKey(ProjectSettings.DEFAULT_COLLECTION_KEY);
+            var configured = ConfiguredContainerId;
+
+            var lines = new List<string>
+            {
+               (UsesDatabase
+                  ? "Projects are stored in a database, through the CATALOG."
+                  : "Projects are stored as files, in a folder (the catalog is not configured)."),
+               "Storage: " + StorageKind,
+               "Where: " + m_StorageLocation,
+               "Container: " + (configured ?? "(none named yet — the catalog's own containers are listed)"),
+               "Container source: " + (answered
+                  ? "your answer (kept with your settings)"
+                  : (configured is null
+                     ? "not stated yet"
+                     : "the deployment (appsettings.json)")),
+               "This machine: " + (IsLocalTarget ? "yes — local" : "no — shared/remote"),
+            };
+
+            if (UsesDatabase)
+            {
+               var collections = await Catalog.GetCollectionsAsync(ct).ConfigureAwait(false);
+               lines.Add("Containers in the database: " + collections.Count);
+
+               var match = collections
+                  .FirstOrDefault(c => string.Equals(c.CollectionId, collectionUri,
+                     StringComparison.OrdinalIgnoreCase))
+                  ?? collections.FirstOrDefault(c => string.Equals(c.CollectionId, configured,
+                     StringComparison.OrdinalIgnoreCase))
+                  ?? collections.FirstOrDefault(c => c.IsDefault)
+                  ?? collections.FirstOrDefault();
+
+               if (match is not null)
+               {
+                  var projects = await Catalog.GetProjectsAsync(match.CollectionId, ct)
+                     .ConfigureAwait(false);
+                  lines.Add("Projects in '" + match.CollectionId + "': " + projects.Count);
+               }
+            }
+
+            return string.Join(Environment.NewLine, lines);
+         }
+         catch (Exception ex)
+         {
+            return "The storage could not be described — " + ExplainFailure(ex);
          }
       }
 
@@ -488,6 +612,14 @@ namespace Edam.WinUI.Controls.DataModels
             values[ProjectSettings.ROOT_KEY] = settings.Root!;
          }
 
+         // the user's ANSWERS are configuration from then on (ADR-0013): layered over the application's own
+         // values, so an answered container is USED by the composition root. An answer the store never sees
+         // would be exactly the "configured but inert" defect this area keeps producing.
+         foreach (var answer in UserConfiguration.Answers)
+         {
+            values[answer.Key] = answer.Value;
+         }
+
          // the configuration every policy sees, the root fallback included — ONE source for the composition
          // root, the storage description and the container-scoped content factory (LM-2b-ii)
          bootstrap = new ConfigurationBuilder().AddInMemoryCollection(values).Build();
@@ -623,7 +755,29 @@ namespace Edam.WinUI.Controls.DataModels
           dsn.Contains("Username=", StringComparison.OrdinalIgnoreCase) ||
           dsn.Contains("Port=", StringComparison.OrdinalIgnoreCase));
 
+      /// <summary>
+      /// The container the projects live in: <b>the user's answer first</b> (an answer is configuration,
+      /// ADR-0013), then the deployment's own statement. Nothing here guesses, and nothing reads only the
+      /// file while an answer exists — that is how a stated container ends up unused.
+      /// </summary>
+      private static string? ConfiguredContainerId
+      {
+         get
+         {
+            if (UserConfiguration.Answers.TryGetValue(
+                   ProjectSettings.DEFAULT_COLLECTION_KEY, out var answered) &&
+                !string.IsNullOrWhiteSpace(answered))
+            {
+               return answered;
+            }
+
+            var stated = AppSettings.GetString(ProjectSettings.DEFAULT_COLLECTION_KEY);
+            return string.IsNullOrWhiteSpace(stated) ? null : stated;
+         }
+      }
+
       private static bool m_ContainerEnsured;
+      private static string? m_EnsuredContainerId;
       private static string? m_LastContainerFailure;
 
       /// <summary>
@@ -633,28 +787,35 @@ namespace Edam.WinUI.Controls.DataModels
       /// <para>
       /// Host policy, reported: a file-system collection is a folder and needs nothing; a missing
       /// configuration or an unreachable database is <b>reported</b>, never thrown, so browsing still shows
-      /// what the catalog really has.
+      /// what the catalog really has. It runs again when the container the person named <b>changes</b>.
       /// </para>
       /// </summary>
       public static async Task EnsureDefaultContainerAsync(CancellationToken ct = default)
       {
-         if (m_ContainerEnsured) return;
+         var id = ConfiguredContainerId;
+
+         if (m_ContainerEnsured &&
+             string.Equals(m_EnsuredContainerId, id, StringComparison.OrdinalIgnoreCase))
+         {
+            return;
+         }
 
          var connection = AppSettings.GetConnectionString("catalog");
          if (string.IsNullOrWhiteSpace(connection))
          {
             m_ContainerEnsured = true;   // a file-system collection is a folder: nothing to enlist
+            m_EnsuredContainerId = id;
             return;
          }
 
-         var id = AppSettings.GetString(ProjectSettings.DEFAULT_COLLECTION_KEY);
          if (string.IsNullOrWhiteSpace(id))
          {
             m_ContainerEnsured = true;
+            m_EnsuredContainerId = null;
             Edam.WinUI.Controls.Logging.AppDiagnostics.Write(
-               "Projects storage: no default collection is configured (" +
-               ProjectSettings.DEFAULT_COLLECTION_KEY + ") — the catalog's own containers are shown as " +
-               "they are.",
+               "Projects storage: no container is named yet (the catalog is configured, and the name is the " +
+               "part a person states) — the catalog's own containers are shown as they are until it is " +
+               "answered.",
                Microsoft.Extensions.Logging.LogLevel.Information, StorageCategory);
             return;
          }
@@ -675,6 +836,7 @@ namespace Edam.WinUI.Controls.DataModels
 
             var container = store.EnlistContainer(id, "EDAM Studio projects", null, kind);
             m_ContainerEnsured = true;
+            m_EnsuredContainerId = id;
             m_LastContainerFailure = null;
 
             Edam.WinUI.Controls.Logging.AppDiagnostics.Write(
@@ -1012,8 +1174,9 @@ namespace Edam.WinUI.Controls.DataModels
          // the CONFIGURED default comes first: `Edam:Projects:DefaultCollection` names the container this
          // installation is meant to use, and it must win over whatever the provider happens to flag (or
          // over "the first one") — otherwise the key would say something the application ignores.
-         var preferred = AppSettings.GetString(
-            Edam.Data.Projects.DependencyInjection.ProjectSettings.DEFAULT_COLLECTION_KEY);
+         // the CONTAINER comes from the ANSWER first, then from configuration (the person's answer is what the
+         // composition root and the store both use — one container, named once)
+         var preferred = ConfiguredContainerId;
 
          if (!string.IsNullOrWhiteSpace(preferred))
          {

@@ -54,6 +54,52 @@ public static class RegistryScenario
          markerItem.Storage == ConfigurationStorage.PackagedSettings,
          $"{markerItem?.Policy} askable={markerItem?.IsAskable}");
 
+      // ---- ADR-0014: the container is the ONE part of the storage binding a person states ---------
+      var containerItem = ConfigurableItems.Find(ConfigurableItems.CONTAINER_KEY);
+      var readyItem = ConfigurableItems.Find(ConfigurableItems.CONTAINER_READY_KEY);
+
+      Check("The catalog CONTAINER is a registry item, ACTION-BACKED on the container really existing",
+         containerItem is not null &&
+         containerItem.Policy == ConfigurationPolicy.Required &&
+         containerItem.IsActionBacked &&
+         containerItem.CompletedByKey == ConfigurableItems.CONTAINER_READY_KEY &&
+         containerItem.Default == ConfigurableItems.DEFAULT_CONTAINER_NAME &&
+         readyItem is not null && !readyItem.IsAskable &&
+         readyItem.Storage == ConfigurationStorage.PackagedSettings,
+         $"default='{containerItem?.Default}' completedBy='{containerItem?.CompletedByKey}'");
+
+      Check("The container is asked ONLY when a catalog is configured (a file-system installation is never asked)",
+         containerItem is not null &&
+         !containerItem.AppliesTo(Config()) &&
+         containerItem.AppliesTo(Config(("ConnectionStrings:catalog", "Server=.;Database=edam"))) &&
+         containerItem.AppliesTo(Config((ProjectSettings.TARGET_KEY, "catalog"))),
+         "applies only when a catalog is configured");
+
+      Check("A container NAME follows the catalog address rule — it starts with a letter and carries no separator",
+         ConfigurableItems.ValidateContainerName("Edam.Projects") is null &&
+         ConfigurableItems.ValidateContainerName("edam.studio-1") is null &&
+         ConfigurableItems.ValidateContainerName("pe3 mssql d3ca8a12") is not null &&
+         ConfigurableItems.ValidateContainerName("1bad") is not null &&
+         ConfigurableItems.ValidateContainerName("a/b") is not null &&
+         ConfigurableItems.ValidateContainerName(".hidden") is not null &&
+         ConfigurableItems.ValidateContainerName("") is not null &&
+         ConfigurableItems.ValidateContainerName(
+            new string('a', ConfigurableItems.CONTAINER_NAME_MAX_LENGTH + 1)) is not null,
+         "a generated-looking name is refused; a human one is accepted");
+
+      Check("Answering the container is NOT completion: the question returns until the container EXISTS",
+         ConfigurableItems.ToAsk(Config(
+            ("ConnectionStrings:catalog", "Server=.;Database=edam"),
+            (ConfigurableItems.CONTAINER_KEY, "Edam.Projects")))
+            .Any(a => a.Item.Id == ConfigurableItems.CONTAINER_KEY &&
+                      !string.IsNullOrWhiteSpace(a.Reason)) &&
+         !ConfigurableItems.ToAsk(Config(
+            ("ConnectionStrings:catalog", "Server=.;Database=edam"),
+            (ConfigurableItems.CONTAINER_KEY, "Edam.Projects"),
+            (ConfigurableItems.CONTAINER_READY_KEY, "true")))
+            .Any(a => a.Item.Id == ConfigurableItems.CONTAINER_KEY),
+         "pending until the ready marker is stated");
+
       // ---- the batch ---------------------------------------------------------------------------
       var unset = ConfigurableItems.ToAsk(Config());
       Check("Nothing stated: the batch asks for the name — and only for it (the marker is silent)",

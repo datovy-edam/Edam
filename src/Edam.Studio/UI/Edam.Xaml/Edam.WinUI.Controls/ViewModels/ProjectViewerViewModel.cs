@@ -435,6 +435,40 @@ namespace Edam.WinUI.Controls.ViewModels
       public Visibility EmptyStateActionVisibility =>
          m_StorageProblem is null ? Visibility.Visible : Visibility.Collapsed;
 
+      private string m_StorageInfoText = "Reading the storage description…";
+
+      /// <summary>
+      /// What the <b>info surface</b> shows (LM-9 / ADR-0014 decision 8): the storage kind, the
+      /// <b>redacted</b> location, whether it is local, <b>where the value came from</b> (the deployment, or
+      /// the person's own answer) and what the catalog currently holds. Assembled by the platform bridge and
+      /// rendered here — a person must never have to infer where their data is.
+      /// </summary>
+      public string StorageInfoText
+      {
+         get { return m_StorageInfoText; }
+         private set
+         {
+            if (m_StorageInfoText == value) return;
+            m_StorageInfoText = value;
+            OnPropertyChanged(nameof(StorageInfoText));
+         }
+      }
+
+      /// <summary>Resolve the storage description for the info button's flyout.</summary>
+      public async Task LoadStorageInfoAsync()
+      {
+         StorageInfoText = "Reading the storage description…";
+         try
+         {
+            StorageInfoText = await ProjectServicesHelper.DescribeStorageAsync(
+               SelectedUriItem == null ? null : SelectedUriItem.UriText);
+         }
+         catch (Exception ex)
+         {
+            StorageInfoText = "The storage could not be described: " + ex.Message;
+         }
+      }
+
       public void ManageResults(IResultsLog results)
       {
 
