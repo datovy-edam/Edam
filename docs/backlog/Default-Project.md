@@ -58,6 +58,16 @@ which is a seed **source**, never a configured location. The eight checks:
 8. a collection that **already holds a project is refused, with its own reason** (a fresh answer state, so the
    marker cannot be the reason).
 
+**Runtime finding (2026-10-08, the user's own first run) — fixed.** The prompt appeared and the offered
+`Edam.Sample` was accepted, but the **left panel kept showing nothing**; a **restart showed the project's
+folders**, so the project *had* been created and only the tree was never reloaded. Every other path that
+changes the set of projects updates the UI itself (the manual New-Project flow appends the node it created;
+DP-2's delete reloads the tree), but the **first-run project is created by the configuration prompt**, which
+knows nothing about the panel. **Fix:** `ProjectServicesHelper.ProjectsChanged` (raised only when the action
+really created the project) + `ProjectSidePanelControl` subscribing on `Loaded` / unsubscribing on
+`Unloaded`, marshalling to the UI thread — so the tree (and DP-1's empty state) tells the truth immediately.
+`Edam.WinUI.Controls` and `Edam.Studio.sln` build **0 errors**; the runtime re-check is the user's F5.
+
 **Finding recorded by the run (not hidden).** `IDefaultProjectHost.SeedAsync(projectName, templateAddress)`
 receives `DefaultProjectService.Template` — the registry's `Edam:Projects:DefaultTemplate` value, which is a
 **location path** (`Templates/ToAssets.Args.json`), *not* a `catalog://` address. A host must resolve it: the

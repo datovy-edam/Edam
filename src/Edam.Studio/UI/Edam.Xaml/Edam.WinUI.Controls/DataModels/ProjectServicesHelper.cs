@@ -209,6 +209,23 @@ namespace Edam.WinUI.Controls.DataModels
             AppSettings.GetConnectionString("catalog"));
 
       /// <summary>
+      /// <b>The set of projects changed</b>, raised by this bridge when it changes it <b>from outside a
+      /// view model</b> — today the first-run starter project, which the configuration prompt creates while
+      /// the projects panel is on screen. A panel that only learns about projects when it loads would keep
+      /// showing "no projects yet" until the next restart, which is exactly the defect this notification
+      /// closes (DP-5).
+      /// <para>
+      /// A view model that performs the change itself refreshes directly (the manual New-Project flow adds
+      /// the node it created, and DP-2's delete reloads) — this is for the changes made <i>behind</i> it.
+      /// Subscribers own their lifecycle: subscribe while the surface is loaded, unsubscribe when it goes.
+      /// </para>
+      /// </summary>
+      public static event Action? ProjectsChanged;
+
+      /// <summary>Tell the loaded surfaces that the set of projects changed (see <see cref="ProjectsChanged"/>).</summary>
+      public static void NotifyProjectsChanged() => ProjectsChanged?.Invoke();
+
+      /// <summary>
       /// Complete the <b>action</b> behind an answered item (DP-3 / ADR-0012): for the starter-project
       /// name, create the project in the bound collection. Returns null on success, or why it failed — and
       /// on failure the marker is <b>not</b> written, so the question stays pending and is asked again
@@ -239,6 +256,13 @@ namespace Edam.WinUI.Controls.DataModels
                   ? Microsoft.Extensions.Logging.LogLevel.Information
                   : Microsoft.Extensions.Logging.LogLevel.Warning,
                "Edam.Studio");
+
+            // DP-5: the project was created WITHOUT the projects panel being involved, so nothing would
+            // refresh its tree — it would say "no projects yet" until the next restart. Tell it now.
+            if (outcome.Created)
+            {
+               NotifyProjectsChanged();
+            }
 
             return outcome.Created ? null : outcome.Problem;
          }

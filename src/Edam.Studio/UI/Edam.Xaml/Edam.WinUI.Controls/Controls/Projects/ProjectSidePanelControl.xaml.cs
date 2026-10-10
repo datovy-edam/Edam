@@ -1,4 +1,4 @@
-﻿using Microsoft.UI.Xaml;
+using Microsoft.UI.Xaml;
 using Microsoft.UI.Xaml.Controls;
 using Microsoft.UI.Xaml.Controls.Primitives;
 using Microsoft.UI.Xaml.Data;
@@ -17,6 +17,7 @@ using Windows.Foundation.Collections;
 // and more about our project templates, see: http://aka.ms/winui-project-info.
 using Edam.WinUI.Controls.ViewModels;
 using Edam.WinUI.Controls.Common;
+using Edam.WinUI.Controls.DataModels;
 
 namespace Edam.WinUI.Controls.Projects
 {
@@ -33,6 +34,35 @@ namespace Edam.WinUI.Controls.Projects
          this.InitializeComponent();
          m_ViewModel = new ProjectViewerViewModel();
          DataContext = m_ViewModel;
+
+         // DP-5: the platform can change the set of projects BEHIND this panel — the first-run starter
+         // project is created by the configuration prompt, which knows nothing about this tree. Without
+         // this, the panel keeps saying "no projects yet" until the application is restarted, although the
+         // project exists. The subscription follows the control's own lifecycle, so a panel that is gone is
+         // not kept alive by it (and re-loading does not subscribe twice).
+         Loaded += (sender, args) =>
+         {
+            ProjectServicesHelper.ProjectsChanged -= OnProjectsChanged;
+            ProjectServicesHelper.ProjectsChanged += OnProjectsChanged;
+         };
+         Unloaded += (sender, args) =>
+            ProjectServicesHelper.ProjectsChanged -= OnProjectsChanged;
+      }
+
+      /// <summary>
+      /// Reload the projects tree when the set of projects changed elsewhere — marshalled to the UI thread,
+      /// whatever raised the change, because the tree is a bound UI object.
+      /// </summary>
+      private void OnProjectsChanged()
+      {
+         if (DispatcherQueue.HasThreadAccess)
+         {
+            m_ViewModel.FetchProjectFolderInfo();
+         }
+         else
+         {
+            DispatcherQueue.TryEnqueue(() => m_ViewModel.FetchProjectFolderInfo());
+         }
       }
 
       private void ProjectRefresh_Click(object sender, RoutedEventArgs e)
