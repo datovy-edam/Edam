@@ -144,31 +144,11 @@ namespace Edam.WinUI.Controls.DataModels
          /// </summary>
          private static string? FindSampleInput(string fileName)
          {
-            try
-            {
-               var root = AppData.GetApplicationDataLocation();
-               if (string.IsNullOrWhiteSpace(root))
-               {
-                  return null;
-               }
+            var folder = FindSeedFolder("Samples");
+            if (folder is null) return null;
 
-               foreach (var shape in new[] { "Edam.Studio/Edam.App.Data", "Edam.App.Data" })
-               {
-                  var candidate = System.IO.Path.Combine(
-                     root!, shape.Replace('/', System.IO.Path.DirectorySeparatorChar),
-                     "Samples", fileName);
-                  if (System.IO.File.Exists(candidate))
-                  {
-                     return candidate;
-                  }
-               }
-            }
-            catch (Exception)
-            {
-               // a missing seed is not fatal: the project is simply seeded without its input
-            }
-
-            return null;
+            var candidate = System.IO.Path.Combine(folder, fileName);
+            return System.IO.File.Exists(candidate) ? candidate : null;
          }
 
          public async Task<bool> IsContainerEmptyAsync(CancellationToken ct)
@@ -439,6 +419,15 @@ namespace Edam.WinUI.Controls.DataModels
                AppSettings.GetString("Edam:Catalog:Target") ?? "postgres");
             values["ConnectionStrings:catalog"] = connection;
 
+            // the CONTAINER the projects live in (ADR-0009/0011): the composition root reads exactly this
+            // key as the collection id, so it is handed over explicitly — a key that configuration states
+            // and the composition root never sees is a setting that does nothing.
+            var defaultCollection = AppSettings.GetString(ProjectSettings.DEFAULT_COLLECTION_KEY);
+            if (!string.IsNullOrWhiteSpace(defaultCollection))
+            {
+               values[ProjectSettings.DEFAULT_COLLECTION_KEY] = defaultCollection!;
+            }
+
             // a file-system-backed catalog states its root the same way (the reader expects these keys in
             // the bootstrap it is handed, not only in appsettings.json)
             var catalogRoot = AppSettings.GetString("Edam:Catalog:FileSystemRoot");
@@ -457,6 +446,10 @@ namespace Edam.WinUI.Controls.DataModels
          }
 
          var bootstrap = new ConfigurationBuilder().AddInMemoryCollection(values).Build();
+
+         // kept: the storage description and the container-scoped content policy both read the SAME
+         // configuration the composition root was given — one policy, one source (LM-2b-ii)
+         m_StorageConfiguration = bootstrap;
          var settings = ProjectSettings.Read(bootstrap);
 
          // the Studio's own host policy: with nothing configured (and no EDAM_ROOT), its app-data
@@ -477,11 +470,311 @@ namespace Edam.WinUI.Controls.DataModels
             values[ProjectSettings.ROOT_KEY] = settings.Root!;
          }
 
+         // WHERE projects are stored, stated once from the ONE place that resolves it (and kept for the
+         // storage-description surface): a storage the application never names is a storage the user has
+         // to guess at.
+         LogStorageSummary(values);
+
          var services = new ServiceCollection();
          services.AddProjectServices(values);
 
          var physical = !string.Equals(settings.Target, "catalog", StringComparison.OrdinalIgnoreCase);
          return (services.BuildServiceProvider(), physical);
+      }
+
+      // ---------------------------------------------------------------------
+      // where the projects are stored (stated, never guessed)
+      // ---------------------------------------------------------------------
+
+      private const string StorageCategory = "Edam.Studio";
+
+      private static string m_StorageTarget = "(not resolved)";
+      private static string m_StorageKind = "(not resolved)";
+      private static string m_StorageCollection = "(not resolved)";
+      private static string m_StorageLocation = "(not resolved)";
+
+      /// <summary>
+      /// <b>Where the projects are stored</b> — one line, reported to the diagnostics panel the moment the
+      /// composition root is built (so it is on the record before anything is read or written) and available
+      /// to the UI as the storage description, so a person never has to infer it from behaviour. The
+      /// location is <b>redacted</b>: a password never reaches a log or a screen.
+      /// </summary>
+      public static string StorageSummary =>
+         "target=" + m_StorageTarget + " storage=" + m_StorageKind +
+         " collection=" + m_StorageCollection + " location=" + m_StorageLocation;
+
+      /// <summary>
+      /// True when projects are stored in a Database (the catalog), false when they are files in a folder.
+      /// </summary>
+      public static bool UsesDatabase =>
+         string.Equals(m_StorageTarget, "catalog", StringComparison.OrdinalIgnoreCase);
+
+      /// <summary>The storage kind as the person should read it (MS-SQL, PostgreSQL, file system, service).</summary>
+      public static string StorageKind =>
+         string.Equals(m_StorageKind, "mssql", StringComparison.OrdinalIgnoreCase) ? "MS-SQL" :
+         string.Equals(m_StorageKind, "postgres", StringComparison.OrdinalIgnoreCase) ? "PostgreSQL" :
+         string.Equals(m_StorageKind, "service", StringComparison.OrdinalIgnoreCase) ? "a catalog service" :
+         "the file system";
+
+      private static void LogStorageSummary(IReadOnlyDictionary<string, string> values)
+      {
+         values.TryGetValue(ProjectSettings.TARGET_KEY, out var target);
+         target = string.IsNullOrWhiteSpace(target) ? "filesystem" : target!;
+
+         var catalog = string.Equals(target, "catalog", StringComparison.OrdinalIgnoreCase);
+
+         values.TryGetValue(ProjectSettings.DEFAULT_COLLECTION_KEY, out var collection);
+         values.TryGetValue("Edam:Catalog:Target", out var kind);
+         values.TryGetValue("ConnectionStrings:catalog", out var dsn);
+         values.TryGetValue("Edam:Catalog:FileSystemRoot", out var catalogRoot);
+         values.TryGetValue(ProjectSettings.ROOT_KEY, out var root);
+
+         m_StorageTarget = target!;
+         m_StorageKind = catalog ? (string.IsNullOrWhiteSpace(kind) ? "postgres" : kind!) : "filesystem";
+         m_StorageCollection = string.IsNullOrWhiteSpace(collection) ? "(default)" : collection!;
+         m_StorageLocation = Redact(catalog
+            ? (string.IsNullOrWhiteSpace(dsn) ? catalogRoot : dsn)
+            : root);
+
+         Edam.WinUI.Controls.Logging.AppDiagnostics.Write(
+            "Projects storage: " + StorageSummary, Microsoft.Extensions.Logging.LogLevel.Information,
+            StorageCategory);
+
+         // the trap this exists to prevent: a catalog configured for ONE engine while the connection string
+         // names ANOTHER — the project would fail obscurely (or land somewhere unexpected)
+         if (catalog && LooksLikeMsSql(dsn) &&
+             !string.Equals(m_StorageKind, "mssql", StringComparison.OrdinalIgnoreCase))
+         {
+            Edam.WinUI.Controls.Logging.AppDiagnostics.Write(
+               "Projects storage: the catalog is configured as '" + m_StorageKind + "' but the connection " +
+               "string looks like MS-SQL (Server=/Data Source=/Initial Catalog=/Integrated Security=). " +
+               "Set Edam:Catalog:Target=mssql, or the projects will not be reachable.",
+               Microsoft.Extensions.Logging.LogLevel.Warning, StorageCategory);
+         }
+         else if (catalog && LooksLikePostgres(dsn) &&
+             !string.Equals(m_StorageKind, "postgres", StringComparison.OrdinalIgnoreCase))
+         {
+            Edam.WinUI.Controls.Logging.AppDiagnostics.Write(
+               "Projects storage: the catalog is configured as '" + m_StorageKind + "' but the connection " +
+               "string looks like PostgreSQL (Host=/Username=/Port=). Set Edam:Catalog:Target=postgres, " +
+               "or the projects will not be reachable.",
+               Microsoft.Extensions.Logging.LogLevel.Warning, StorageCategory);
+         }
+      }
+
+      /// <summary>
+      /// The <b>one</b> definition of redaction: a credential in a location string is replaced before the
+      /// value is logged or shown. (Never redact in the UI — there would be more than one rule.)
+      /// </summary>
+      private static string Redact(string? value)
+      {
+         if (string.IsNullOrWhiteSpace(value)) return "(none)";
+
+         var text = value!;
+         foreach (var key in new[] { "Password", "Pwd" })
+         {
+            text = System.Text.RegularExpressions.Regex.Replace(
+               text, "(?i)(" + key + "\\s*=\\s*)[^;]*", "$1***");
+         }
+         return text;
+      }
+
+      private static bool LooksLikeMsSql(string? dsn) =>
+         !string.IsNullOrWhiteSpace(dsn) &&
+         (dsn!.Contains("Server=", StringComparison.OrdinalIgnoreCase) ||
+          dsn.Contains("Data Source=", StringComparison.OrdinalIgnoreCase) ||
+          dsn.Contains("Initial Catalog=", StringComparison.OrdinalIgnoreCase) ||
+          dsn.Contains("Integrated Security=", StringComparison.OrdinalIgnoreCase));
+
+      private static bool LooksLikePostgres(string? dsn) =>
+         !string.IsNullOrWhiteSpace(dsn) &&
+         (dsn!.Contains("Host=", StringComparison.OrdinalIgnoreCase) ||
+          dsn.Contains("Username=", StringComparison.OrdinalIgnoreCase) ||
+          dsn.Contains("Port=", StringComparison.OrdinalIgnoreCase));
+
+      private static bool m_ContainerEnsured;
+      private static string? m_LastContainerFailure;
+
+      /// <summary>
+      /// Make sure the configured <b>collection</b> (container) exists before it is browsed: a catalog has
+      /// to hold a location before it can hold projects, and enlistment is <b>idempotent</b> (an existing
+      /// container is returned, never rewritten — a seed can never change a binding, ADR-0011).
+      /// <para>
+      /// Host policy, reported: a file-system collection is a folder and needs nothing; a missing
+      /// configuration or an unreachable database is <b>reported</b>, never thrown, so browsing still shows
+      /// what the catalog really has.
+      /// </para>
+      /// </summary>
+      public static async Task EnsureDefaultContainerAsync(CancellationToken ct = default)
+      {
+         if (m_ContainerEnsured) return;
+
+         var connection = AppSettings.GetConnectionString("catalog");
+         if (string.IsNullOrWhiteSpace(connection))
+         {
+            m_ContainerEnsured = true;   // a file-system collection is a folder: nothing to enlist
+            return;
+         }
+
+         var id = AppSettings.GetString(ProjectSettings.DEFAULT_COLLECTION_KEY);
+         if (string.IsNullOrWhiteSpace(id))
+         {
+            m_ContainerEnsured = true;
+            Edam.WinUI.Controls.Logging.AppDiagnostics.Write(
+               "Projects storage: no default collection is configured (" +
+               ProjectSettings.DEFAULT_COLLECTION_KEY + ") — the catalog's own containers are shown as " +
+               "they are.",
+               Microsoft.Extensions.Logging.LogLevel.Information, StorageCategory);
+            return;
+         }
+
+         try
+         {
+            var store = Services.GetService<Edam.Data.Catalog.Contracts.ICatalogStore>();
+            if (store is null)
+            {
+               ReportOnce(
+                  "the catalog storage could not be resolved (" + StorageSummary + ") — browsing shows " +
+                  "nothing until that is fixed");
+               return;
+            }
+
+            var kind = Edam.Data.Catalog.DependencyInjection.CatalogServices.ParseTarget(
+               AppSettings.GetString("Edam:Catalog:Target"));
+
+            var container = store.EnlistContainer(id, "EDAM Studio projects", null, kind);
+            m_ContainerEnsured = true;
+            m_LastContainerFailure = null;
+
+            Edam.WinUI.Controls.Logging.AppDiagnostics.Write(
+               "Projects storage: collection '" + container.ContainerId + "' is present (" + kind +
+               ") — projects live at /Projects/<name> inside it.",
+               Microsoft.Extensions.Logging.LogLevel.Information, StorageCategory);
+
+            // a catalog container starts EMPTY: the shared locations the starter recipe reads (the
+            // arguments template, the text map, the sample input) are seeded from the app-data seed —
+            // the same "read a folder, write a location" step the conformance suite uses (LM-5) — and
+            // only when a location is missing, so a curated template is never overwritten by the default
+            await SeedSharedLocationsAsync(store, container.Id, id, ct).ConfigureAwait(false);
+         }
+         catch (Exception ex)
+         {
+            // reported once per distinct reason: the database may come back, so a retry stays allowed
+            ReportOnce("the collection '" + id + "' could not be ensured: " + ex.Message);
+
+            // a folder that can also be a collection root is not a failure: the file system needs no
+            // enlistment, and reporting it as a fault would train people to ignore the panel
+         }
+      }
+
+      private static void ReportOnce(string reason)
+      {
+         if (String.Equals(m_LastContainerFailure, reason, StringComparison.Ordinal)) return;
+         m_LastContainerFailure = reason;
+
+         Edam.WinUI.Controls.Logging.AppDiagnostics.Write(
+            "Projects storage: " + reason + ".",
+            Microsoft.Extensions.Logging.LogLevel.Warning, StorageCategory);
+      }
+
+      private static IConfiguration? m_StorageConfiguration;
+
+      /// <summary>
+      /// The app-data <b>seed</b> folder for a shared location family (<c>Templates</c>, <c>TextMaps</c>,
+      /// <c>Samples</c>) — the ONE definition of where the packaged seed lives. Its shape differs between a
+      /// packaged run and a development one, so both are tried rather than one being assumed. A missing seed
+      /// is never fatal: the caller decides what to report.
+      /// </summary>
+      private static string? FindSeedFolder(string family)
+      {
+         try
+         {
+            var root = AppData.GetApplicationDataLocation();
+            if (string.IsNullOrWhiteSpace(root)) return null;
+
+            foreach (var shape in new[] { "Edam.Studio/Edam.App.Data", "Edam.App.Data" })
+            {
+               var candidate = System.IO.Path.Combine(
+                  root!, shape.Replace('/', System.IO.Path.DirectorySeparatorChar), family);
+               if (System.IO.Directory.Exists(candidate)) return candidate;
+            }
+         }
+         catch (Exception)
+         {
+            // a missing seed is not fatal: the caller reports what it could not find
+         }
+
+         return null;
+      }
+
+      /// <summary>
+      /// Seed the collection's <b>shared locations</b> from the app-data seed (LM-5): the starter recipe
+      /// reads <c>Templates/&lt;arguments&gt;</c>, <c>TextMaps/…</c> and <c>Samples/…</c>, and a catalog
+      /// container starts empty — without this, the first project would be created with its folder
+      /// structure and <b>no recipe at all</b> (exactly what DP-4 set out to prevent). Each location is
+      /// seeded only when its probe file is <b>missing</b>, and every outcome is reported.
+      /// </summary>
+      private static async Task SeedSharedLocationsAsync(
+         Edam.Data.Catalog.Contracts.ICatalogStore store, Guid containerId, string collectionId,
+         CancellationToken ct)
+      {
+         // the file the starter arguments are written from, plus the two the shipped recipe references
+         var locations = new (string Family, string Probe)[]
+         {
+            ("Templates", System.IO.Path.GetFileName(
+               Edam.Data.Projects.DependencyInjection.ConfigurableItems.DEFAULT_TEMPLATE)),
+            ("TextMaps", "XsdTextMap.json"),
+            ("Samples", "schema.local.v1r0.xsd"),
+         };
+
+         // ONE content policy (LM-2b-ii): a named container gets its scoped store; the sentinel `default`
+         // means the legacy/unscoped namespace, which is the store the composition root injects
+         Edam.Data.Catalog.Contracts.IContentStore? content = null;
+         if (m_StorageConfiguration is not null)
+         {
+            content = Edam.Data.Catalog.DependencyInjection.CatalogScopedContent
+               .Factory(m_StorageConfiguration)(collectionId);
+         }
+         content ??= Services.GetService<Edam.Data.Catalog.Contracts.IContentStore>();
+
+         if (content is null)
+         {
+            ReportOnce("the catalog content store could not be resolved, so the collection's shared " +
+                       "locations could not be seeded");
+            return;
+         }
+
+         foreach (var (family, probe) in locations)
+         {
+            try
+            {
+               if (await content.ExistsAsync("/" + family + "/" + probe, ct).ConfigureAwait(false))
+               {
+                  continue;   // present already: a curated location is never overwritten by the seed
+               }
+
+               var source = FindSeedFolder(family);
+               if (source is null)
+               {
+                  ReportOnce("the app-data seed has no '" + family + "' folder, so collection '" +
+                             collectionId + "' will lack it (the starter project may have no recipe)");
+                  continue;
+               }
+
+               var seeded = await CatalogFolderSeeder
+                  .SeedAsync(containerId, store, content, source, "/" + family, ct)
+                  .ConfigureAwait(false);
+
+               Edam.WinUI.Controls.Logging.AppDiagnostics.Write(
+                  "Projects storage: seeded " + seeded + " file(s) into '/" + family +
+                  "' of collection '" + collectionId + "' from the app-data seed.",
+                  Microsoft.Extensions.Logging.LogLevel.Information, StorageCategory);
+            }
+            catch (Exception ex)
+            {
+               ReportOnce("seeding '/" + family + "' failed: " + ex.Message);
+            }
+         }
       }
 
       // ---------------------------------------------------------------------
@@ -491,7 +784,12 @@ namespace Edam.WinUI.Controls.DataModels
       /// <summary>The registered collections (the default one is required and always present).</summary>
       public static async Task<IReadOnlyList<ProjectCollectionInfo>> GetCollectionsAsync(
          CancellationToken ct = default)
-         => await Catalog.GetCollectionsAsync(ct).ConfigureAwait(false);
+      {
+         // every path that browses projects comes through here (discovery, then the tree, then creation),
+         // so this is the one place the collection has to exist before it is used
+         await EnsureDefaultContainerAsync(ct).ConfigureAwait(false);
+         return await Catalog.GetCollectionsAsync(ct).ConfigureAwait(false);
+      }
 
       /// <summary>
       /// The projects tree of a collection, in the shape the Studio's items-tree expects

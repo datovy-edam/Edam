@@ -47,7 +47,7 @@ Authorized · Enterprise quality · Verified (build 0 errors, tests green) · Tr
 | Live state + handoff | `docs/HANDOFF.md` |
 | Full standards & enterprise guidance | `docs/EDAM-Engineering-Standards-and-Enterprise-Guidance.md` |
 | v2.0 vision / reusable components | `docs/EDAM-v2.0-Introduction.md` |
-| Adopted decisions | `docs/adr/` (0001, 0002, 0003) |
+| Adopted decisions | `docs/adr/` → the ADR series (0001 … 0014; read each ADR's own Status) |
 | Authorized work + traceability | `docs/backlog/` → `README.md` index |
 | Area 1 workflow spec | `docs/area1-schema-mapping-workflow.md` |
 | Anti-drift gate/checklist | `docs/doc-health-checklist.md` |
