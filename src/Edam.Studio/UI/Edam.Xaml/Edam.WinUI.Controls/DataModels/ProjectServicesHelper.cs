@@ -406,7 +406,8 @@ namespace Edam.WinUI.Controls.DataModels
                      m_BuildFailure = ex;
 
                      Edam.WinUI.Controls.Logging.AppDiagnostics.Write(
-                        "Projects storage: the project composition root could not be built — " + ex.Message,
+                        "Projects storage: the project composition root could not be built — " +
+                        ExplainFailure(ex),
                         Microsoft.Extensions.Logging.LogLevel.Error, StorageCategory);
 
                      throw;
@@ -690,7 +691,7 @@ namespace Edam.WinUI.Controls.DataModels
          catch (Exception ex)
          {
             // reported once per distinct reason: the database may come back, so a retry stays allowed
-            ReportOnce("the collection '" + id + "' could not be ensured: " + ex.Message);
+            ReportOnce("the collection '" + id + "' could not be ensured: " + ExplainFailure(ex));
 
             // a folder that can also be a collection root is not a failure: the file system needs no
             // enlistment, and reporting it as a fault would train people to ignore the panel
@@ -708,6 +709,33 @@ namespace Edam.WinUI.Controls.DataModels
       }
 
       private static IConfiguration? m_StorageConfiguration;
+
+      /// <summary>
+      /// Explain a failure in terms a person can act on. A <b>missing Edam.* assembly</b> is a
+      /// <b>deployment</b> fault — the configuration is fine and the code is present, but the layout does not
+      /// carry a provider the composition root resolves <b>by type</b> — so say that, and say what to do,
+      /// instead of leaving a raw loader error that reads like a code defect. (It cost a round trip: a
+      /// deployed build with a green compile died with *"Could not load file or assembly
+      /// 'Edam.Data.Catalog.MsSql'"*.)
+      /// </summary>
+      public static string ExplainFailure(Exception ex)
+      {
+         var missing = (ex as FileNotFoundException)?.FileName
+                    ?? (ex as FileLoadException)?.FileName
+                    ?? (ex?.InnerException as FileNotFoundException)?.FileName
+                    ?? (ex?.InnerException as FileLoadException)?.FileName;
+
+         if (!string.IsNullOrWhiteSpace(missing) &&
+             missing!.StartsWith("Edam.", StringComparison.OrdinalIgnoreCase))
+         {
+            return ex!.Message +
+               " — the deployed application does not carry '" + missing + "'. This is a DEPLOYMENT fault, not " +
+               "a configuration one: clean, rebuild and deploy again (an incremental copy can leave a " +
+               "provider assembly out of the layout).";
+         }
+
+         return ex?.Message ?? "(no detail)";
+      }
 
       /// <summary>
       /// The app-data <b>seed</b> folder for a shared location family (<c>Templates</c>, <c>TextMaps</c>,

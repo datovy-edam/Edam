@@ -113,6 +113,19 @@
          DI composition root). In-repo projects, not published packages. -->
     <ProjectReference Include="..\..\..\..\Edam.Data.Projects\Edam.Data.Projects.Contracts\Edam.Data.Projects.Contracts.csproj" />
     <ProjectReference Include="..\..\..\..\Edam.Data.Projects\Edam.Data.Projects.DependencyInjection\Edam.Data.Projects.DependencyInjection.csproj" />
+    <!-- LM-9 / ADR-0014 — EXPLICIT, not transitive. This project NAMES catalog types (the storage description
+         and the container-scoped content policy in ProjectServicesHelper), and the composition root resolves a
+         storage PROVIDER assembly at run time. The deployment lesson that made these references explicit: the
+         application was configured for the MS-SQL catalog and died with "Could not load file or assembly
+         'Edam.Data.Catalog.MsSql'" — a transitive-only edge can be absent from the deployed layout (or from a
+         stale deps.json), and NO compile error reveals it, because nothing here loads the provider by name.
+         Keep them: the deployed application must carry every storage provider it can be told to use. -->
+    <ProjectReference Include="..\..\..\..\Edam.Data.Catalog\Edam.Data.Catalog.Contracts\Edam.Data.Catalog.Contracts.csproj" />
+    <ProjectReference Include="..\..\..\..\Edam.Data.Catalog\Edam.Data.Catalog.DependencyInjection\Edam.Data.Catalog.DependencyInjection.csproj" />
+    <ProjectReference Include="..\..\..\..\Edam.Data.Catalog\Edam.Data.Catalog.FileSystem\Edam.Data.Catalog.FileSystem.csproj" />
+    <ProjectReference Include="..\..\..\..\Edam.Data.Catalog\Edam.Data.Catalog.Folder\Edam.Data.Catalog.Folder.csproj" />
+    <ProjectReference Include="..\..\..\..\Edam.Data.Catalog\Edam.Data.Catalog.PostgreSql\Edam.Data.Catalog.PostgreSql.csproj" />
+    <ProjectReference Include="..\..\..\..\Edam.Data.Catalog\Edam.Data.Catalog.MsSql\Edam.Data.Catalog.MsSql.csproj" />
   </ItemGroup>
 
   <ItemGroup>

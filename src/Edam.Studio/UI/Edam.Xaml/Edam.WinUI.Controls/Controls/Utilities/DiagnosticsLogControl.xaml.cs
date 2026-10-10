@@ -37,11 +37,46 @@ namespace Edam.WinUI.Controls.Utilities
       }
 
       /// <summary>
+      /// Put the <b>selected</b> messages on the clipboard — one line per message (timestamp + text). The
+      /// button is enabled only when something is selected and the panel states how many, so what lands on the
+      /// clipboard is never a guess: someone investigating an issue needs a few lines, not the whole log.
+      /// </summary>
+      private void CopySelectedButton_Click(object sender, RoutedEventArgs e)
+      {
+         CopyToClipboard(BuildText(m_ViewModel.SelectedItems));
+      }
+
+      /// <summary>
       /// Put the whole log on the clipboard — one line per entry (timestamp + message) — so it can be
       /// pasted into a report, an issue or a message for investigation. Individual entries are selectable
       /// in the list as well.
       /// </summary>
       private void CopyAllButton_Click(object sender, RoutedEventArgs e)
+      {
+         CopyToClipboard(BuildText(m_ViewModel.Items));
+      }
+
+      /// <summary>
+      /// Copy exactly the message that was right-clicked — without disturbing what is ticked (the context
+      /// menu is the one-click path for "this line", the ticks are the path for several).
+      /// </summary>
+      private void CopyEntry_Click(object sender, RoutedEventArgs e)
+      {
+         var element = sender as FrameworkElement;
+         var entry = element?.Tag as DiagnosticsEntry ?? element?.DataContext as DiagnosticsEntry;
+         if (entry == null)
+         {
+            return;
+         }
+
+         CopyToClipboard(BuildText(new[] { entry }));
+      }
+
+      /// <summary>
+      /// The clipboard text: the log <b>FILE</b> path first (the channel that cannot be lost to a clipboard or
+      /// a closed window), then one line per message — the ONE place a copied message is rendered.
+      /// </summary>
+      private static string BuildText(IEnumerable<DiagnosticsEntry> entries)
       {
          var text = new System.Text.StringBuilder();
 
@@ -49,17 +84,17 @@ namespace Edam.WinUI.Controls.Utilities
          text.AppendLine("--- Edam diagnostics (full log file: " +
             Edam.WinUI.Controls.Logging.AppDiagnostics.LogFilePath + ") ---");
 
-         foreach (var item in m_ViewModel.Items)
+         foreach (var entry in entries)
          {
-            if (item == null)
+            if (entry == null)
             {
                continue;
             }
 
-            text.AppendLine(item.LoggedDateTimeText + "  " + item.ErrorMessage);
+            text.AppendLine(entry.Line);
          }
 
-         CopyToClipboard(text.ToString());
+         return text.ToString();
       }
 
       /// <summary>Copy text to the clipboard; a failed copy is ignored (it must never disturb the view).</summary>

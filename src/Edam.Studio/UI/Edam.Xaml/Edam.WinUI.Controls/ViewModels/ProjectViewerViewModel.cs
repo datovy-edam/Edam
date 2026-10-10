@@ -317,7 +317,7 @@ namespace Edam.WinUI.Controls.ViewModels
          }
 
          Edam.WinUI.Controls.Logging.AppDiagnostics.Write(
-            "Projects: " + what + ": " + ex.Message,
+            "Projects: " + what + ": " + ProjectServicesHelper.ExplainFailure(ex),
             Microsoft.Extensions.Logging.LogLevel.Error, "Edam.Studio");
       }
 

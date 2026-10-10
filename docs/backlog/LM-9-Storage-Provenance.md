@@ -11,6 +11,28 @@
   ADR-0014 turns that into a rule: *the storage kind is stated, the binding is a deployment fact, and the app
   says where the data is.*
 
+## The second runtime run (2026-10-10) — the provider was not deployed
+
+`Could not load file or assembly 'Edam.Data.Catalog.MsSql, Version=1.0.0.0' … The system cannot find the file
+specified.` The configuration was right; the **provider assembly was not in the deployment**.
+
+**Root cause:** the platform projects the app builds (`Edam.Data.Projects.*`, `Edam.Data.Catalog.*`) were
+**ProjectReferences but not members of `Edam.Studio.sln`** — so the solution's build/restore/packaging graph
+never owned them. The compile stayed green (types come from the referenced assembly) and nothing revealed the
+missing deployment artifact; the failure appears only when the composition root resolves the provider **by
+type** at run time. The projects platform had arrived (its assemblies were copied); the **MS-SQL provider** —
+added to the graph by LM-8 and first exercised from the Studio by LM-9 — had not.
+
+**Fixed:** the 11 platform projects are now members of `Edam.Studio.sln`; `Edam.WinUI.Controls` carries the
+catalog references **explicitly** (not transitively); `Edam.System`/`Edam.Net` stay **out** (they are consumed
+as feed packages — as solution members they would be built *and packed* on every Studio build). A new
+ProjectReference also requires a **restore** (`NU1105` otherwise), so the recipe is
+**Clean → Restore → Rebuild → Deploy**. A missing `Edam.*` assembly is now reported as a **deployment** fault
+with the remedy (`ProjectServicesHelper.ExplainFailure`).
+
+**Verified:** `Edam.Studio.sln` (x64) restores and builds 0 errors; **8** `Edam.Data.Catalog*.dll` in the app
+output **and** in its `AppX` layout. **Pending:** the user's redeploy, then the container/`seeded` lines.
+
 ## The first runtime run (2026-10-08) — a defective assumption, found and closed
 
 The user deployed and ran it. The log is the whole story, and the **missing** line said as much as the

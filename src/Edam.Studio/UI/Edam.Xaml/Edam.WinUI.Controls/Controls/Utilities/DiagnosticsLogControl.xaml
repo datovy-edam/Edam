@@ -4,7 +4,7 @@
     xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
     xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
     xmlns:local="using:Edam.WinUI.Controls.Controls.Utilities"
-    xmlns:diag="using:Edam.Diagnostics"
+    xmlns:viewmodels="using:Edam.WinUI.Controls.ViewModels"
     xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
     xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
     mc:Ignorable="d" VerticalAlignment="Stretch" HorizontalAlignment="Stretch">
@@ -28,7 +28,14 @@
          <!-- copy the whole log: an entry is selectable too, but this is the quick way to hand the log
               to someone else for investigation -->
          <AppBarButton Icon="Copy" LabelPosition="Collapsed" Width="34"
-                       Click="CopyAllButton_Click" ToolTipService.ToolTip="Copy all entries to the clipboard"/>
+                       Click="CopySelectedButton_Click"
+                       IsEnabled="{x:Bind m_ViewModel.HasSelection, Mode=OneWay}"
+                       ToolTipService.ToolTip="Copy the SELECTED messages to the clipboard"/>
+         <AppBarButton Icon="SelectAll" LabelPosition="Collapsed" Width="34"
+                       Click="CopyAllButton_Click" ToolTipService.ToolTip="Copy every message to the clipboard"/>
+         <!-- what a copy will take: the panel states it, so the clipboard's contents are never a guess -->
+         <TextBlock VerticalAlignment="Center" Margin="6,0,0,0" FontSize="11" Foreground="Gray"
+                    Text="{x:Bind m_ViewModel.CopySelectionText, Mode=OneWay}"/>
       </StackPanel>
       
       <!-- SelectionMode=None so a click/drag goes to the entry's text (selecting to copy) rather than
@@ -43,8 +50,13 @@
              Grid.Row="1" Grid.Column="0"
              >
          <ListView.ItemTemplate>
-            <DataTemplate x:DataType="diag:IMessageLogEntry">
+            <DataTemplate x:DataType="viewmodels:DiagnosticsEntry">
                <StackPanel Padding="2,4,2,4">
+                  <!-- tick ONE message to copy it on its own, tick SEVERAL to copy exactly those; the header
+                       says how many are selected (and where nothing is ticked, Copy takes the whole log) -->
+                  <CheckBox MinWidth="0" Padding="0,0,4,0" VerticalAlignment="Top"
+                            IsChecked="{x:Bind IsSelected, Mode=TwoWay}"
+                            ToolTipService.ToolTip="Tick to copy this message on its own"/>
                   <!-- read-only TextBoxes, not TextBlocks: text must be SELECTABLE and COPYABLE -->
                   <TextBox Text="{x:Bind LoggedDateTimeText}" IsReadOnly="True"
                            BorderThickness="0" Background="Transparent" Padding="0"
@@ -52,6 +64,13 @@
                   <TextBox Text="{x:Bind ErrorMessage}" IsReadOnly="True"
                            TextWrapping="Wrap" BorderThickness="0" Background="Transparent"
                            Padding="0" FontSize="12" IsSpellCheckEnabled="False"/>
+                  <!-- right-click a message: copy exactly it, without touching the ticks -->
+                  <StackPanel.ContextFlyout>
+                     <MenuFlyout>
+                        <MenuFlyoutItem Text="Copy this message" Tag="{Binding}" Click="CopyEntry_Click"/>
+                        <MenuFlyoutItem Text="Copy selected messages" Click="CopySelectedButton_Click"/>
+                     </MenuFlyout>
+                  </StackPanel.ContextFlyout>
                </StackPanel>
             </DataTemplate>
          </ListView.ItemTemplate>
