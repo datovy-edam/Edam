@@ -1460,13 +1460,220 @@ namespace Edam.WinUI.Controls.DataModels
          return folder;
       }
 
-      /// <summary>Disk path for the file-system target; the project-relative catalog path otherwise.</summary>
+      /// <summary>
+      /// Disk path for the file-system target; the <b>project address</b> otherwise
+      /// (<c>/Projects/&lt;name&gt;/&lt;resource…&gt;</c>).
+      /// <para>
+      /// The catalog form deliberately keeps the <b>project</b> in the path: a bare project-relative path
+      /// (<c>/Arguments/x.Args.json</c>) does not say which project it belongs to — and Windows then reads it
+      /// as a drive path (<c>C:\Arguments\x.Args.json</c>), which is how selecting a catalog file threw
+      /// <c>DirectoryNotFoundException</c> at a click.
+      /// </para>
+      /// </summary>
       private static string NodePath(string projectRoot, string relativePath)
       {
-         if (!m_PhysicalPaths) return relativePath;
+         if (!m_PhysicalPaths)
+         {
+            return projectRoot.TrimEnd('/') + "/" + relativePath.TrimStart('/');
+         }
 
          return Path.Combine(projectRoot,
             relativePath.TrimStart('/').Replace('/', Path.DirectorySeparatorChar));
+      }
+
+      /// <summary>
+      /// Split a project address of the shape <c>/Projects/&lt;name&gt;/&lt;resource…&gt;</c> into the project's name and
+      /// the project-relative resource path — the inverse of <see cref="NodePath"/> for the catalog target, and
+      /// the mapping a consumer holding a path (the Studio's tree) needs in order to read through the seam.
+      /// </summary>
+      private static bool TrySplitProjectPath(
+         string? path, out string projectName, out ProjectPath resource)
+      {
+         projectName = String.Empty;
+         resource = ProjectPath.Root;
+
+         if (String.IsNullOrWhiteSpace(path)) return false;
+
+         var segments = path!.Trim('/').Split('/', StringSplitOptions.RemoveEmptyEntries);
+         if (segments.Length < 2) return false;
+         if (!String.Equals(segments[0], ProjectCollectionFolders.Projects,
+                StringComparison.OrdinalIgnoreCase))
+         {
+            return false;
+         }
+
+         projectName = segments[1];
+         resource = segments.Length == 2
+            ? ProjectPath.Root
+            : ProjectPath.Parse("/" + String.Join('/', segments[2..]));
+         return true;
+      }
+
+      /// <summary>
+      /// <b>Read a project resource's text through the platform.</b> A catalog target has no disk path: the
+      /// resource is addressed (<c>/Projects/&lt;name&gt;/&lt;resource…&gt;</c>) and read with
+      /// <see cref="IProjectResources"/>, so the Studio edits what the catalog holds. The file-system target
+      /// keeps reading the file it always read. Returns null — never throws — when the resource is not there,
+      /// so a click can never bring the application down.
+      /// </summary>
+      public static async Task<string?> ReadProjectTextAsync(
+         string? path, string? collectionId = null, CancellationToken ct = default)
+      {
+         if (String.IsNullOrWhiteSpace(path)) return null;
+
+         try
+         {
+            if (m_PhysicalPaths)
+            {
+               return File.Exists(path!) ? await File.ReadAllTextAsync(path!, ct).ConfigureAwait(true) : null;
+            }
+
+            if (!TrySplitProjectPath(path, out var projectName, out var resource))
+            {
+               ReportOnce("'" + path + "' is not a project address, so its content could not be read");
+               return null;
+            }
+
+            var collection = await ResolveCollectionAsync(collectionId ?? ConfiguredContainerId, ct)
+               .ConfigureAwait(true);
+            if (collection is null) return null;
+
+            var project = await Catalog.GetProjectAsync(collection.CollectionId, projectName, ct)
+               .ConfigureAwait(true);
+            if (project is null)
+            {
+               ReportOnce("the project '" + projectName + "' was not found in container '" +
+                          collection.CollectionId + "', so '" + path + "' could not be read");
+               return null;
+            }
+
+            using var stream = await Resources.OpenReadAsync(project, resource, ct).ConfigureAwait(true);
+            if (stream is null)
+            {
+               ReportOnce("'" + path + "' has no content in the catalog yet");
+               return null;
+            }
+
+            using var reader = new StreamReader(stream);
+            return await reader.ReadToEndAsync(ct).ConfigureAwait(true);
+         }
+         catch (Exception ex)
+         {
+            ReportOnce("reading '" + path + "' failed: " + ExplainFailure(ex));
+            return null;
+         }
+      }
+
+      /// <summary>
+      /// <b>Delete one project resource</b> (a file inside a project, not the project itself) through the
+      /// platform: the file-system target deletes the file it always deleted, a catalog target deletes the
+      /// catalog item and its content. Both are reported; neither throws at a click. (This retires the
+      /// long-recorded defect that a catalog resource node was deleted with <c>System.IO.File.Delete</c>.)
+      /// </summary>
+      public static async Task<Boolean> DeleteResourceAsync(
+         string? path, string? collectionId = null, CancellationToken ct = default)
+      {
+         if (String.IsNullOrWhiteSpace(path)) return false;
+
+         try
+         {
+            if (m_PhysicalPaths)
+            {
+               if (!File.Exists(path!)) return false;
+
+               File.Delete(path!);
+               Edam.WinUI.Controls.Logging.AppDiagnostics.Write(
+                  "Project item deleted: '" + path + "'.",
+                  Microsoft.Extensions.Logging.LogLevel.Information, StorageCategory);
+               return true;
+            }
+
+            if (!TrySplitProjectPath(path, out var projectName, out var resource)) return false;
+
+            var collection = await ResolveCollectionAsync(collectionId ?? ConfiguredContainerId, ct)
+               .ConfigureAwait(true);
+            if (collection is null) return false;
+
+            var project = await Catalog.GetProjectAsync(collection.CollectionId, projectName, ct)
+               .ConfigureAwait(true);
+            if (project is null) return false;
+
+            var deleted = await Resources.DeleteAsync(project, resource, ct).ConfigureAwait(true);
+
+            Edam.WinUI.Controls.Logging.AppDiagnostics.Write(
+               deleted
+                  ? "Project item deleted: '" + path + "'."
+                  : "Project item NOT deleted: '" + path + "' (nothing to remove).",
+               deleted
+                  ? Microsoft.Extensions.Logging.LogLevel.Information
+                  : Microsoft.Extensions.Logging.LogLevel.Warning,
+               StorageCategory);
+
+            return deleted;
+         }
+         catch (Exception ex)
+         {
+            ReportOnce("deleting '" + path + "' failed: " + ExplainFailure(ex));
+            return false;
+         }
+      }
+      /// <summary>
+      /// <b>Write a project resource's text through the platform</b> — the counterpart of
+      /// <see cref="ReadProjectTextAsync"/>, and the reason editing must not go through the file system: a
+      /// catalog target's item is an address, so a file write would land in a stray
+      /// <c>C:\Projects\…</c> path (or throw). Returns false when it could not be written; never throws.
+      /// </summary>
+      public static async Task<Boolean> WriteProjectTextAsync(
+         string? path, string? text, string? collectionId = null, CancellationToken ct = default)
+      {
+         if (String.IsNullOrWhiteSpace(path)) return false;
+
+         try
+         {
+            if (m_PhysicalPaths)
+            {
+               var folder = Path.GetDirectoryName(path!);
+               if (!String.IsNullOrWhiteSpace(folder)) Directory.CreateDirectory(folder!);
+
+               await File.WriteAllTextAsync(path!, text ?? String.Empty, ct).ConfigureAwait(true);
+               return true;
+            }
+
+            if (!TrySplitProjectPath(path, out var projectName, out var resource))
+            {
+               ReportOnce("'" + path + "' is not a project address, so it could not be written");
+               return false;
+            }
+
+            var collection = await ResolveCollectionAsync(collectionId ?? ConfiguredContainerId, ct)
+               .ConfigureAwait(true);
+            if (collection is null) return false;
+
+            var project = await Catalog.GetProjectAsync(collection.CollectionId, projectName, ct)
+               .ConfigureAwait(true);
+            if (project is null)
+            {
+               ReportOnce("the project '" + projectName + "' was not found in container '" +
+                          collection.CollectionId + "', so '" + path + "' could not be written");
+               return false;
+            }
+
+            var bytes = System.Text.Encoding.UTF8.GetBytes(text ?? String.Empty);
+            using var content = new MemoryStream(bytes);
+
+            await Resources.WriteAsync(project, resource, content, ct).ConfigureAwait(true);
+
+            Edam.WinUI.Controls.Logging.AppDiagnostics.Write(
+               "Project item saved: '" + path + "'.",
+               Microsoft.Extensions.Logging.LogLevel.Information, StorageCategory);
+
+            return true;
+         }
+         catch (Exception ex)
+         {
+            ReportOnce("writing '" + path + "' failed: " + ExplainFailure(ex));
+            return false;
+         }
       }
    }
 }

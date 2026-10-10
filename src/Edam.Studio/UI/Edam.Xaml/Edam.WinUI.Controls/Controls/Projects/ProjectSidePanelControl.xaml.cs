@@ -122,11 +122,11 @@ namespace Edam.WinUI.Controls.Projects
       /// The Arguments are selected... notify others.
       /// </summary>
       /// <param name="selectedItem">selected item</param>
-      private void ItemSelected(object selectedItem = null)
+      private async void ItemSelected(object selectedItem = null)
       {
          object sitem = selectedItem == null ?
             TreeView.SelectedItem : selectedItem;
-         var results = m_ViewModel.TreeItemSelected(sitem);
+         var results = await m_ViewModel.TreeItemSelected(sitem);
 
          if (results.Success)
          {

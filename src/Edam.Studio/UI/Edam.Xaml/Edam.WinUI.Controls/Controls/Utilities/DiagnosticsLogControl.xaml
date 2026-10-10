@@ -93,7 +93,7 @@
                                ToolTipService.ToolTip="Tick to copy this message on its own"/>
                      <TextBox Grid.Column="1" Text="{x:Bind LoggedDateTimeText}" IsReadOnly="True"
                               BorderThickness="0" Background="Transparent" Padding="0"
-                              MinHeight="0" FontSize="10" Foreground="Gray"
+                              MinHeight="0" FontSize="12" Foreground="Gray"
                               VerticalAlignment="Center" VerticalContentAlignment="Center"/>
                   </Grid>
                   <TextBox Text="{x:Bind ErrorMessage}" IsReadOnly="True"

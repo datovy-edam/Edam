@@ -82,6 +82,9 @@ namespace Edam.WinUI.Controls.ViewModels
       /// <summary>True when a container is selected, so "remove container" has something to act on.</summary>
       public Boolean HasContainerSelected => m_SelectedUriItem is not null;
 
+      /// <summary>The container the platform flags as this installation's default (named by the person).</summary>
+      private string? m_DefaultContainerId;
+
       private string m_SelectedItemName;
       public string SelectedItemName
       {
@@ -283,11 +286,21 @@ namespace Edam.WinUI.Controls.ViewModels
             // file-system root, or the catalog when a catalog connection is configured — instead of
             // AppSettings' UriList.
             var l = new ObservableCollection<UriItemInfo>();
+            string? defaultId = null;
+
             foreach (var collection in await ProjectServicesHelper.GetCollectionsAsync())
             {
+               // the container the person named (the platform flags it as the collection's default) is
+               // labelled here: the list is otherwise whatever order the catalog returns, and a leftover
+               // test container can easily come first
+               if (collection.IsDefault)
+               {
+                  defaultId = collection.CollectionId;
+               }
+
                l.Add(new UriItemInfo
                {
-                  Name = collection.Name,
+                  Name = collection.IsDefault ? collection.Name + " (default)" : collection.Name,
                   Type = UriType.ConsolePath,
 
                   // IDENTITY, not address: a catalog container's URI is EMPTY by design, so using it as the
@@ -297,15 +310,26 @@ namespace Edam.WinUI.Controls.ViewModels
                });
             }
 
+            m_DefaultContainerId = defaultId;
             UriItems = l;
             ClearStorageProblem();
 
             if (UriItems.Count > 0)
             {
+               // the default container comes FIRST and is pre-selected, so the application opens where the
+               // person is meant to work rather than on whatever the catalog happened to return first
+               UriItems = new ObservableCollection<UriItemInfo>(
+                  UriItems
+                     .OrderByDescending(i => String.Equals(i.UriText, m_DefaultContainerId,
+                        StringComparison.OrdinalIgnoreCase))
+                     .ThenBy(i => i.Name, StringComparer.OrdinalIgnoreCase));
+
                SelectedUriItem = (previous is null
                      ? null
                      : UriItems.FirstOrDefault(i => String.Equals(
                           i.UriText, previous, StringComparison.OrdinalIgnoreCase)))
+                  ?? UriItems.FirstOrDefault(i => String.Equals(i.UriText, m_DefaultContainerId,
+                        StringComparison.OrdinalIgnoreCase))
                   ?? UriItems.First();
             }
             else
@@ -611,7 +635,7 @@ namespace Edam.WinUI.Controls.ViewModels
       /// Tree Item haas been selected, setup editor...
       /// </summary>
       /// <param name="tree"></param>
-      public ResultsLog<ProjectItem> TreeItemSelected(object item)
+      public async System.Threading.Tasks.Task<ResultsLog<ProjectItem>> TreeItemSelected(object item)
       {
          ResultsLog<ProjectItem> results = new ResultsLog<ProjectItem>();
          if (item == null)
@@ -648,7 +672,19 @@ namespace Edam.WinUI.Controls.ViewModels
             SelectedItem = itm;
             SelectedItemName = itm.Item.NameFull;
             itm.SetEditorVisibility(false);
-            returnMessage = System.IO.File.ReadAllText(itm.Item.Full);
+            var text = await ProjectServicesHelper.ReadProjectTextAsync(
+                  itm.Item.Full,
+                  SelectedUriItem == null ? null : SelectedUriItem.UriText);
+
+               if (text is null)
+               {
+                  // not there (or not resolvable): a diagnostic, never a crash — reading a catalog address
+                  // with the file system is what threw DirectoryNotFoundException ('C:\Arguments\…') here
+                  results.Failed("the item could not be read: " + itm.Item.Full);
+                  return results;
+               }
+
+               returnMessage = text;
             results.ReturnText = returnMessage;
             results.Succeeded();
          }
@@ -748,6 +784,27 @@ namespace Edam.WinUI.Controls.ViewModels
          FetchProjectFolderInfo();
       }
 
+      /// <summary>
+      /// Delete <b>one item inside a project</b> through the platform and reload the tree. A catalog target's
+      /// item is an address (<c>/Projects/&lt;name&gt;/…</c>) that the file system cannot open — deleting one with
+      /// <c>System.IO.File.Delete</c> was the long-recorded defect in this method, and it throws on a catalog
+      /// path. Best effort: a failure is reported, never thrown at the UI.
+      /// </summary>
+      private async System.Threading.Tasks.Task DeleteResourceAndRefreshAsync(ProjectItem item)
+      {
+         try
+         {
+            await ProjectServicesHelper.DeleteResourceAsync(
+               item?.Item?.Full, SelectedUriItem?.UriText);
+         }
+         catch (Exception ex)
+         {
+            ReportStorageProblem("the item could not be deleted", ex, blocksListing: false);
+         }
+
+         FetchProjectFolderInfo();
+      }
+
       /// Process Result...
       /// </summary>
       /// <param name="result"></param>
@@ -772,6 +829,15 @@ namespace Edam.WinUI.Controls.ViewModels
                if (IsProjectNode(item))
                {
                   _ = DeleteProjectAndRefreshAsync(item.Item.NameFull);
+                  return;
+               }
+
+               // a resource INSIDE a project: through the platform when the projects are in the catalog (its
+               // node is an address, not a disk path), the file system otherwise. Never a raw File.Delete on a
+               // catalog address — that is what threw DirectoryNotFoundException at a click.
+               if (!ProjectServicesHelper.UsesPhysicalPaths)
+               {
+                  _ = DeleteResourceAndRefreshAsync(item);
                   return;
                }
 
@@ -828,14 +894,13 @@ namespace Edam.WinUI.Controls.ViewModels
       }
 
       /// <summary>
-      /// Save edited text...
+      /// Save edited text <b>through the platform</b>: a catalog target's item is an address, so the text is
+      /// written with <see cref="ProjectServicesHelper.WriteProjectTextAsync"/> — writing it with the file
+      /// system would create a stray <c>C:\Projects\…</c> file or throw, the same defect class as the read.
+      /// Best effort: a failure is reported, never thrown at the UI.
       /// </summary>
-      /// <param name="fileName">name of the file to be updated</param>
-      /// <param name="text">text to save</param>
-      public void ItemSave(string fileName, string text)
+      public async void ItemSave(string fileName, string text)
       {
-         Diagnostics.ResultLog results = new ResultLog();
-
          if (SelectedItem == null || SelectedItem.Item.NameFull != fileName)
          {
             return;
@@ -843,15 +908,20 @@ namespace Edam.WinUI.Controls.ViewModels
 
          try
          {
-            System.IO.File.WriteAllText(SelectedItem.Item.Full, text);
-            results.Succeeded();
+            var saved = await ProjectServicesHelper.WriteProjectTextAsync(
+               SelectedItem.Item.Full, text, SelectedUriItem == null ? null : SelectedUriItem.UriText);
+
+            if (!saved)
+            {
+               ReportStorageProblem("the item could not be saved", 
+                  new InvalidOperationException(SelectedItem.Item.Full ?? "(no path)"),
+                  blocksListing: false);
+            }
          }
          catch (Exception ex)
          {
-            results.Failed(ex);
+            ReportStorageProblem("the item could not be saved", ex, blocksListing: false);
          }
-
-         ManageResults(results);
       }
 
       /// <summary>
