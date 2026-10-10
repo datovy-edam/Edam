@@ -1021,7 +1021,10 @@ namespace Edam.WinUI.Controls.DataModels
          var collection = await ResolveCollectionAsync(collectionUri, ct).ConfigureAwait(false);
          if (collection is null) return null;
 
-         var root = new FolderFileItemInfo(collection.Uri, null) { Type = ItemType.Folder };
+         // the root node's address: a catalog container's URI is empty by design, so fall back to its id —
+         // an empty root path is how a tree ends up with no identity at all
+         var rootPath = string.IsNullOrWhiteSpace(collection.Uri) ? collection.CollectionId : collection.Uri;
+         var root = new FolderFileItemInfo(rootPath, null) { Type = ItemType.Folder };
 
          foreach (var project in await Catalog.GetProjectsAsync(collection.CollectionId, ct)
                      .ConfigureAwait(false))
@@ -1062,9 +1065,11 @@ namespace Edam.WinUI.Controls.DataModels
       /// </summary>
       /// <returns>True when a project was removed.</returns>
       public static async Task<Boolean> DeleteProjectAsync(
-         String nameOrPath, CancellationToken ct = default)
+         String nameOrPath, String? collectionId = null, CancellationToken ct = default)
       {
-         var collection = await ResolveCollectionAsync(null, ct).ConfigureAwait(false);
+         // the container the person is LOOKING AT, not the configured default: deleting from a container the
+         // UI is not showing is how a project disappears from under someone else's tree
+         var collection = await ResolveCollectionAsync(collectionId, ct).ConfigureAwait(false);
          if (collection is null)
          {
             return false;
@@ -1119,6 +1124,57 @@ namespace Edam.WinUI.Controls.DataModels
       }
 
       /// <summary>
+      /// <b>Remove a container</b> (a catalog location). This affordance was missing, and its absence is why
+      /// a conformance run's leftover container (<c>pe3-mssql-…</c>) had to survive in a database for a person
+      /// to stare at. Removal is the store's own operation (<c>DelistContainer</c>); the outcome is reported,
+      /// never guessed. A container the installation is configured to use is simply created again by the
+      /// ensure step on the next browse — so this is safe, and the confirmation says as much.
+      /// </summary>
+      public static async Task<Boolean> DeleteContainerAsync(
+         String collectionId, CancellationToken ct = default)
+      {
+         if (String.IsNullOrWhiteSpace(collectionId))
+         {
+            return false;
+         }
+
+         try
+         {
+            var store = Services.GetService<Edam.Data.Catalog.Contracts.ICatalogStore>();
+            if (store is null)
+            {
+               ReportOnce("the catalog storage could not be resolved (" + StorageSummary +
+                          "), so the container could not be removed");
+               return false;
+            }
+
+            var removed = store.DelistContainer(collectionId);
+            var ok = !String.IsNullOrWhiteSpace(removed?.ContainerId);
+
+            // the ensure step must re-check: the container that was just removed may be the configured one
+            m_ContainerEnsured = false;
+            m_EnsuredContainerId = null;
+
+            Edam.WinUI.Controls.Logging.AppDiagnostics.Write(
+               ok
+                  ? "Projects storage: container '" + collectionId + "' was removed from the catalog."
+                  : "Projects storage: container '" + collectionId + "' was NOT removed (the store " +
+                    "returned nothing).",
+               ok
+                  ? Microsoft.Extensions.Logging.LogLevel.Information
+                  : Microsoft.Extensions.Logging.LogLevel.Warning,
+               StorageCategory);
+
+            return ok;
+         }
+         catch (Exception ex)
+         {
+            ReportOnce("container '" + collectionId + "' could not be removed: " + ExplainFailure(ex));
+            return false;
+         }
+      }
+
+      /// <summary>
       /// <b>LM-6:</b> seed a new project's <c>Arguments</c> folder from the configured arguments
       /// template — the behaviour the legacy <c>Project.CreateProject</c> had, now expressed as
       /// <i>read an address, write an address</i>. Best effort: a missing template just means no
@@ -1165,10 +1221,28 @@ namespace Edam.WinUI.Controls.DataModels
 
          if (!string.IsNullOrWhiteSpace(collectionUri))
          {
-            var match = collections.FirstOrDefault(c =>
-               string.Equals(c.Uri, collectionUri, StringComparison.OrdinalIgnoreCase) ||
-               string.Equals(c.Name, collectionUri, StringComparison.OrdinalIgnoreCase));
-            if (match is not null) return match;
+            // IDENTITY FIRST: a collection is named by its **id**. A catalog container's URI is empty by
+            // design (`ContainerInfo.ContainerUri` defaults to ""), so matching on the URI made every
+            // selection fall through to the default container — a project created in one container then
+            // appeared under every container, which is a correctness bug, not a display one. Uri and Name
+            // remain as fallbacks for a file-system collection (where the id is the folder name).
+            var requested = collections.FirstOrDefault(c =>
+               string.Equals(c.CollectionId, collectionUri, StringComparison.OrdinalIgnoreCase))
+               ?? collections.FirstOrDefault(c =>
+                  string.Equals(c.Uri, collectionUri, StringComparison.OrdinalIgnoreCase))
+               ?? collections.FirstOrDefault(c =>
+                  string.Equals(c.Name, collectionUri, StringComparison.OrdinalIgnoreCase));
+
+            if (requested is not null) return requested;
+
+            // a SPECIFIC collection was asked for and is not there: say so and return nothing. Falling back
+            // would silently show ANOTHER container's projects — exactly the confusion this fixes.
+            Edam.WinUI.Controls.Logging.AppDiagnostics.Write(
+               "Projects: the selected container '" + collectionUri + "' was not found in the catalog — " +
+               "nothing is shown for it (the containers present are: " +
+               string.Join(", ", collections.Select(c => c.CollectionId)) + ").",
+               Microsoft.Extensions.Logging.LogLevel.Warning, StorageCategory);
+            return null;
          }
 
          // the CONFIGURED default comes first: `Edam:Projects:DefaultCollection` names the container this

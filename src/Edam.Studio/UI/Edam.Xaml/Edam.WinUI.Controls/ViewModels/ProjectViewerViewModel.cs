@@ -69,11 +69,18 @@ namespace Edam.WinUI.Controls.ViewModels
             if (value != m_SelectedUriItem)
             {
                m_SelectedUriItem = value;
-               OnPropertyChanged(nameof(m_SelectedUriItem));
+
+               // the PROPERTY, not the field: notifying "m_SelectedUriItem" told the selector nothing, so a
+               // selection made in code (after removing a container) never reached the ComboBox
+               OnPropertyChanged(nameof(SelectedUriItem));
+               OnPropertyChanged(nameof(HasContainerSelected));
                FetchProjectFolderInfo();
             }
          }
       }
+
+      /// <summary>True when a container is selected, so "remove container" has something to act on.</summary>
+      public Boolean HasContainerSelected => m_SelectedUriItem is not null;
 
       private string m_SelectedItemName;
       public string SelectedItemName
@@ -268,6 +275,10 @@ namespace Edam.WinUI.Controls.ViewModels
       {
          try
          {
+            // keep what the person had selected: reloading the list (after removing a container) must not
+            // silently move them to a different one
+            var previous = SelectedUriItem?.UriText;
+
             // PE-5c: the collections come from the project platform (DI composition root) — the
             // file-system root, or the catalog when a catalog connection is configured — instead of
             // AppSettings' UriList.
@@ -278,7 +289,11 @@ namespace Edam.WinUI.Controls.ViewModels
                {
                   Name = collection.Name,
                   Type = UriType.ConsolePath,
-                  UriText = collection.Uri,
+
+                  // IDENTITY, not address: a catalog container's URI is EMPTY by design, so using it as the
+                  // selection key made every container resolve to the same default — a project created in one
+                  // container showed up under all of them. The id is what names a collection.
+                  UriText = collection.CollectionId,
                });
             }
 
@@ -287,13 +302,82 @@ namespace Edam.WinUI.Controls.ViewModels
 
             if (UriItems.Count > 0)
             {
-               SelectedUriItem = UriItems.First();
+               SelectedUriItem = (previous is null
+                     ? null
+                     : UriItems.FirstOrDefault(i => String.Equals(
+                          i.UriText, previous, StringComparison.OrdinalIgnoreCase)))
+                  ?? UriItems.First();
+            }
+            else
+            {
+               SelectedUriItem = null;
             }
          }
          catch (Exception ex)
          {
             ReportStorageProblem("the project locations could not be listed", ex);
          }
+      }
+
+      /// <summary>
+      /// Reload the container list — used after one is removed, or a new one is created — keeping the current
+      /// selection when it still exists.
+      /// </summary>
+      public async Task RefreshCollectionsAsync()
+      {
+         await PrepareUriItemsAsync();
+      }
+
+      /// <summary>
+      /// <b>Remove the selected container</b> from the catalog. This is the affordance whose absence is why a
+      /// conformance run's leftover container (<c>pe3-mssql-…</c>) had to live in a database for a person to
+      /// stare at. Removing a location is not undoable, so it is confirmed first; and if the container is the
+      /// one this installation uses, the ensure step creates it again on the next browse.
+      /// </summary>
+      public void RemoveContainer()
+      {
+         var selected = SelectedUriItem;
+         if (selected is null || String.IsNullOrWhiteSpace(selected.UriText))
+         {
+            return;
+         }
+
+         Dialogs.DialogInfo d = new Dialogs.DialogInfo
+         {
+            ItemName = selected.Name,
+            ItemType = Dialogs.DialogInfo.ITEM_TYPE_FILE,
+            CallBack = ProcessRemoveContainerResult,
+            DataObject = selected
+         };
+
+         Dialogs.DialogMessageBox.DeleteItem(d);
+      }
+
+      private async void ProcessRemoveContainerResult(Dialogs.IDialogObjectInfo result)
+      {
+         var rslt = result as Dialogs.IDialogObjectInfo;
+         if (rslt is null || rslt.CommandText != Dialogs.DialogMessageBox.COMMAND_DELETE)
+         {
+            return;
+         }
+
+         var selected = rslt.DataObject as UriItemInfo;
+         if (selected is null)
+         {
+            return;
+         }
+
+         try
+         {
+            await ProjectServicesHelper.DeleteContainerAsync(selected.UriText);
+         }
+         catch (Exception ex)
+         {
+            // a diagnostic, not a document title (the same rule as every other storage failure)
+            ReportStorageProblem("the container could not be removed", ex, blocksListing: false);
+         }
+
+         await RefreshCollectionsAsync();
       }
 
       private static string? m_StorageProblem;
@@ -651,7 +735,10 @@ namespace Edam.WinUI.Controls.ViewModels
       {
          try
          {
-            await ProjectServicesHelper.DeleteProjectAsync(nameOrPath);
+            // the container the person is LOOKING AT — deleting from another one would remove a project from a
+            // tree that is not on screen
+            await ProjectServicesHelper.DeleteProjectAsync(
+               nameOrPath, SelectedUriItem?.UriText);
          }
          catch (Exception ex)
          {

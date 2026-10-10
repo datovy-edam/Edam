@@ -30,6 +30,12 @@ namespace Edam.WinUI.Controls.ViewModels
       /// <summary>The entry's message, in the entry's own words (with any attached exception).</summary>
       public String ErrorMessage => Entry.ErrorMessage;
 
+      /// <summary>
+      /// The entry's <b>kind</b> — rendered as a colour by the panel's converter, so information, warnings,
+      /// errors and critical messages are distinguishable at a glance.
+      /// </summary>
+      public SeverityLevel Severity => Entry.Severity;
+
       /// <summary>Selected for copying: the panel copies exactly what is selected (or all of it).</summary>
       public Boolean IsSelected
       {

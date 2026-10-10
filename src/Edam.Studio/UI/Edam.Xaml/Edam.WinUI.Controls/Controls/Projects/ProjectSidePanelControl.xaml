@@ -49,6 +49,10 @@
                </Flyout>
             </Button.Flyout>
          </Button>
+         <Button x:Name="RemoveContainerButton" Click="RemoveContainer_Click" Padding="8,0,8,0"
+                 FontFamily="Segoe MDL2 Assets" Content="&#xE74D;"
+                 IsEnabled="{x:Bind ViewModel.HasContainerSelected, Mode=OneWay}"
+                 ToolTipService.ToolTip="Remove this container from the catalog (a leftover test container can be removed here)" />
       </StackPanel>
 
       <!-- DP-1: the empty state. A fresh installation has no projects and an empty TreeView explains

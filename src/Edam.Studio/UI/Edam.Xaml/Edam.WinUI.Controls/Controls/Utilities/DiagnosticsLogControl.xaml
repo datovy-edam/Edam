@@ -5,9 +5,16 @@
     xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
     xmlns:local="using:Edam.WinUI.Controls.Controls.Utilities"
     xmlns:viewmodels="using:Edam.WinUI.Controls.ViewModels"
+    xmlns:cnv="using:Edam.WinUI.Controls.Common"
     xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
     xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
     mc:Ignorable="d" VerticalAlignment="Stretch" HorizontalAlignment="Stretch">
+
+   <UserControl.Resources>
+      <!-- the KIND of a message is visible before its words: navy = information, dark goldenrod = warning,
+           brown = error/exception, dark red = critical, grey = debug noise -->
+      <cnv:SeverityLevelBrushConverter x:Key="SeverityBrush" />
+   </UserControl.Resources>
 
    <Grid>
       <!-- the log must FILL the width it is given: an Auto column (and a ListView, which has no
@@ -92,6 +99,7 @@
                   <TextBox Text="{x:Bind ErrorMessage}" IsReadOnly="True"
                            TextWrapping="Wrap" BorderThickness="0" Background="Transparent"
                            Padding="0" MinHeight="0" Margin="24,0,0,0" FontSize="12"
+                           Foreground="{x:Bind Severity, Converter={StaticResource SeverityBrush}}"
                            IsSpellCheckEnabled="False"/>
                   <!-- right-click a message: copy exactly it, without touching the ticks -->
                   <StackPanel.ContextFlyout>

@@ -86,6 +86,15 @@ namespace Edam.WinUI.Controls.Projects
          await m_ViewModel.LoadStorageInfoAsync();
       }
 
+      /// <summary>
+      /// Remove the selected container (confirming first). An affordance the panel was missing — and the
+      /// reason a conformance run's leftover container had to be deleted in a database by hand.
+      /// </summary>
+      private void RemoveContainer_Click(object sender, RoutedEventArgs e)
+      {
+         m_ViewModel.RemoveContainer();
+      }
+
       private void TreeViewItem_PointerPressed(
          object sender, PointerRoutedEventArgs e)
       {

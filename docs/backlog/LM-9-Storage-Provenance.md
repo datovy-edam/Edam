@@ -107,14 +107,13 @@ looked verified. A kind must be checked in **every** composition root that names
 ## Remaining
 
 - **The user's runtime confirmation** and the **data cleanup**: the containers the earlier verification runs
-  created are still in `Edam.Database` and the selector will list them until they are removed — either
-  `SELECT container_id FROM edam_container;` and delete the `pe3-%` / `di-pg-%` / `dp5-pg-%` rows (with their
-  items and content), or **drop the five `edam_*` tables** and let `MsSqlSchema.EnsureAsync` recreate the schema
-  on the next run (the catalog holds only test data today).
+  created are still in `Edam.Database` — they can now be removed **from the panel** (the Remove-container button,
+  item 119), or in SQL, or by dropping the five `edam_*` tables and letting the schema be recreated.
 - **Migration of what is on disk:** switching the target moves nothing. `IProjectStore.ImportAsync` (upload)
   exists and is exercised only by tests; there is **no import/export UI**.
-- **The inspection surface could go further** (not required): the same description **per project** ("a branch in
-  container X; its files are content in Y"), and a container **delete/rename** affordance in the UI — today a
-  container can only be removed in the database, which is how the conformance leftovers survived.
+- **Still open (not required now):** a **rename** affordance for a container (removal is delivered), the same
+  storage description **per project** ("a branch in container X; its files are content in Y"), and moving the
+  bridge's collection-resolution rule (id first, never a silent fallback) into the platform so it is headlessly
+  testable — today it lives in WinUI code and only the runtime check covers it.
 - **Not verified here (honest):** everything above is **build-verified** plus headless conformance; the Studio's
   catalog path is proven at run time only by the user's F5.
