@@ -42,6 +42,12 @@ var cwdBefore = Directory.GetCurrentDirectory();
 var temp = Path.Combine(Path.GetTempPath(), "edam-pe3-" + Guid.NewGuid().ToString("N"));
 Directory.CreateDirectory(temp);
 
+// The seed the DP-5 default-project runs are prepared with: the SHIPPED repo seed (the real starter
+// template and the real sample input) when it can be found from here, else a minimal inline fixture.
+var seed = DefaultProjectRunScenario.Seed(
+   FindRepoSeedRoot(), Path.Combine(temp, "seed-fixture"));
+Console.WriteLine("  info: the default-project runs (DP-5) seed from " + seed.Origin + ".");
+
 try
 {
    // ---- 1. file-system providers ------------------------------------------------------------
@@ -296,6 +302,60 @@ try
    // ---- 10j. the gated default project: gates, the name, and the marker as proof (DP-3) ----------
    all["default project (DP-3)"] = await DefaultProjectScenario.Run(Path.Combine(temp, "dp3"));
 
+   // ---- 10k. the same flow over the REAL targets, through the seams the Studio uses (DP-5) ------
+   //      The gates, the created project, its seeded content, and — the point of the group — the seeded
+   //      arguments' own ./Files reference resolving inside the project on each back-end.
+   {
+      var root = Path.Combine(temp, "dp5-fs");
+      DefaultProjectRunScenario.PrepareFileSystemSeed(root, seed);
+
+      var catalog = new FileSystemProjectCatalog(root);
+      var projectStore = new FileSystemProjectStore(catalog);
+      var resources = new FileSystemProjectResources(root, catalog);
+      var seeder = new FileSystemProjectSeeder(root, resources);
+      var collection = (await catalog.GetCollectionsAsync()).First();
+
+      all["default project (DP-5, file-system)"] = await DefaultProjectRunScenario.RunAsync(
+         Path.Combine(temp, "dp5-fs-work"), collection.CollectionId,
+         catalog, projectStore, resources, seeder, seed, _ => Task.CompletedTask);
+   }
+   {
+      var root = Path.Combine(temp, "dp5-cat");
+      var store = new FileSystemCatalogStore(root);
+      var content = new FileSystemContentStore(root);
+      const string containerId = "dp5-projects";
+      store.EnlistContainer(containerId, "DP-5 conformance collection", null, ContainerType.FileSystem);
+
+      var catalog = new CatalogProjectCatalog(store, store, containerId);
+      var projectStore = new CatalogProjectStore(catalog, store, store, content);
+      var resources = new CatalogProjectResources(store, store, content);
+      var seeder = new CatalogProjectSeeder(content, resources);
+
+      all["default project (DP-5, catalog local)"] = await DefaultProjectRunScenario.RunAsync(
+         Path.Combine(temp, "dp5-cat-work"), containerId,
+         catalog, projectStore, resources, seeder, seed,
+         ct => DefaultProjectRunScenario.PrepareCatalogSeedAsync(
+            store, store, content, containerId, seed, ct));
+   }
+   if (dsn is not null)
+   {
+      var containerId = "dp5-pg-" + Guid.NewGuid().ToString("N")[..8];
+      var store = new PostgreSqlCatalogStore(dsn);
+      var content = new PostgreSqlContentStore(dsn);
+      store.EnlistContainer(containerId, "DP-5 postgres collection", null, ContainerType.FileSystem);
+
+      var catalog = new CatalogProjectCatalog(store, store, containerId);
+      var projectStore = new CatalogProjectStore(catalog, store, store, content);
+      var resources = new CatalogProjectResources(store, store, content);
+      var seeder = new CatalogProjectSeeder(content, resources);
+
+      all["default project (DP-5, catalog postgres)"] = await DefaultProjectRunScenario.RunAsync(
+         Path.Combine(temp, "dp5-pg-work"), containerId,
+         catalog, projectStore, resources, seeder, seed,
+         ct => DefaultProjectRunScenario.PrepareCatalogSeedAsync(
+            store, store, content, containerId, seed, ct));
+   }
+
    // ---- 11. a REAL end-to-end process attempt (PE-5c) — INFORMATIONAL ------------------------
    //      Reports what the legacy pipeline actually does; deliberately not a pass/fail, so the
    //      remaining gap (the console needs real project data to yield assets) stays visible.
@@ -348,7 +408,7 @@ var cwdUnchanged = cwdBefore == cwdAfter;
 Console.WriteLine($"  [{(cwdUnchanged ? "PASS" : "FAIL")}] No process current-directory change: '{cwdBefore}' -> '{cwdAfter}'");
 if (!cwdUnchanged) failed++;
 
-Console.WriteLine($"result: projects conformance (PE-2\u2026PE-5c) {(failed == 0 ? "ALL CONFORM" : $"{failed} FAILED")}");
+Console.WriteLine($"result: projects conformance (PE-2\u2026PE-5c / LM / CF / DP) {(failed == 0 ? "ALL CONFORM" : $"{failed} FAILED")}");
 
 // ---------------------------------------------------------------------------------------------
 
@@ -390,4 +450,27 @@ static int GetFreePort()
    var port = ((IPEndPoint)listener.LocalEndpoint).Port;
    listener.Stop();
    return port;
+}
+
+/// <summary>
+/// Locate the repository's shipped seed (<c>app-data/Edam.App.Data</c>) by walking up from the build output
+/// — so the DP-5 runs use the <b>real</b> starter template and sample input, not a fixture that could drift
+/// from what the application ships. Returns null when the source tree is out of reach.
+/// </summary>
+static string? FindRepoSeedRoot()
+{
+   var directory = new DirectoryInfo(AppContext.BaseDirectory);
+
+   while (directory is not null)
+   {
+      var candidate = Path.Combine(directory.FullName, "app-data", "Edam.App.Data");
+      if (File.Exists(Path.Combine(candidate, "Templates", DefaultProjectRunScenario.TEMPLATE_FILE)))
+      {
+         return candidate;
+      }
+
+      directory = directory.Parent;
+   }
+
+   return null;
 }

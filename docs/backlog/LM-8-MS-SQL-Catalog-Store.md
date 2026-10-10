@@ -1,6 +1,8 @@
 # LM-8 — MS-SQL as a catalog storage kind (the catalog on SQL Server)
 
-- **Status:** **Authorized 2026-09-28** by the user's decision (*"use c"*) — the catalog should be able to
+- **Status:** **COMPLETE + RUNTIME-VERIFIED (2026-09-28; committed 2026-09-30)** — every task is done and the
+  live-server result is `catalog (mssql, local): ALL CONFORM (16 checks)`. Originally **authorized
+  2026-09-28** by the user's decision (*"use c"*) — the catalog should be able to
   live in **MS-SQL**, using the installation's existing convention (`Server=.`, integrated security), in
   place of PostgreSQL.
   **Progress 2026-09-28 — tasks 1 and 4 DONE and build-verified.** **Task 1:** `mssql` is now a storage
