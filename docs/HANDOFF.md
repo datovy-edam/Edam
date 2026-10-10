@@ -860,7 +860,13 @@ Full itemized list (each now a backlog item): BL-3.1; BL-5.1 (HintPath); BL-5.2 
 
 
 
+118. **Diagnostics panel: vertical centring (the message band and the toolbar) (2026-10-10; `Edam.Studio.sln` (x64) builds 0 errors).** The user reported that the tick shared the date/time's line but the **band** did not look vertically centred, and that the **toolbar icons were off-centre and crowding the bottom** of the strip. **Cause and fix:** the entry's tick and timestamp now live in a **`Grid`** whose two children are both `VerticalAlignment="Center"` (with a 20×20 tick, `MinHeight="0"` on the timestamp) — which centres the visuals against each other *and* against the band, instead of each control centring inside a box of a different height; and the toolbar uses **plain `Button`s with a `FontIcon`** instead of `AppBarButton`s, because an `AppBarButton`'s template reserves room for a **label even when collapsed** and centres the glyph inside *that* — which is exactly why the icons sat low. The toolbar row is now `Height="Auto"` with the strip's own `Padding`, so it is exactly as tall as its centred content and can never crowd the panel's bottom edge; the glyphs are the standard MDL2 clear/copy/select-all icons at 12 px in 28×28 buttons. **Verified:** the solution builds **0 errors** (only the known offline `NU1900` warning). **Honest limit:** layout is judged by eye — the confirmation is the user's next look, and this is recorded as a presentation tweak rather than a validated behaviour.
+
+
+
 ### 5.6 Validation outcome
+
+**Diagnostics presentation (2026-10-10, item 118):** the message band and the toolbar are now vertically centred by construction (a `Grid` of centred children for the tick + timestamp; plain `Button` + `FontIcon` for the toolbar, whose row is `Height="Auto"`). Build-verified only — layout is judged by eye.
 
 **App-close crash (2026-10-10, item 117):** the configuration ask's triggers are now released when the window closes (`Closed` stops the poll and detaches every handler), and a late signal is reported instead of thrown — `Edam.Studio.sln` (x64) builds 0 errors; the user's next close is the runtime proof.
 
