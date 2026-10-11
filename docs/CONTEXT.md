@@ -50,6 +50,7 @@ Authorized · Enterprise quality · Verified (build 0 errors, tests green) · Tr
 | Adopted decisions | `docs/adr/` → the ADR series (0001 … 0014; read each ADR's own Status) |
 | Authorized work + traceability | `docs/backlog/` → `README.md` index |
 | Area 1 workflow spec | `docs/area1-schema-mapping-workflow.md` |
+| Projects source spec (authoritative) | `docs/reference/0010 - Edam.Studio.Understanding.Projects.v0.docx` (+ transcription beside it) |
 | Anti-drift gate/checklist | `docs/doc-health-checklist.md` |
 | AI governance / ISL r3 reference | ALETHEIA `specs/isl releases/isl release 3` |
 

@@ -2,7 +2,7 @@
 
 > **Status:** Started (2026-09-18) — **PE-0…PE-4 complete**; **PE-5 in progress (5a–5c done; 5d: option A implemented — opt-in, build-verified, runtime validation pending)**.
 > **Goal:** move EDAM **Projects** off the file system and onto the **Catalog** platform, behind interfaces so the storage is replaceable and the surface is easy to consume (CLI, Studio, services).
-> **Decision record:** **ADR-0009**. Source specification: *EDAM Studio — Understanding Projects* (2023-02-05).
+> **Decision record:** **ADR-0009**. Source specification: *EDAM Studio — Understanding Projects* (2023-02-05), kept at `docs/reference/0010 - Edam.Studio.Understanding.Projects.v0.docx` (a transcription sits beside it).
 > **Authority:** per `AGENTS.md`, the live repository is the authority; this document is a planning aid.
 
 ## Why
