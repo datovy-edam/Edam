@@ -110,23 +110,36 @@ namespace Edam.Studio
       {
          m_Closed = true;
 
-         try
-         {
-            m_ConfigurationTimer?.Stop();
-            m_ConfigurationTimer = null;
+         // EACH step guarded on its own: with a single try around all of them, a failure in the first (a timer
+         // whose dispatcher is already gone, say) would SKIP the unsubscriptions — leaving handlers attached to a
+         // dead window, which is exactly the defect item 117 fixed. A failure here is recorded by the app's WinRT
+         // diagnostics hook rather than disappearing.
+         Try(() => m_ConfigurationTimer?.Stop());
+         Try(() => m_ConfigurationTimer = null);
 
+         Try(() =>
+         {
             if (m_Shell is not null)
             {
                m_Shell.Loaded -= OnShellLoaded;
                m_Shell = null;
             }
+         });
 
-            Activated -= OnWindowActivated;
-            Closed -= OnWindowClosed;
+         Try(() => Activated -= OnWindowActivated);
+         Try(() => Closed -= OnWindowClosed);
+      }
+
+      /// <summary>Run one teardown step; closing must never fail, whatever a window object reports.</summary>
+      private static void Try(Action step)
+      {
+         try
+         {
+            step();
          }
          catch (Exception)
          {
-            // closing must never fail, whatever the window object reports
+            // a WinRT failure here is recorded by the diagnostics hook; nothing to add
          }
       }
 
