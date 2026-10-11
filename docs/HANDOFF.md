@@ -905,6 +905,10 @@ Full itemized list (each now a backlog item): BL-3.1; BL-5.1 (HintPath); BL-5.2 
 
 
 
+### 5.6 Validation outcome
+
+**The Projects source spec is now tracked and reachable (2026-10-11, item 129):** `docs/reference/0010 - Edam.Studio.Understanding.Projects.v0.docx` (+ transcription) is the document ADR-0009 and four sources cite by section; the decision documents and `docs/CONTEXT.md` now name its path. It also settles the arguments-file contract (§2.3, nine steps) and confirms item 127's diagnosis from the source itself.
+
 **A first-chance WinRT notice on exit can now be placed (2026-10-11, item 128):** the window's teardown is bracketed by two log lines and `ProcessExit` always states an orderly exit (naming the last WinRT failure if one was seen), so the log decides whether the exception came from our teardown, from the framework's, or from a process that died. `Edam.Studio.sln` (x64) builds **0 errors**; the reading is the user's.
 
 **The reference-data database could not work as published (2026-10-11, item 127):** the registry rows the procedures require lived in a file that no publish ever ran, so a domain insert was refused by `fk_DataDomainType` while editing an arguments file. Now the database project **deploys** them (a guarded, idempotent post-deployment script — the built `dacpac` carries `postdeploy.sql` with the rows), the failure **names its remedy** in the app, and `docs/environment-prerequisites.md` has the load/verify steps. All four solutions build **0 errors**; projects conformance **ALL CONFORM**; the user's step is loading the registry into the existing `Edam.Database` (or re-publishing).
