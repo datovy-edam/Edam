@@ -59,6 +59,22 @@ public sealed class InMemoryCatalogStore : ICatalogStore
     public Task<ContainerInfo> SetContainerAsync(string sessionId, string containerId, CancellationToken ct = default)
         => Task.FromResult(GetContainer(containerId) ?? EnlistContainer(containerId, "Default", null));
 
+    public Task<ContainerInfo?> SetContainerDescriptionAsync(
+        string containerId, string? description, CancellationToken ct = default)
+    {
+        if (!_containerByName.TryGetValue(containerId, out var id) || !_containers.TryGetValue(id, out var existing))
+            return Task.FromResult<ContainerInfo?>(null);
+
+        // the description ONLY: enlistment never rewrites (see the contract), so this is the one way a
+        // description changes — and a person's edit cannot be reverted by the application's next browse
+        var updated = existing with { Description = description ?? string.Empty };
+        _containers[id] = updated;
+        return Task.FromResult<ContainerInfo?>(updated);
+    }
+
+    public ContainerInfo? SetContainerDescription(string containerId, string? description)
+        => SetContainerDescriptionAsync(containerId, description).Result;
+
     public ContainerInfo SetContainer(string sessionId, string containerId) => SetContainerAsync(sessionId, containerId).Result;
 
     public async Task<ContainerInfo> DelistContainerAsync(string containerId, CancellationToken ct = default)
@@ -192,7 +208,10 @@ public sealed class InMemoryCatalogStore : ICatalogStore
     public ContentTypeInfo? GetContentType(string contentTypeId) => GetContentTypeAsync(contentTypeId).Result;
 
     public ItemDataInfo? CreateDataLeaf(ItemInfo item, string name, Guid? dataId = null, byte[]? dataValue = null)
-        => CreateDataLeaf(item, name, dataId, dataValue is null ? null : Convert.ToBase64String(dataValue));
+        // FULLY qualified: referencing the catalog composition root pulls Edam.System transitively, and its
+        // Edam.Convert shadows System.Convert inside these Edam.* namespaces (the BL-4.2 name-collision class)
+        => CreateDataLeaf(item, name, dataId,
+           dataValue is null ? null : System.Convert.ToBase64String(dataValue));
 
     public ItemDataInfo? CreateDataLeaf(ItemInfo item, string name, Guid? dataId = null, string? dataValue = null)
         => AddItem(new ItemDataInfo(dataId ?? Guid.NewGuid(), item.Id, name, string.Empty, "default", dataValue));

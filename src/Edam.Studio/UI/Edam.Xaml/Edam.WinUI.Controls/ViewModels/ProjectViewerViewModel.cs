@@ -73,14 +73,10 @@ namespace Edam.WinUI.Controls.ViewModels
                // the PROPERTY, not the field: notifying "m_SelectedUriItem" told the selector nothing, so a
                // selection made in code (after removing a container) never reached the ComboBox
                OnPropertyChanged(nameof(SelectedUriItem));
-               OnPropertyChanged(nameof(HasContainerSelected));
                FetchProjectFolderInfo();
             }
          }
       }
-
-      /// <summary>True when a container is selected, so "remove container" has something to act on.</summary>
-      public Boolean HasContainerSelected => m_SelectedUriItem is not null;
 
       /// <summary>The container the platform flags as this installation's default (named by the person).</summary>
       private string? m_DefaultContainerId;
@@ -352,75 +348,6 @@ namespace Edam.WinUI.Controls.ViewModels
          await PrepareUriItemsAsync();
       }
 
-      /// <summary>
-      /// <b>Remove the selected container</b> from the catalog — and <b>everything it holds</b>: the
-      /// confirmation states what will go (projects, items and their content), because removing a location is
-      /// not undoable. The removal itself runs the platform's cascade, so the item rows (which have a foreign
-      /// key to the container) and the content (which has none) are both gone — the reason the button used to
-      /// do nothing. If the container is the one this installation uses, the ensure step creates it again on
-      /// the next browse.
-      /// </summary>
-      public async void RemoveContainer()
-      {
-         var selected = SelectedUriItem;
-         if (selected is null || String.IsNullOrWhiteSpace(selected.UriText))
-         {
-            return;
-         }
-
-         string contents;
-         try
-         {
-            contents = await ProjectServicesHelper.DescribeContainerContentsAsync(selected.UriText);
-         }
-         catch (Exception)
-         {
-            contents = "everything it holds";
-         }
-
-         Dialogs.DialogInfo d = new Dialogs.DialogInfo
-         {
-            Title = "Remove container",
-            Message = "Remove the container '" + selected.Name + "' from the catalog?" +
-               Environment.NewLine + Environment.NewLine +
-               "This removes " + contents + " — every catalog entry and its content — and cannot be undone.",
-            PrimaryText = Dialogs.DialogMessageBox.COMMAND_DELETE,
-            CloseText = Dialogs.DialogMessageBox.COMMAND_CANCEL,
-            CallBack = ProcessRemoveContainerResult,
-            DataObject = selected
-         };
-
-         // the message is ours, so it goes through ShowMessage rather than the generic "Delete File (…)?"
-         Dialogs.DialogMessageBox.ShowMessage(d);
-      }
-
-      private async void ProcessRemoveContainerResult(Dialogs.IDialogObjectInfo result)
-      {
-         var rslt = result as Dialogs.IDialogObjectInfo;
-         if (rslt is null || rslt.CommandText != Dialogs.DialogMessageBox.COMMAND_DELETE)
-         {
-            return;
-         }
-
-         var selected = rslt.DataObject as UriItemInfo;
-         if (selected is null)
-         {
-            return;
-         }
-
-         try
-         {
-            await ProjectServicesHelper.DeleteContainerAsync(selected.UriText);
-         }
-         catch (Exception ex)
-         {
-            // a diagnostic, not a document title (the same rule as every other storage failure)
-            ReportStorageProblem("the container could not be removed", ex, blocksListing: false);
-         }
-
-         await RefreshCollectionsAsync();
-      }
-
       private static string? m_StorageProblem;
 
       /// <summary>
@@ -559,40 +486,6 @@ namespace Edam.WinUI.Controls.ViewModels
       /// <summary>Creating a project is offered only when listing them actually worked.</summary>
       public Visibility EmptyStateActionVisibility =>
          m_StorageProblem is null ? Visibility.Visible : Visibility.Collapsed;
-
-      private string m_StorageInfoText = "Reading the storage description…";
-
-      /// <summary>
-      /// What the <b>info surface</b> shows (LM-9 / ADR-0014 decision 8): the storage kind, the
-      /// <b>redacted</b> location, whether it is local, <b>where the value came from</b> (the deployment, or
-      /// the person's own answer) and what the catalog currently holds. Assembled by the platform bridge and
-      /// rendered here — a person must never have to infer where their data is.
-      /// </summary>
-      public string StorageInfoText
-      {
-         get { return m_StorageInfoText; }
-         private set
-         {
-            if (m_StorageInfoText == value) return;
-            m_StorageInfoText = value;
-            OnPropertyChanged(nameof(StorageInfoText));
-         }
-      }
-
-      /// <summary>Resolve the storage description for the info button's flyout.</summary>
-      public async Task LoadStorageInfoAsync()
-      {
-         StorageInfoText = "Reading the storage description…";
-         try
-         {
-            StorageInfoText = await ProjectServicesHelper.DescribeStorageAsync(
-               SelectedUriItem == null ? null : SelectedUriItem.UriText);
-         }
-         catch (Exception ex)
-         {
-            StorageInfoText = "The storage could not be described: " + ex.Message;
-         }
-      }
 
       public void ManageResults(IResultsLog results)
       {

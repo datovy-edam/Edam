@@ -44,6 +44,7 @@ public sealed class CatalogHttpClient : ICatalogClient
    public const string URI_CONTAINER_INFO = "container/info";
    public const string URI_CONTAINER_LIST = "container/list";
    public const string URI_CONTAINER_ENLIST = "container/enlist";
+   public const string URI_CONTAINER_DESCRIPTION = "container/description";
    public const string URI_CONTAINER_DELIST = "container/delist";
    public const string URI_CONTAINER_ROOT_ITEM_ID = "container/item/root/id";
    public const string URI_CONTAINER_ITEMS = "container/items/id";

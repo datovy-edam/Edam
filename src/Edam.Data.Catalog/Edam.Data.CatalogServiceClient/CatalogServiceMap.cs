@@ -94,6 +94,14 @@ public class CatalogServiceMap
          return store.EnlistContainer(containerId, description, baseUri, type);
       });
 
+      // set a container's description — the ONLY part of a container that is not identity (ADR-0014
+      // decision 8); enlist is idempotent and never rewrites, so the edit needs its own route
+      app.MapGet("/catalogservice/container/description", (
+         string sessionId, string containerId, string? description) =>
+      {
+         return store.SetContainerDescription(containerId, description);
+      });
+
       // delist a container
       app.MapGet("/catalogservice/container/delist", (
          string sessionId, string containerId, string description,

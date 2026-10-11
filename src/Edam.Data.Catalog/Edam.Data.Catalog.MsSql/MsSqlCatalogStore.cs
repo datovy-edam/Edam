@@ -116,14 +116,16 @@ public sealed class MsSqlCatalogStore : ICatalogStore
       await using var conn = await OpenAsync(ct).ConfigureAwait(false);
 
       // Upsert by container_id; OUTPUT yields the ACTUAL row so the returned Id always matches the
-      // persisted row — on a first insert AND on an idempotent re-enlist (MERGE updates the matched row,
-      // so the existing id survives and GetContainer(returned.Id) keeps resolving).
+      // persisted row. On a re-enlist the update is a deliberate NO-OP — enlistment means "make sure it
+      // exists and give me the row", never "rewrite what is there", or an application enlisting its
+      // container on every browse would silently revert a description the person had edited (ADR-0014
+      // decision 8). Editing a description is SetContainerDescriptionAsync, and nothing else.
       await using var cmd = new SqlCommand("""
          MERGE dbo.edam_container AS target
          USING (SELECT @cid AS container_id) AS source
             ON target.container_id = source.container_id
          WHEN MATCHED THEN
-            UPDATE SET description = @desc, container_type = @cty, container_uri = @uri
+            UPDATE SET target.container_id = target.container_id
          WHEN NOT MATCHED THEN
             INSERT (id, container_id, description, container_type, container_uri, content_type)
             VALUES (@id, @cid, @desc, @cty, @uri, @ctype)
@@ -148,6 +150,29 @@ public sealed class MsSqlCatalogStore : ICatalogStore
       string containerId, string description, string? baseUri = null,
       ContainerType type = ContainerType.DataContext)
       => EnlistContainerAsync(containerId, description, baseUri, type).GetAwaiter().GetResult();
+
+   public async Task<ContainerInfo?> SetContainerDescriptionAsync(
+      string containerId, string? description, CancellationToken ct = default)
+   {
+      await EnsureSchemaAsync(ct).ConfigureAwait(false);
+      await using var conn = await OpenAsync(ct).ConfigureAwait(false);
+
+      // the description ONLY: the name, the kind and the base uri are identity/binding, never edited here
+      await using var cmd = new SqlCommand("""
+         UPDATE dbo.edam_container SET description = @desc
+         OUTPUT INSERTED.id, INSERTED.container_id, INSERTED.description, INSERTED.container_type,
+                INSERTED.container_uri, INSERTED.content_type
+         WHERE container_id = @cid;
+         """, conn);
+      cmd.Parameters.AddWithValue("desc", description ?? string.Empty);
+      cmd.Parameters.AddWithValue("cid", containerId);
+
+      await using var r = await cmd.ExecuteReaderAsync(ct).ConfigureAwait(false);
+      return await r.ReadAsync(ct).ConfigureAwait(false) ? ReadContainer(r) : null;
+   }
+
+   public ContainerInfo? SetContainerDescription(string containerId, string? description)
+      => SetContainerDescriptionAsync(containerId, description).GetAwaiter().GetResult();
 
    public async Task<ContainerInfo> SetContainerAsync(
       string sessionId, string containerId, CancellationToken ct = default)

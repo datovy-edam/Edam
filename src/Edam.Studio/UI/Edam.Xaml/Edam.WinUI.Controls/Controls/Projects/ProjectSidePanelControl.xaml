@@ -32,27 +32,18 @@
                        ToolTipService.ToolTip="Add New Project" Icon="Add" Height="64" />
       </CommandBar>
 
-      <!-- the container selector, with the info surface beside it: "where does the catalog store my data?"
-           must be answerable FROM the application, not by reading configuration (LM-9 / ADR-0014) -->
+      <!-- the container selector, with ONE manager button beside it: "where does the catalog store my data?",
+           and add / describe / remove a container — must be answerable FROM the application, not by reading
+           configuration (LM-9 / ADR-0014 decision 8). The button carries no border, by design. -->
       <StackPanel Grid.Column="0" Grid.Row="1" Orientation="Horizontal" Spacing="4" Margin="8,0,8,0">
          <ComboBox ItemsSource="{x:Bind ViewModel.UriItems, Mode=TwoWay}" MinWidth="150"
                   SelectedItem="{x:Bind ViewModel.SelectedUriItem, Mode=TwoWay}"
                   ToolTipService.ToolTip="Select the catalog container the projects live in"
                   DisplayMemberPath="Name" />
-         <Button x:Name="StorageInfoButton" Click="StorageInfo_Click" Padding="8,0,8,0"
-                 FontFamily="Segoe MDL2 Assets" Content="&#xE946;"
-                 ToolTipService.ToolTip="Where the catalog stores the data">
-            <Button.Flyout>
-               <Flyout Placement="Bottom">
-                  <TextBlock Text="{x:Bind ViewModel.StorageInfoText, Mode=OneWay}"
-                             TextWrapping="Wrap" MaxWidth="380" FontSize="12" />
-               </Flyout>
-            </Button.Flyout>
-         </Button>
-         <Button x:Name="RemoveContainerButton" Click="RemoveContainer_Click" Padding="8,0,8,0"
-                 FontFamily="Segoe MDL2 Assets" Content="&#xE74D;"
-                 IsEnabled="{x:Bind ViewModel.HasContainerSelected, Mode=OneWay}"
-                 ToolTipService.ToolTip="Remove this container from the catalog (a leftover test container can be removed here)" />
+         <Button x:Name="ContainerManagerButton" Click="ContainerManager_Click" Padding="8,0,8,0"
+                 Background="Transparent" BorderThickness="0"
+                 FontFamily="Segoe MDL2 Assets" Content="&#xE713;"
+                 ToolTipService.ToolTip="Containers — review, add, describe, remove; and where the catalog stores the data" />
       </StackPanel>
 
       <!-- DP-1: the empty state. A fresh installation has no projects and an empty TreeView explains

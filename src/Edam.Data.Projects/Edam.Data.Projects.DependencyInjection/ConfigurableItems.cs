@@ -136,6 +136,14 @@ public static class ConfigurableItems
    /// <summary>Longest accepted container name (it becomes a URI authority and a folder-name-like key).</summary>
    public const int CONTAINER_NAME_MAX_LENGTH = 64;
 
+   /// <summary>
+   /// The catalog's <b>connection string</b> — the binding the deployment states (ADR-0014 decision 1), which a
+   /// person may now <b>deliberately override</b> from the container manager. An override is an ordinary answer
+   /// (the per-user overlay) and is always <b>reported as the source</b>, so a value can never look like it came
+   /// from somewhere it did not.
+   /// </summary>
+   public const string CATALOG_CONNECTION_KEY = "ConnectionStrings:catalog";
+
    /// <summary>Longest accepted project name (it also becomes a folder and an artifact name).</summary>
    public const int PROJECT_NAME_MAX_LENGTH = 64;
 
@@ -181,6 +189,21 @@ public static class ConfigurableItems
             Storage: ConfigurationStorage.AppDataOverlay,
             Validate: null),
 
+         // ADR-0014 (amended): the binding is a deployment fact, and a person may override it — deliberately and
+         // visibly. Silent default, so it is never ASKED (a connection string is not a first-run question); it
+         // is edited in the container manager, and an override lives in the per-user overlay.
+         new(
+            Id: CATALOG_CONNECTION_KEY,
+            Key: CATALOG_CONNECTION_KEY,
+            Title: "Catalog connection string",
+            WhatItIs: "Where the catalog keeps its data — the database your projects and their content live in.",
+            WhatItAffects: "Pointing it at another catalog changes which containers, projects and content the " +
+               "application sees. The deployment states it; keeping your own value overrides that, visibly.",
+            Policy: ConfigurationPolicy.SilentDefault,
+            Default: null,
+            Storage: ConfigurationStorage.AppDataOverlay,
+            Validate: ValidateConnectionString),
+
          // ADR-0014 decision 1: the container is the ONE part of the storage binding a person states. It is
          // asked only when a catalog is configured (Applies), it is asked until the container really EXISTS
          // (CompletedByKey — an answer is not completion), and a name is validated by the catalog address rule
@@ -191,8 +214,10 @@ public static class ConfigurableItems
             Title: "Catalog container",
             WhatItIs: "The name of the catalog container (the collection) that will hold your projects.",
             WhatItAffects: "It is the container's address: your projects live at /Projects/<name> inside " +
-               "it, and it is the name you will see when browsing the catalog. The catalog itself was " +
-               "configured for this installation — the container is the part that is yours to name.",
+               "it. The container's NAME is its address and cannot be changed later, while its DESCRIPTION " +
+               "(what you see everywhere, and what you may edit in the Containers dialog) starts as this text. " +
+               "The catalog itself is configured for this installation — the container is the part that is " +
+               "yours to name.",
             Policy: ConfigurationPolicy.Required,
             Default: DEFAULT_CONTAINER_NAME,
             Storage: ConfigurationStorage.AppDataOverlay,
@@ -343,6 +368,37 @@ public static class ConfigurableItems
       if (ReservedProjectNames.Contains(raw, StringComparer.OrdinalIgnoreCase))
       {
          return $"'{raw}' is reserved for a container-level location family";
+      }
+
+      return null;
+   }
+
+   /// <summary>
+   /// The rules a <b>connection string</b> must satisfy: it must look like a connection string, and it must
+   /// <b>not carry a password</b> — the application accepts <b>Integrated Security</b> only, so no secret is
+   /// ever written to a file, a log or a screen (ADR-0010; ADR-0014 decision 2).
+   /// </summary>
+   /// <returns>Why the value is unusable, or null when it is fine.</returns>
+   public static string? ValidateConnectionString(string? value)
+   {
+      var raw = value ?? String.Empty;
+
+      if (raw.Trim().Length == 0)
+      {
+         return "a connection string is required (or use the deployment's value)";
+      }
+
+      if (raw.Contains("Password=", StringComparison.OrdinalIgnoreCase) ||
+          raw.Contains("Pwd=", StringComparison.OrdinalIgnoreCase))
+      {
+         return "a password is not accepted here — use Integrated Security " +
+            "(Integrated Security=True / Trusted_Connection=True) so no secret has to be stored anywhere";
+      }
+
+      if (!raw.Contains('='))
+      {
+         return "a connection string is written as key=value pairs, e.g. " +
+            "Server=.;Database=Edam.Database;Integrated Security=True";
       }
 
       return null;

@@ -186,7 +186,7 @@ namespace Edam.WinUI.Controls.DataModels
       public static Boolean IsLocalTarget =>
          UsesPhysicalPaths ||
          Edam.Data.Projects.DependencyInjection.LocalTarget.IsLocalServer(
-            AppSettings.GetConnectionString("catalog"));
+            EffectiveCatalogConnection);
 
       /// <summary>
       /// <b>The set of projects changed</b>, raised by this bridge when it changes it <b>from outside a
@@ -348,6 +348,7 @@ namespace Edam.WinUI.Controls.DataModels
                      ? "not stated yet"
                      : "the deployment (appsettings.json)")),
                "This machine: " + (IsLocalTarget ? "yes — local" : "no — shared/remote"),
+               "Connection string: " + CatalogConnectionSource,
             };
 
             if (UsesDatabase)
@@ -553,7 +554,9 @@ namespace Edam.WinUI.Controls.DataModels
             [ProjectSettings.TARGET_KEY] = "filesystem",
          };
 
-         var connection = AppSettings.GetConnectionString("catalog");
+         // the OVERRIDE first, then the deployment (ADR-0014 amended): an answered connection string must be the
+         // one the composition root is built from, or saving it would do nothing
+         var connection = EffectiveCatalogConnection;
          if (!string.IsNullOrWhiteSpace(connection))
          {
             // projects live in the catalog: the provider family is catalog, and the reader derives the
@@ -781,6 +784,227 @@ namespace Edam.WinUI.Controls.DataModels
       private static string? m_LastContainerFailure;
 
       /// <summary>
+      /// The catalog's connection string as it will actually be used: <b>the person's override first</b> (an
+      /// answer is configuration — ADR-0013, ADR-0014 amended), then the deployment's value. Reading only the
+      /// file while an override exists is how a saved value ends up inert.
+      /// </summary>
+      private static string? EffectiveCatalogConnection
+      {
+         get
+         {
+            if (UserConfiguration.Answers.TryGetValue(ConfigurableItems.CATALOG_CONNECTION_KEY,
+                   out var answered) && !string.IsNullOrWhiteSpace(answered))
+            {
+               return answered;
+            }
+
+            var stated = AppSettings.GetConnectionString("catalog");
+            return string.IsNullOrWhiteSpace(stated) ? null : stated;
+         }
+      }
+
+      /// <summary>Where the connection string in use comes from — stated, never guessed.</summary>
+      public static string CatalogConnectionSource =>
+         UserConfiguration.Answers.ContainsKey(ConfigurableItems.CATALOG_CONNECTION_KEY)
+            ? "your own value (it overrides the deployment)"
+            : (string.IsNullOrWhiteSpace(AppSettings.GetConnectionString("catalog"))
+               ? "not stated"
+               : "the deployment (appsettings.json)");
+
+      /// <summary>
+      /// The connection string as the manager may show it: <b>redacted</b> (a password never reaches a screen —
+      /// ADR-0014 decision 5) and empty when nothing is stated. Editing it is deliberate: the value becomes the
+      /// person's own answer, and the manager always names where the value came from.
+      /// </summary>
+      public static string CatalogConnectionText
+      {
+         get
+         {
+            var connection = EffectiveCatalogConnection;
+            return string.IsNullOrWhiteSpace(connection) ? string.Empty : Redact(connection);
+         }
+      }
+
+      /// <summary>The container this installation uses (the person's answer, else the deployment's statement).</summary>
+      public static string? ConfiguredContainerName => ConfiguredContainerId;
+
+      /// <summary>
+      /// Forget the resolved storage so the next call rebuilds it — used when the connection string is edited in
+      /// the container manager. Without this the composition root built from the OLD value would keep pointing
+      /// at the old catalog, and the saved value would look inert (the defect this area keeps meeting).
+      /// </summary>
+      public static void ResetStorage()
+      {
+         lock (Gate)
+         {
+            try
+            {
+               (m_Provider as IDisposable)?.Dispose();
+            }
+            catch (Exception)
+            {
+               // a provider that cannot be disposed must not stop the reset
+            }
+
+            m_Provider = null;
+            m_PhysicalPaths = false;
+            m_BuildFailure = null;
+            m_LastStorageSummary = null;
+            m_StorageConfiguration = null;
+            m_ContainerEnsured = false;
+            m_EnsuredContainerId = null;
+         }
+      }
+
+      /// <summary>Every container in the catalog, as the container manager lists them.</summary>
+      public static async Task<IReadOnlyList<
+         Edam.Data.Catalog.DependencyInjection.ContainerSummary>> ContainerSummariesAsync(
+         CancellationToken ct = default)
+      {
+         try
+         {
+            var store = Services.GetService<Edam.Data.Catalog.Contracts.ICatalogStore>();
+            if (store is null)
+            {
+               return Array.Empty<Edam.Data.Catalog.DependencyInjection.ContainerSummary>();
+            }
+
+            var administration = new Edam.Data.Catalog.DependencyInjection.CatalogContainerAdministration(
+               store, ContainerContent, Services.GetService<Edam.Data.Catalog.Contracts.IContentStore>());
+
+            return await administration.DescribeAllAsync(ct).ConfigureAwait(true);
+         }
+         catch (Exception ex)
+         {
+            ReportOnce("the containers could not be listed: " + ExplainFailure(ex));
+            return Array.Empty<Edam.Data.Catalog.DependencyInjection.ContainerSummary>();
+         }
+      }
+
+      /// <summary>
+      /// <b>Add a container</b> through the manager: the name is validated by the registry's own rule (one
+      /// definition), the container is created (or returned unchanged when the name exists), and its shared
+      /// locations are seeded so a project created there is runnable rather than inert (LM-5/DP-4).
+      /// </summary>
+      /// <returns>Why it could not be added, or null on success.</returns>
+      public static async Task<String?> AddContainerAsync(
+         String name, String? description, String kind, CancellationToken ct = default)
+      {
+         var problem = ConfigurableItems.ValidateContainerName(name);
+         if (problem is not null)
+         {
+            return problem;
+         }
+
+         try
+         {
+            var store = Services.GetService<Edam.Data.Catalog.Contracts.ICatalogStore>();
+            if (store is null)
+            {
+               return "the catalog storage is not available (" + StorageSummary + ")";
+            }
+
+            var administration = new Edam.Data.Catalog.DependencyInjection.CatalogContainerAdministration(
+               store, ContainerContent, Services.GetService<Edam.Data.Catalog.Contracts.IContentStore>());
+
+            var type = Edam.Data.Catalog.DependencyInjection.CatalogServices.ParseTarget(kind);
+            var container = await administration.AddAsync(name, description, type, null, ct)
+               .ConfigureAwait(true);
+
+            if (container is null)
+            {
+               return "the container '" + name + "' could not be created";
+            }
+
+            Edam.WinUI.Controls.Logging.AppDiagnostics.Write(
+               "Projects storage: container '" + container.ContainerId + "' is present (" + type + ").",
+               Microsoft.Extensions.Logging.LogLevel.Information, StorageCategory);
+
+            await SeedSharedLocationsAsync(store, container.Id, container.ContainerId, ct)
+               .ConfigureAwait(true);
+
+            return null;
+         }
+         catch (Exception ex)
+         {
+            return ExplainFailure(ex);
+         }
+      }
+
+      /// <summary>Save a container's description — the only part of a container that may be edited.</summary>
+      /// <returns>Why it could not be saved, or null on success.</returns>
+      public static async Task<String?> SaveContainerDescriptionAsync(
+         String containerId, String? description, CancellationToken ct = default)
+      {
+         try
+         {
+            var store = Services.GetService<Edam.Data.Catalog.Contracts.ICatalogStore>();
+            if (store is null)
+            {
+               return "the catalog storage is not available (" + StorageSummary + ")";
+            }
+
+            var administration = new Edam.Data.Catalog.DependencyInjection.CatalogContainerAdministration(
+               store, ContainerContent, Services.GetService<Edam.Data.Catalog.Contracts.IContentStore>());
+
+            var updated = await administration.SaveDescriptionAsync(containerId, description, ct)
+               .ConfigureAwait(true);
+
+            if (updated is null)
+            {
+               return "the container '" + containerId + "' was not found";
+            }
+
+            m_LastStorageSummary = null;   // the description is part of the next storage announcement
+
+            Edam.WinUI.Controls.Logging.AppDiagnostics.Write(
+               "Projects storage: container '" + updated.ContainerId + "' description saved.",
+               Microsoft.Extensions.Logging.LogLevel.Information, StorageCategory);
+
+            return null;
+         }
+         catch (Exception ex)
+         {
+            return ExplainFailure(ex);
+         }
+      }
+
+      /// <summary>
+      /// Keep the person's <b>own</b> catalog connection string — a deliberate, visible override of the
+      /// deployment's binding (ADR-0014, amended) — or clear it (<paramref name="connectionString"/> null/blank)
+      /// so the deployment's value applies again. The storage is rebuilt immediately, so the change is real.
+      /// </summary>
+      /// <returns>Why it was refused (a password is never accepted), or null on success.</returns>
+      public static Task<String?> SetCatalogConnectionAsync(
+         String? connectionString, CancellationToken ct = default)
+      {
+         var item = ConfigurableItems.Find(ConfigurableItems.CATALOG_CONNECTION_KEY);
+         if (item is null)
+         {
+            return Task.FromResult<String?>("the connection string is not a configurable item");
+         }
+
+         var value = String.IsNullOrWhiteSpace(connectionString) ? null : connectionString!.Trim();
+
+         // validated where it is entered (ADR-0013 decision 7): a refused value is never stored
+         var refused = UserConfiguration.Answer(item, value);
+         if (refused is not null)
+         {
+            return Task.FromResult<String?>(refused);
+         }
+
+         ResetStorage();
+
+         Edam.WinUI.Controls.Logging.AppDiagnostics.Write(
+            value is null
+               ? "Projects storage: the connection override was CLEARED — the deployment's value applies again."
+               : "Projects storage: your own connection string was saved — it OVERRIDES the deployment's value.",
+            Microsoft.Extensions.Logging.LogLevel.Information, StorageCategory);
+
+         return Task.FromResult<String?>(null);
+      }
+
+      /// <summary>
       /// Make sure the configured <b>collection</b> (container) exists before it is browsed: a catalog has
       /// to hold a location before it can hold projects, and enlistment is <b>idempotent</b> (an existing
       /// container is returned, never rewritten — a seed can never change a binding, ADR-0011).
@@ -800,7 +1024,8 @@ namespace Edam.WinUI.Controls.DataModels
             return;
          }
 
-         var connection = AppSettings.GetConnectionString("catalog");
+         // the override first, then the deployment — the same value the composition root was built from
+         var connection = EffectiveCatalogConnection;
          if (string.IsNullOrWhiteSpace(connection))
          {
             m_ContainerEnsured = true;   // a file-system collection is a folder: nothing to enlist

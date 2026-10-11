@@ -123,6 +123,26 @@ public sealed class FileSystemCatalogStore : ICatalogStore
    public ContainerInfo SetContainer(string sessionId, string containerId)
       => GetContainer(containerId) ?? EnlistContainer(containerId, "Default", null);
 
+   public Task<ContainerInfo?> SetContainerDescriptionAsync(
+      string containerId, string? description, CancellationToken ct = default)
+   {
+      if (!_containers.TryGetValue(containerId, out var existing))
+      {
+         return Task.FromResult<ContainerInfo?>(null);
+      }
+
+      // the description ONLY: the name, the kind and the base uri are identity/binding — and enlistment
+      // (above) deliberately never rewrites them, or the application's own enlist on every browse would
+      // revert a description the person had edited (ADR-0014 decision 8)
+      var updated = existing with { Description = description ?? string.Empty };
+      _containers[containerId] = updated;
+      Save();
+      return Task.FromResult<ContainerInfo?>(updated);
+   }
+
+   public ContainerInfo? SetContainerDescription(string containerId, string? description)
+      => SetContainerDescriptionAsync(containerId, description).GetAwaiter().GetResult();
+
    public ContainerInfo DelistContainer(string containerId)
    {
       if (!_containers.TryGetValue(containerId, out var c))

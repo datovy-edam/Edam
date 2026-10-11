@@ -76,23 +76,14 @@ namespace Edam.WinUI.Controls.Projects
       }
 
       /// <summary>
-      /// The <b>info surface</b> (LM-9 / ADR-0014 decision 8): the button's flyout opens on the click, and the
-      /// description is resolved then — the storage kind, the <b>redacted</b> location, whether it is local,
-      /// where the value came from, and what the catalog currently holds. A person must never have to infer
-      /// where their data is.
+      /// The <b>container manager</b> (LM-9 / ADR-0014 decision 8): ONE surface that reviews the catalog's
+      /// containers, adds one, edits a description, removes a container <b>with everything it holds</b>, and
+      /// states (or lets a person deliberately override) where the catalog keeps the data. It replaces the
+      /// separate info and remove buttons — the dialog <i>is</i> the information surface.
       /// </summary>
-      private async void StorageInfo_Click(object sender, RoutedEventArgs e)
+      private async void ContainerManager_Click(object sender, RoutedEventArgs e)
       {
-         await m_ViewModel.LoadStorageInfoAsync();
-      }
-
-      /// <summary>
-      /// Remove the selected container (confirming first). An affordance the panel was missing — and the
-      /// reason a conformance run's leftover container had to be deleted in a database by hand.
-      /// </summary>
-      private void RemoveContainer_Click(object sender, RoutedEventArgs e)
-      {
-         m_ViewModel.RemoveContainer();
+         await ContainerManagerDialog.ShowAsync(this.XamlRoot, m_ViewModel.RefreshCollectionsAsync);
       }
 
       private void TreeViewItem_PointerPressed(

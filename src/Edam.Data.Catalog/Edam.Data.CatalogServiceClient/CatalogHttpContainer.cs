@@ -102,6 +102,35 @@ public sealed class CatalogHttpContainer : ICatalogContainer
          Guid.Empty, containerId, description, type, baseUri ?? "");
    }
 
+   /// <summary>
+   /// Set a container's description over the wire — the only editable part of a container (ADR-0014
+   /// decision 8). Null means "the container is not there", so a caller can tell it apart from a failure.
+   /// </summary>
+   public async Task<ContainerInfo?> SetContainerDescriptionAsync(
+      string containerId, string? description, CancellationToken ct = default)
+   {
+      _client.ResultsLog.Clear();
+      ContainerInfo? container = null;
+      var pars = new QueryStringBuilder();
+      pars.Add(QueryStringTag.SessionId, _client.LastSessionId);
+      pars.Add(CatalogHttpClient.TAG_CONTAINER_ID, containerId);
+      pars.Add(QueryStringTag.Description, description);
+      var endpoint = CatalogHttpClient.URI_CONTAINER_DESCRIPTION + pars.ToString();
+      try
+      {
+         container = await _client.Client!
+            .GetDataFromJsonAsync<ContainerInfo?>(endpoint).ConfigureAwait(false);
+      }
+      catch (Exception ex)
+      {
+         _client.ResultsLog.Failed(ex);
+      }
+      return container;
+   }
+
+   public ContainerInfo? SetContainerDescription(string containerId, string? description)
+      => SetContainerDescriptionAsync(containerId, description).ConfigureAwait(false).GetAwaiter().GetResult();
+
    public async Task<ContainerInfo> DelistContainerAsync(
       string containerId, string? description = null, string? status = null,
       CancellationToken ct = default)

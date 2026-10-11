@@ -133,13 +133,14 @@ public sealed class PostgreSqlCatalogStore : ICatalogStore
         using var conn = await OpenAsync(ct);
         using var cmd = conn.CreateCommand();
         // Upsert by container_id; RETURNING yields the ACTUAL row so the returned Id always matches
-        // the persisted row (works both on first insert and on idempotent re-enlist of an existing
-        // container — previously the method returned a new random id that diverged from the row,
-        // so GetContainer(returned.Id) came back null once the container already existed).
+        // the persisted row. On a re-enlist the update is a deliberate NO-OP: enlistment means "make sure it
+        // exists and give me the row", never "rewrite what is there" — otherwise an application enlisting its
+        // container on every browse would silently revert a description the person had edited (ADR-0014
+        // decision 8). Editing a description is SetContainerDescriptionAsync, and nothing else.
         cmd.CommandText = """
             INSERT INTO edam_container (id, container_id, description, container_type, container_uri, content_type)
             VALUES (@id, @cid, @desc, @cty, @uri, @ctype)
-            ON CONFLICT (container_id) DO UPDATE SET description = @desc, container_type = @cty, container_uri = @uri
+            ON CONFLICT (container_id) DO UPDATE SET container_id = edam_container.container_id
             RETURNING id, container_id, description, container_type, container_uri, content_type;
             """;
         cmd.Parameters.AddWithValue("id", id);
@@ -155,6 +156,28 @@ public sealed class PostgreSqlCatalogStore : ICatalogStore
 
     public ContainerInfo EnlistContainer(string containerId, string description, string? baseUri = null, ContainerType type = ContainerType.DataContext)
         => EnlistContainerAsync(containerId, description, baseUri, type).GetAwaiter().GetResult();
+
+    public async Task<ContainerInfo?> SetContainerDescriptionAsync(string containerId, string? description, CancellationToken ct = default)
+    {
+        await EnsureSchemaAsync(ct);
+        using var conn = await OpenAsync(ct);
+        using var cmd = conn.CreateCommand();
+
+        // the description ONLY: the name, the kind and the base uri are identity/binding, never edited here
+        cmd.CommandText = """
+            UPDATE edam_container SET description = @desc
+            WHERE container_id = @cid
+            RETURNING id, container_id, description, container_type, container_uri, content_type;
+            """;
+        cmd.Parameters.AddWithValue("desc", description ?? string.Empty);
+        cmd.Parameters.AddWithValue("cid", containerId);
+
+        using var r = await cmd.ExecuteReaderAsync(ct);
+        return await r.ReadAsync(ct) ? ReadContainer(r) : null;
+    }
+
+    public ContainerInfo? SetContainerDescription(string containerId, string? description)
+        => SetContainerDescriptionAsync(containerId, description).GetAwaiter().GetResult();
 
     public async Task<ContainerInfo> SetContainerAsync(string sessionId, string containerId, CancellationToken ct = default)
         => await GetContainerAsync(containerId, ct: ct) ?? await EnlistContainerAsync(containerId, "Default", null, ContainerType.DataContext, ct);

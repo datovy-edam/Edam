@@ -36,6 +36,10 @@ else
 
 var checks = await CatalogScenario.RunAsync((ICatalogStore)store, content);
 
+// The container manager's operations (add / describe / edit the description / REMOVE) on the SAME provider:
+// a removal must take the container's items and their content, or a UI Remove button is a lie.
+var containerChecks = await CatalogContainerScenario.RunAsync((ICatalogStore)store, content);
+
 Console.WriteLine($"Provider-conformance: {providerName}");
 var failed = 0;
 foreach (var c in checks)
@@ -43,5 +47,13 @@ foreach (var c in checks)
     Console.WriteLine($"  [{(c.Passed ? "PASS" : "FAIL")}] {c.Name}  ({c.Detail})");
     if (!c.Passed) failed++;
 }
+
+Console.WriteLine($"--- containers (add / describe / edit / remove): {providerName}");
+foreach (var c in containerChecks)
+{
+    Console.WriteLine($"  [{(c.Passed ? "PASS" : "FAIL")}] {c.Name}  ({c.Detail})");
+    if (!c.Passed) failed++;
+}
+
 Console.WriteLine($"\nresult: {(failed == 0 ? "ALL CONFORM" : $"{failed} FAILED")}");
 return failed == 0 ? 0 : 1;
