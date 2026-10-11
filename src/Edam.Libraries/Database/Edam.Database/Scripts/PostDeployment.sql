@@ -1,0 +1,15 @@
+-- -----------------------------------------------------------------------------
+-- EDAM — POST-DEPLOYMENT.
+--
+-- The schema is not a usable database on its own: the application's procedures require the reference-data
+-- REGISTRY rows, and a fresh deployment used to have none — so editing an arguments file failed the moment the
+-- application tried to identify (and insert) the corresponding domain:
+--
+--    "The INSERT statement conflicted with the FOREIGN KEY constraint fk_DataDomainType.
+--     The conflict occurred in database 'Edam.Database', table 'Data.DataDomainType', column 'IdNo'."
+--
+-- The rows lived in Scripts\Sql-Scripts\00040 - Data Registry Resources.sql, which was listed as a plain file
+-- and therefore NEVER ran on publish or deploy. Including it here makes a publish/deploy produce a working
+-- database; the script guards every block with IF NOT EXISTS, so it is safe to run again.
+-- -----------------------------------------------------------------------------
+:r ".\Sql-Scripts\00040 - Data Registry Resources.sql"

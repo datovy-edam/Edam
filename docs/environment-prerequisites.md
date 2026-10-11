@@ -54,6 +54,36 @@ There is **no** database project for `Edam.Lexicon`, although `LexiconConnection
 the local instance (`Data Source=.`). The login that publishes needs `db_owner` (or sysadmin) on that
 instance; afterwards the objects — and the stored procedures the application calls — exist.
 
+### The schema is not enough: the REGISTRY rows must be loaded
+
+Publishing `Edam.Database` creates the tables **and now also loads the reference-data registry rows**:
+`Scripts/PostDeployment.sql` is the project's **post-deployment** script and includes
+`Scripts/Sql-Scripts/00040 - Data Registry Resources.sql` (every block guarded by `IF NOT EXISTS`, so a
+re-publish is safe). Before this, those rows were a plain file that no publish ever ran, and the database
+was **unusable** in a way that only showed up late — while editing an arguments file, the application
+identifies (and inserts) the corresponding domain, and the insert was refused:
+
+```
+The INSERT statement conflicted with the FOREIGN KEY constraint "fk_DataDomainType".
+The conflict occurred in database "Edam.Database", table "Data.DataDomainType", column 'IdNo'.
+```
+
+The domain carries a `TypeNo` that must exist in `Data.DataDomainType`; an empty registry means no
+`TypeNo` can be valid. **If your database was published before this change**, load the registry once —
+either re-publish the project, or run the script directly:
+
+```powershell
+sqlcmd -S . -E -C -d Edam.Database -i "src\Edam.Libraries\Database\Edam.Database\Scripts\Sql-Scripts\00040 - Data Registry Resources.sql"
+```
+
+Verify it, and expect **11** and a non-zero row count for every table:
+
+```sql
+SELECT (SELECT COUNT(*) FROM Data.DataDomainType)   AS DomainTypes,
+       (SELECT COUNT(*) FROM Data.DataReferenceType) AS ReferenceTypes,
+       (SELECT COUNT(*) FROM Data.DataKind)          AS Kinds;
+```
+
 `Cannot open database "X" requested by the login` from the application means the *authentication
 succeeded* and the database could not be opened: normally it does not exist yet (publish it), or the
 login has no user/CONNECT permission in it.

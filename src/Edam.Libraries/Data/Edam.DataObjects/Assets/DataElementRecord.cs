@@ -1,4 +1,4 @@
-﻿using System;
+using System;
 using System.Collections.Generic;
 
 // -----------------------------------------------------------------------------
@@ -173,7 +173,7 @@ namespace Edam.Data.AssetManagement
          }
          catch (Exception ex)
          {
-            results.Failed(ex);
+            results.Failed(ExplainDomainWrite(domain, ex));
          }
          finally
          {
@@ -181,6 +181,31 @@ namespace Edam.Data.AssetManagement
                provider.Dispose();
          }
          return results;
+      }
+
+      /// <summary>
+      /// Explain a domain write that the database REFUSED. A <b>foreign-key conflict</b> here is not a code defect:
+      /// the reference-data <b>registry rows</b> are missing from that database, so the <c>TypeNo</c> a domain
+      /// carries has no row to point at (<c>fk_DataDomainType</c>). That is exactly how editing an arguments file
+      /// failed — with a raw SQL message naming a constraint nobody can act on — so the remedy now travels with
+      /// the failure instead of being left to a search engine.
+      /// </summary>
+      private static Exception ExplainDomainWrite(DataDomain domain, Exception ex)
+      {
+         var text = ex?.Message ?? String.Empty;
+
+         if (text.IndexOf("FOREIGN KEY constraint", StringComparison.OrdinalIgnoreCase) < 0)
+         {
+            return ex!;
+         }
+
+         return new InvalidOperationException(
+            "The domain '" + (domain?.DomainId ?? "(unknown)") + "' (TypeNo " +
+            (domain?.TypeNo.ToString() ?? "?") + ") could not be written: this database is missing the " +
+            "reference-data REGISTRY rows, so the domain's TypeNo has no row in Data.DataDomainType " +
+            "(fk_DataDomainType). Load them by DEPLOYING Edam.Database — its post-deployment script loads the " +
+            "registry — or by running Scripts\\Sql-Scripts\\00040 - Data Registry Resources.sql against it. " +
+            "Database said: " + text, ex);
       }
 
       /// <summary>

@@ -1,4 +1,4 @@
-﻿<?xml version="1.0" encoding="utf-8"?>
+<?xml version="1.0" encoding="utf-8"?>
 <Project DefaultTargets="Build" xmlns="http://schemas.microsoft.com/developer/msbuild/2003" ToolsVersion="4.0">
   <PropertyGroup>
     <Configuration Condition=" '$(Configuration)' == '' ">Debug</Configuration>
@@ -622,5 +622,11 @@
     <None Include="Scripts\Sql-Scripts\00030 - IdBase Resources.sql" />
     <None Include="Scripts\Sql-Scripts\00040 - Data Registry Resources.sql" />
     <None Include="Scripts\Sql-Scripts\00000 - Add DbAdmin User.sql" />
+  </ItemGroup>
+  <!-- POST-DEPLOYMENT: the reference-data REGISTRY rows. Without them the database is unusable — inserting a
+       domain violates fk_DataDomainType, which is exactly how a fresh deployment failed. The rows used to sit in
+       a script that no publish ever ran; it is idempotent, so deploying (or re-deploying) is safe. -->
+  <ItemGroup>
+    <PostDeploy Include="Scripts\PostDeployment.sql" />
   </ItemGroup>
 </Project>
