@@ -1,0 +1,129 @@
+{
+   "$schema": "http://json-schema.org/draft-07/schema#",
+   "$id": "https://www.datovy.com/edam/arguments.schema.json",
+   "title": "EDAM project process arguments (*.Args.json)",
+   "description": "The contract of an EDAM project process-arguments document, as specified by 'EDAM Studio — Understanding Projects' §2.3 (docs/reference/0010 - Edam.Studio.Understanding.Projects.v0.docx), derived from the code model (Edam.Data.AssetConsole.AssetConsoleArgumentsInfo) and the templates this application ships. It is deliberately LENIENT: the specification leaves InspectArguments and ElementTransform as TBD, its own InspectArguments values are strings, and the shipped templates carry only a subset of the sections — so a document that runs today must validate today. Unknown properties are tolerated here and reported by the validator (strictly, when asked).",
+
+   "type": "object",
+   "required": [ "@context", "Process" ],
+
+   "properties": {
+      "@context": {
+         "type": "object",
+         "description": "Step 1 — the JSON vocabulary. 'Always include the above at the top of the file.'",
+         "additionalProperties": { "type": "string" }
+      },
+
+      "Domain": {
+         "type": [ "object", "null" ],
+         "description": "Step 2 — the asset domain. The application looks for DomainId when an arguments file is selected and adds the domain to the EDAM database when it is not there yet.",
+         "required": [ "DomainId" ],
+         "properties": {
+            "DomainId": { "type": "string", "minLength": 1 },
+            "Description": { "type": [ "string", "null" ] }
+         }
+      },
+
+      "Namespace": {
+         "type": [ "object", "null" ],
+         "description": "Step 3 — the asset URI, its prefix and its root element.",
+         "properties": {
+            "OrganizationDomainId": { "type": [ "string", "null" ] },
+            "Uri": { "type": [ "string", "null" ] },
+            "Prefix": { "type": [ "string", "null" ] },
+            "Extension": { "type": [ "string", "null" ] },
+            "RootElementName": { "type": [ "string", "null" ] }
+         }
+      },
+
+      "Project": {
+         "type": [ "object", "null" ],
+         "description": "Step 4 — the project and its version. 'The name must be the same as the Project folder' — a rule no JSON schema can check, so the validator checks it against the project it was given.",
+         "properties": {
+            "Name": { "type": [ "string", "null" ] },
+            "VersionId": { "type": [ "string", "null" ] }
+         }
+      },
+
+      "Process": {
+         "type": "object",
+         "description": "Step 5 — the process to execute. ProcedureName is the procedure the runner invokes; its valid values are the enumerator values of Edam.Data.AssetConsole.AssetConsoleProcedure (a conformance check keeps this list equal to the code's).",
+         "required": [ "ProcedureName" ],
+         "properties": {
+            "RecordId": { "type": [ "string", "integer", "null" ] },
+            "Name": { "type": [ "string", "null" ] },
+            "OrganizationId": { "type": [ "string", "null" ] },
+            "OrganizationDomainUri": { "type": [ "string", "null" ] },
+            "ProcedureName": {
+               "type": "string",
+               "enum": [
+                  "Unknown", "CreateProject",
+                  "DdlFromDb", "JsdFromDb", "XsdFromDb",
+                  "ToFile", "DdlToFile", "JsdToFile", "XsdToFile", "DbToFile", "DbDdlToFile",
+                  "EdiToFile", "EdiToXsd", "ToJsonLd", "ToXsd", "UseCaseToFile",
+                  "ToDb", "DdlToDb", "JsdToDb", "XsdToDb", "EdiToDb",
+                  "AssetsToDb", "DbDdlToDb",
+                  "DdlImportToAssets", "DdlToAssets", "JsdToAssets", "XsdToAssets", "DbToAssets",
+                  "DbDdlToAssets", "DbDdlToGsql", "EdiToAssets",
+                  "AssetsToDdl", "AssetsToDataTemplate", "AssetsToGql", "AssetsToXsd", "AssetsToJsd",
+                  "AssetsToJld", "AssetsToOpenXml", "AssetsToLexiconWorkbook", "AssetsToLexiconDatabase",
+                  "JsonToAssets", "FileToCodeSet", "XsdToAssetsReport"
+               ]
+            },
+            "ProcedureTag": { "type": [ "string", "null" ] },
+            "ScanFilesFolder": { "type": [ "boolean", "null" ] },
+            "SchemaType": { "type": [ "integer", "string", "null" ] },
+            "NextProcess": { "type": [ "string", "null" ] },
+            "NextProcedure": {
+               "type": [ "array", "null" ],
+               "items": { "type": "string" }
+            }
+         }
+      },
+
+      "InputFile": { "$ref": "#/definitions/fileSpec", "description": "Step 6 — the default input file." },
+      "OutputFile": { "$ref": "#/definitions/fileSpec", "description": "Step 6 — the default output file." },
+
+      "UriList": {
+         "type": "array",
+         "description": "Step 7 — where the input file(s) are, relative to the project folder. Several files compose one set of data elements.",
+         "items": {
+            "type": "string",
+            "pattern": "^(?![A-Za-z]:)(?![\\\\/])",
+            "description": "A project-relative reference such as './Archive/x.xlsx' — never an absolute or drive path."
+         }
+      },
+
+      "InspectArguments": {
+         "description": "Step 8 — how to inspect the artifacts. TBD in the specification, and its own values are strings ('1'), so this is deliberately unconstrained.",
+         "type": [ "object", "string", "null" ]
+      },
+
+      "ConnectionString": {
+         "description": "Step 9 — the database connection string, when the procedure involves a database.",
+         "type": [ "string", "null" ]
+      },
+
+      "ElementTransform": {
+         "description": "Step 9 — 'will be documented later': deliberately unconstrained.",
+         "type": [ "object", "array", "string", "null" ]
+      },
+
+      "TextMapFilePath": {
+         "description": "Step 9 — the text-map document that guides language mapping and traversal.",
+         "type": [ "string", "null" ]
+      }
+   },
+
+   "definitions": {
+      "fileSpec": {
+         "type": [ "object", "null" ],
+         "properties": {
+            "Extension": { "type": [ "string", "null" ] },
+            "Name": { "type": [ "string", "null" ] },
+            "Path": { "type": [ "string", "null" ] },
+            "Full": { "type": [ "string", "null" ] }
+         }
+      }
+   }
+}

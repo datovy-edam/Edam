@@ -1457,6 +1457,138 @@ namespace Edam.WinUI.Controls.DataModels
             : Edam.Data.Catalog.DependencyInjection.CatalogScopedContent
                .Factory(m_StorageConfiguration)(containerId);
 
+      // ---------------------------------------------------------------------
+      // the arguments document, validated against the schema (§2.3)
+      // ---------------------------------------------------------------------
+
+      /// <summary>The schema the configuration states, else the one that ships beside the templates.</summary>
+      public static String ConfiguredArgumentsSchema
+         => AppSettings.GetString(ConfigurableItems.ARGUMENTS_SCHEMA_KEY) is { Length: > 0 } stated
+            ? stated
+            : ConfigurableItems.DEFAULT_ARGUMENTS_SCHEMA;
+
+      /// <summary>
+      /// <b>Validate an arguments document</b> (§2.3) and <b>report</b> what is wrong — and never block: editing
+      /// continues, because a document a person is fixing must stay editable (the chosen behaviour), and the
+      /// diagnostics panel carries the detail. Returns the summary when the document is invalid, else null.
+      /// </summary>
+      public static async Task<String?> ValidateArgumentsAsync(
+         String? path, String? text, String? projectName, CancellationToken ct = default)
+      {
+         if (String.IsNullOrWhiteSpace(text) || String.IsNullOrWhiteSpace(path) ||
+             !path!.EndsWith(".Args.json", StringComparison.OrdinalIgnoreCase))
+         {
+            return null;
+         }
+
+         try
+         {
+            var schema = await ReadArgumentsSchemaAsync(ct).ConfigureAwait(true);
+
+            var validator = new Edam.Data.Projects.DependencyInjection.ArgumentsValidator(
+               schema, strict: false,
+               knownProcedures: Enum.GetNames(typeof(Edam.Data.AssetConsole.AssetConsoleProcedure)));
+
+            var result = validator.Validate(text, projectName);
+
+            var summary = result.Issues.Count == 0
+               ? "no issues"
+               : String.Join(" | ", result.Issues.Select(i =>
+                    i.Severity + " " + i.Code + (i.Where is null ? String.Empty : " @" + i.Where)));
+
+            Edam.WinUI.Controls.Logging.AppDiagnostics.Write(
+               "Arguments document '" + path + "': " + (result.Valid ? "VALID" : "INVALID") +
+               (result.SchemaApplied ? String.Empty : " (no schema)") + " — " + summary,
+               result.Valid
+                  ? Microsoft.Extensions.Logging.LogLevel.Information
+                  : Microsoft.Extensions.Logging.LogLevel.Warning,
+               StorageCategory);
+
+            return result.Valid ? null : summary;
+         }
+         catch (Exception ex)
+         {
+            ReportOnce("the arguments document could not be validated: " + ExplainFailure(ex));
+            return null;
+         }
+      }
+
+      /// <summary>
+      /// The schema, read <b>from the address the configuration states</b>: its folder comes from the app-data
+      /// seed (which is where it ships) or, for a catalog project, from the collection's content — so the same
+      /// entry works for both targets (ADR-0011). A schema that cannot be found is <b>reported</b>, never
+      /// silently skipped.
+      /// </summary>
+      public static async Task<String?> ReadArgumentsSchemaAsync(CancellationToken ct = default)
+      {
+         var address = ConfiguredArgumentsSchema;
+
+         try
+         {
+            // "app:templates/Arguments.schema.json" → folder "templates", file "Arguments.schema.json"
+            var relative = address.Contains(':')
+               ? address[(address.IndexOf(':') + 1)..]
+               : address;
+            relative = relative.TrimStart('/');
+
+            var slash = relative.LastIndexOf('/');
+            var folder = slash < 0 ? ProjectLocations.Templates : relative[..slash];
+            var file = slash < 0 ? relative : relative[(slash + 1)..];
+
+            var seed = FindSeedFolder(folder);
+            if (seed is not null)
+            {
+               var candidate = Path.Combine(seed, file);
+               if (File.Exists(candidate)) return await File.ReadAllTextAsync(candidate, ct);
+            }
+
+            // a catalog keeps its locations as content: try the address itself, in the scoped store when there is one
+            var store = ContainerContent(ConfiguredContainerId ?? String.Empty)
+               ?? Services.GetService<Edam.Data.Catalog.Contracts.IContentStore>();
+
+            if (store is not null)
+            {
+               using var stream = await store.OpenReadAsync("/" + folder.Trim('/') + "/" + file, ct);
+               if (stream is not null)
+               {
+                  using var reader = new StreamReader(stream);
+                  return await reader.ReadToEndAsync(ct);
+               }
+            }
+         }
+         catch (Exception ex)
+         {
+            ReportOnce("the arguments schema at '" + address + "' could not be read: " + ExplainFailure(ex));
+            return null;
+         }
+
+         ReportOnce("no arguments schema was found at '" + address + "' — arguments documents are NOT being " +
+                    "validated (state " + ConfigurableItems.ARGUMENTS_SCHEMA_KEY + " or deploy the seed)");
+         return null;
+      }
+
+      /// <summary>
+      /// The <b>project</b> a project resource belongs to — the name the arguments document must state (§2.3
+      /// step 4). Derived from the resource's address: the catalog form names it
+      /// (<c>/Projects/&lt;name&gt;/…</c>), and the file-system form keeps it in the layout the providers documented.
+      /// </summary>
+      public static String? ProjectNameFromResourcePath(String? path)
+      {
+         if (String.IsNullOrWhiteSpace(path)) return null;
+
+         var segments = path!.Replace('\\', '/').Split('/', StringSplitOptions.RemoveEmptyEntries);
+
+         for (var i = 0; i + 1 < segments.Length; i++)
+         {
+            if (String.Equals(segments[i], ProjectCollectionFolders.Projects, StringComparison.OrdinalIgnoreCase))
+            {
+               return segments[i + 1];
+            }
+         }
+
+         return null;
+      }
+
       /// <summary>
       /// <b>LM-6:</b> seed a new project's <c>Arguments</c> folder from the configured arguments
       /// template — the behaviour the legacy <c>Project.CreateProject</c> had, now expressed as

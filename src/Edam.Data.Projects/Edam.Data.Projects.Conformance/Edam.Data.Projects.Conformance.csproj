@@ -21,6 +21,9 @@
     <ProjectReference Include="..\Edam.Data.Projects.Catalog\Edam.Data.Projects.Catalog.csproj" />
     <ProjectReference Include="..\Edam.Data.Projects.DependencyInjection\Edam.Data.Projects.DependencyInjection.csproj" />
     <ProjectReference Include="..\Edam.Data.Projects.Runner\Edam.Data.Projects.Runner.csproj" />
+    <!-- The arguments-file checks compare the schema's procedure list with the code's enumerator
+         (Edam.Data.AssetConsole.AssetConsoleProcedure) — explicit, not transitive. -->
+    <ProjectReference Include="..\..\Edam.Libraries\Data\Edam.Data.Assets\Edam.Data.Assets.csproj" />
     <ProjectReference Include="..\Edam.Data.Projects.Assets\Edam.Data.Projects.Assets.csproj" />
     <ProjectReference Include="..\..\Edam.Data.Catalog\Edam.Data.Catalog.Contracts\Edam.Data.Catalog.Contracts.csproj" />
     <ProjectReference Include="..\..\Edam.Data.Catalog\Edam.Data.Catalog.FileSystem\Edam.Data.Catalog.FileSystem.csproj" />

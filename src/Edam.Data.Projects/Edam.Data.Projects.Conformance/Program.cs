@@ -307,6 +307,9 @@ try
    // ---- 10h. the registry of configurable items (CF-2, ADR-0013) ------------------------------
    all["registry (CF-2)"] = RegistryScenario.Run();
 
+   // ---- 10h-2. the arguments-file schema and the rules a schema cannot express (Projects spec §2.3) -------
+   all["arguments (§2.3)"] = ArgumentsSchemaScenario.Run();
+
    // ---- 10i. the answers: overlay + marker + the ask loop (CF-3, ADR-0013) --------------------
    all["state (CF-3)"] = StateScenario.Run(Path.Combine(temp, "state"));
 

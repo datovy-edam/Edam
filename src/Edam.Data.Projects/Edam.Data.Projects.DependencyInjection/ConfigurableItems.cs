@@ -137,6 +137,17 @@ public static class ConfigurableItems
    public const int CONTAINER_NAME_MAX_LENGTH = 64;
 
    /// <summary>
+   /// The <b>arguments-file schema</b> the application validates <c>*.Args.json</c> against (the Projects
+   /// specification §2.3). A <b>silent default</b>: a sane value ships with the application, so it is documented
+   /// and overridable and never has to ask — and because the default is an <b>address</b>, it resolves for a
+   /// file-system or a catalog project alike (ADR-0011).
+   /// </summary>
+   public const string ARGUMENTS_SCHEMA_KEY = "Edam:Arguments:Schema";
+
+   /// <summary>Where the schema ships: beside the templates, in the application's own data.</summary>
+   public const string DEFAULT_ARGUMENTS_SCHEMA = "app:templates/Arguments.schema.json";
+
+   /// <summary>
    /// The catalog's <b>connection string</b> — the binding the deployment states (ADR-0014 decision 1), which a
    /// person may now <b>deliberately override</b> from the container manager. An override is an ordinary answer
    /// (the per-user overlay) and is always <b>reported as the source</b>, so a value can never look like it came
@@ -186,6 +197,21 @@ public static class ConfigurableItems
                "than an empty one.",
             Policy: ConfigurationPolicy.SilentDefault,
             Default: DEFAULT_TEMPLATE,
+            Storage: ConfigurationStorage.AppDataOverlay,
+            Validate: null),
+
+         // the ARGUMENTS-file schema (the Projects specification §2.3): a silent default, like the template —
+         // a sane value ships beside the templates, it is documented and overridable, and it never has to ask
+         new(
+            Id: ARGUMENTS_SCHEMA_KEY,
+            Key: ARGUMENTS_SCHEMA_KEY,
+            Title: "Arguments schema",
+            WhatItIs: "The JSON schema an arguments file (*.Args.json) is validated against.",
+            WhatItAffects: "It is read when an arguments document is opened: its shape rules are applied, and the " +
+               "rules the specification states but a schema cannot express are checked beside it. A schema that " +
+               "cannot be found is REPORTED as skipped — validation never passes in silence.",
+            Policy: ConfigurationPolicy.SilentDefault,
+            Default: DEFAULT_ARGUMENTS_SCHEMA,
             Storage: ConfigurationStorage.AppDataOverlay,
             Validate: null),
 

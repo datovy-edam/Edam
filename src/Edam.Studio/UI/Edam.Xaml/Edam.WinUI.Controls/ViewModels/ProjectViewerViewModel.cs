@@ -594,6 +594,13 @@ namespace Edam.WinUI.Controls.ViewModels
                }
 
                returnMessage = text;
+
+               // §2.3: an arguments document is validated as it is opened, and what is wrong is REPORTED —
+               // never blocking (the document stays editable) and never silent. It runs HERE, before the
+               // document reaches the process/domain path, where a mistake used to surface far away.
+               _ = ProjectServicesHelper.ValidateArgumentsAsync(
+                  itm.Item.Full, text,
+                  ProjectServicesHelper.ProjectNameFromResourcePath(itm.Item.Full));
             results.ReturnText = returnMessage;
             results.Succeeded();
          }
