@@ -947,15 +947,10 @@ namespace Edam.WinUI.Controls.DataModels
             ("Samples", "schema.local.v1r0.xsd"),
          };
 
-         // ONE content policy (LM-2b-ii): a named container gets its scoped store; the sentinel `default`
-         // means the legacy/unscoped namespace, which is the store the composition root injects
-         Edam.Data.Catalog.Contracts.IContentStore? content = null;
-         if (m_StorageConfiguration is not null)
-         {
-            content = Edam.Data.Catalog.DependencyInjection.CatalogScopedContent
-               .Factory(m_StorageConfiguration)(collectionId);
-         }
-         content ??= Services.GetService<Edam.Data.Catalog.Contracts.IContentStore>();
+         // ONE content policy (LM-2b-ii): a named container gets its scoped store, while the sentinel
+         // `default` resolves to the unscoped one — the same rule the removal follows
+         var content = ContainerContent(collectionId)
+            ?? Services.GetService<Edam.Data.Catalog.Contracts.IContentStore>();
 
          if (content is null)
          {
@@ -1124,11 +1119,11 @@ namespace Edam.WinUI.Controls.DataModels
       }
 
       /// <summary>
-      /// <b>Remove a container</b> (a catalog location). This affordance was missing, and its absence is why
-      /// a conformance run's leftover container (<c>pe3-mssql-…</c>) had to survive in a database for a person
-      /// to stare at. Removal is the store's own operation (<c>DelistContainer</c>); the outcome is reported,
-      /// never guessed. A container the installation is configured to use is simply created again by the
-      /// ensure step on the next browse — so this is safe, and the confirmation says as much.
+      /// <b>Remove a container and everything it holds.</b> The cascade lives in the platform
+      /// (<c>CatalogContainerAdministration</c>) because the order is not optional: the item rows carry a
+      /// <b>foreign key</b> to the container row (so removing the container first fails outright), and content
+      /// carries <b>none</b> (so it would be orphaned). That is the defect behind "the Remove button does
+      /// nothing"; this removes content, items and the container, and reports the counts.
       /// </summary>
       public static async Task<Boolean> DeleteContainerAsync(
          String collectionId, CancellationToken ct = default)
@@ -1148,24 +1143,27 @@ namespace Edam.WinUI.Controls.DataModels
                return false;
             }
 
-            var removed = store.DelistContainer(collectionId);
-            var ok = !String.IsNullOrWhiteSpace(removed?.ContainerId);
+            var administration = new Edam.Data.Catalog.DependencyInjection.CatalogContainerAdministration(
+               store, ContainerContent, Services.GetService<Edam.Data.Catalog.Contracts.IContentStore>());
+
+            var result = await administration.RemoveAsync(collectionId, ct).ConfigureAwait(true);
 
             // the ensure step must re-check: the container that was just removed may be the configured one
             m_ContainerEnsured = false;
             m_EnsuredContainerId = null;
 
             Edam.WinUI.Controls.Logging.AppDiagnostics.Write(
-               ok
-                  ? "Projects storage: container '" + collectionId + "' was removed from the catalog."
-                  : "Projects storage: container '" + collectionId + "' was NOT removed (the store " +
-                    "returned nothing).",
-               ok
+               result.Removed
+                  ? "Projects storage: container '" + result.ContainerId + "' removed, with " +
+                    result.Items + " item(s) and " + result.Contents + " content entry(ies)."
+                  : "Projects storage: container '" + collectionId + "' was NOT removed" +
+                    (String.IsNullOrWhiteSpace(result.Problem) ? "." : " (" + result.Problem + ")."),
+               result.Removed
                   ? Microsoft.Extensions.Logging.LogLevel.Information
                   : Microsoft.Extensions.Logging.LogLevel.Warning,
                StorageCategory);
 
-            return ok;
+            return result.Removed;
          }
          catch (Exception ex)
          {
@@ -1173,6 +1171,50 @@ namespace Edam.WinUI.Controls.DataModels
             return false;
          }
       }
+
+      /// <summary>
+      /// What a container holds, in words — used in the removal confirmation, so a person removes a location
+      /// knowing exactly what goes with it (items, their content, and the projects they make up).
+      /// </summary>
+      public static async Task<String> DescribeContainerContentsAsync(
+         String? collectionId, CancellationToken ct = default)
+      {
+         if (String.IsNullOrWhiteSpace(collectionId))
+         {
+            return "everything it holds";
+         }
+
+         try
+         {
+            var store = Services.GetService<Edam.Data.Catalog.Contracts.ICatalogStore>();
+            if (store is null)
+            {
+               return "everything it holds";
+            }
+
+            var items = new Edam.Data.Catalog.DependencyInjection.CatalogContainerAdministration(store)
+               .Items(collectionId!);
+
+            var projects = await Catalog.GetProjectsAsync(collectionId!, ct).ConfigureAwait(true);
+
+            return projects.Count + " project(s) and " + items.Count + " item(s), with their content";
+         }
+         catch (Exception)
+         {
+            return "everything it holds";
+         }
+      }
+
+      /// <summary>
+      /// The content policy for one container — the <b>same</b> policy seeding and the projects layer use
+      /// (LM-2b-ii): a named container gets its scoped store, and the sentinel <c>default</c> resolves to null
+      /// by design, i.e. the caller's unscoped store.
+      /// </summary>
+      private static Edam.Data.Catalog.Contracts.IContentStore? ContainerContent(String containerId)
+         => m_StorageConfiguration is null
+            ? null
+            : Edam.Data.Catalog.DependencyInjection.CatalogScopedContent
+               .Factory(m_StorageConfiguration)(containerId);
 
       /// <summary>
       /// <b>LM-6:</b> seed a new project's <c>Arguments</c> folder from the configured arguments

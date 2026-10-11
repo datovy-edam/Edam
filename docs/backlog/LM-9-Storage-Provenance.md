@@ -106,14 +106,22 @@ looked verified. A kind must be checked in **every** composition root that names
 
 ## Remaining
 
-- **The user's runtime confirmation** and the **data cleanup**: the containers the earlier verification runs
-  created are still in `Edam.Database` — they can now be removed **from the panel** (the Remove-container button,
-  item 119), or in SQL, or by dropping the five `edam_*` tables and letting the schema be recreated.
+- **The container manager dialog (next, per the user's chosen order):** ONE borderless button opens a modal that
+  lets a person **add**, **review** and **update the description** of containers and **remove** them — showing
+  *how each container is implemented* (file system → path · web API → URI · database → MS-SQL/PostgreSQL with
+  the connection string **redacted and editable**, labelled with the source of the value). Decisions already
+  taken: the connection string is **editable always** and stored as the user's answer (needs a one-line
+  ADR-0014 amendment); **Integrated Security only** (a password is refused); removal **cascades** with the counts
+  shown; the container **name is not editable** — the **description is the display name** (so the first-run
+  question becomes a display-name question). Before the dialog: `Add`/`SaveDescription`/`Describe` on
+  `CatalogContainerAdministration`, plus the conformance group that proves the CRUD **and that a removal leaves
+  nothing behind** (hermetic on the file-system provider, live on PostgreSQL/MS-SQL when a DSN is given).
+- **The user's runtime confirmation** of the removal fix (item 121): pressing Remove on the `pe3-…` container
+  should now report *"removed, with N item(s) and M content entry(ies)"*.
 - **Migration of what is on disk:** switching the target moves nothing. `IProjectStore.ImportAsync` (upload)
   exists and is exercised only by tests; there is **no import/export UI**.
-- **Still open (not required now):** a **rename** affordance for a container (removal is delivered), the same
-  storage description **per project** ("a branch in container X; its files are content in Y"), and moving the
-  bridge's collection-resolution rule (id first, never a silent fallback) into the platform so it is headlessly
-  testable — today it lives in WinUI code and only the runtime check covers it.
+- **Still open (not required now):** container **rename** (identity migration), per-container **bindings**
+  (`Edam:Projects:Bindings:<id>`), the storage description **per project**, and moving the bridge's
+  collection-resolution rule into the platform so it is headlessly testable.
 - **Not verified here (honest):** everything above is **build-verified** plus headless conformance; the Studio's
   catalog path is proven at run time only by the user's F5.

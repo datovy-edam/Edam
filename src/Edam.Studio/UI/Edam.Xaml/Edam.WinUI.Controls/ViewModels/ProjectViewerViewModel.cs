@@ -353,12 +353,14 @@ namespace Edam.WinUI.Controls.ViewModels
       }
 
       /// <summary>
-      /// <b>Remove the selected container</b> from the catalog. This is the affordance whose absence is why a
-      /// conformance run's leftover container (<c>pe3-mssql-…</c>) had to live in a database for a person to
-      /// stare at. Removing a location is not undoable, so it is confirmed first; and if the container is the
-      /// one this installation uses, the ensure step creates it again on the next browse.
+      /// <b>Remove the selected container</b> from the catalog — and <b>everything it holds</b>: the
+      /// confirmation states what will go (projects, items and their content), because removing a location is
+      /// not undoable. The removal itself runs the platform's cascade, so the item rows (which have a foreign
+      /// key to the container) and the content (which has none) are both gone — the reason the button used to
+      /// do nothing. If the container is the one this installation uses, the ensure step creates it again on
+      /// the next browse.
       /// </summary>
-      public void RemoveContainer()
+      public async void RemoveContainer()
       {
          var selected = SelectedUriItem;
          if (selected is null || String.IsNullOrWhiteSpace(selected.UriText))
@@ -366,15 +368,30 @@ namespace Edam.WinUI.Controls.ViewModels
             return;
          }
 
+         string contents;
+         try
+         {
+            contents = await ProjectServicesHelper.DescribeContainerContentsAsync(selected.UriText);
+         }
+         catch (Exception)
+         {
+            contents = "everything it holds";
+         }
+
          Dialogs.DialogInfo d = new Dialogs.DialogInfo
          {
-            ItemName = selected.Name,
-            ItemType = Dialogs.DialogInfo.ITEM_TYPE_FILE,
+            Title = "Remove container",
+            Message = "Remove the container '" + selected.Name + "' from the catalog?" +
+               Environment.NewLine + Environment.NewLine +
+               "This removes " + contents + " — every catalog entry and its content — and cannot be undone.",
+            PrimaryText = Dialogs.DialogMessageBox.COMMAND_DELETE,
+            CloseText = Dialogs.DialogMessageBox.COMMAND_CANCEL,
             CallBack = ProcessRemoveContainerResult,
             DataObject = selected
          };
 
-         Dialogs.DialogMessageBox.DeleteItem(d);
+         // the message is ours, so it goes through ShowMessage rather than the generic "Delete File (…)?"
+         Dialogs.DialogMessageBox.ShowMessage(d);
       }
 
       private async void ProcessRemoveContainerResult(Dialogs.IDialogObjectInfo result)
