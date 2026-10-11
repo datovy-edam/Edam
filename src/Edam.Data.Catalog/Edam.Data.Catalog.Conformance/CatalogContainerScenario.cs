@@ -106,6 +106,18 @@ public static class CatalogContainerScenario
       checks.Add(New("Removing a container that does not exist is reported, not thrown",
          !missing.Removed && !String.IsNullOrWhiteSpace(missing.Problem), missing.Problem ?? "<none>"));
 
+      // ---- the store's OWN delist, exercised on every provider -------------------------------
+      // It is the statement the cascade calls, and on SQL Server its clause order was wrong
+      // ("Incorrect syntax near 'OUTPUT'": OUTPUT must precede WHERE, unlike PostgreSQL's RETURNING) — a
+      // defect no hermetic provider could report, which is why this mode exists for a live database.
+      var direct = store.EnlistContainer(
+         "direct-" + id, "Direct delist", null, ContainerType.DataContext);
+      var delisted = store.DelistContainer(direct.ContainerId);
+
+      checks.Add(New("The store's own delist removes a container and returns the row it removed",
+         delisted is not null && store.GetContainer(direct.ContainerId) is null,
+         delisted?.ContainerId ?? "<null>"));
+
       return checks;
    }
 }

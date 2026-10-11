@@ -188,11 +188,16 @@ public sealed class MsSqlCatalogStore : ICatalogStore
    {
       await using var conn = await OpenAsync(ct).ConfigureAwait(false);
 
-      // RETURNING becomes OUTPUT DELETED.* — the row being removed is what a delete yields
+      // RETURNING becomes OUTPUT DELETED.* — the row being removed is what a delete yields. The clause ORDER
+      // is not cosmetic in T-SQL: OUTPUT must come BEFORE the WHERE clause (`DELETE … OUTPUT … WHERE …`),
+      // whereas PostgreSQL's RETURNING comes last. This file had it last (a direct port) and every removal then
+      // failed with "Incorrect syntax near 'OUTPUT'." — a defect only a LIVE database could report, because the
+      // hermetic providers have no SQL at all and the LM-8 conformance never delisted a container.
       await using var cmd = new SqlCommand(
-         "DELETE FROM dbo.edam_container WHERE container_id = @cid " +
+         "DELETE FROM dbo.edam_container " +
          "OUTPUT DELETED.id, DELETED.container_id, DELETED.description, DELETED.container_type, " +
-         "DELETED.container_uri, DELETED.content_type", conn);
+         "DELETED.container_uri, DELETED.content_type " +
+         "WHERE container_id = @cid", conn);
       cmd.Parameters.AddWithValue("cid", containerId);
 
       await using var r = await cmd.ExecuteReaderAsync(ct).ConfigureAwait(false);

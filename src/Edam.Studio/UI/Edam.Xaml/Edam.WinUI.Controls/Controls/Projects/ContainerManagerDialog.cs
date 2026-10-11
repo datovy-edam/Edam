@@ -67,9 +67,22 @@ namespace Edam.WinUI.Controls.Projects
             TextWrapping = TextWrapping.Wrap,
          };
 
-         var status = new TextBlock { TextWrapping = TextWrapping.Wrap, FontSize = 12 };
+         var status = new TextBlock
+         {
+            TextWrapping = TextWrapping.Wrap,
+            FontSize = 12,
+
+            // the status line changes length with every command; a fixed slot means the dialog's SHAPE never
+            // changes with it (a dialog that grows and shrinks looks like it is jumping around)
+            MinHeight = 40,
+            VerticalAlignment = VerticalAlignment.Top,
+         };
 
          // ---- the tabs ------------------------------------------------------------------------------
+         // FIXED height, not MaxHeight: both tabs are exactly the same size, so switching tabs cannot resize
+         // the dialog either — overflow scrolls inside the tab, and nothing is ever clipped or shifts.
+         const double TabHeight = 430;
+
          var containersTab = new TabViewItem
          {
             Header = "Containers",
@@ -77,7 +90,7 @@ namespace Edam.WinUI.Controls.Projects
             Content = new ScrollViewer
             {
                VerticalScrollBarVisibility = ScrollBarVisibility.Auto,
-               MaxHeight = 420,
+               Height = TabHeight,
                Content = new StackPanel { Spacing = 10, Children = { list, detail } },
             },
          };
@@ -101,7 +114,7 @@ namespace Edam.WinUI.Controls.Projects
             Content = new ScrollViewer
             {
                VerticalScrollBarVisibility = ScrollBarVisibility.Auto,
-               MaxHeight = 420,
+               Height = TabHeight,
                Content = storageContent,
             },
          };
@@ -116,6 +129,12 @@ namespace Edam.WinUI.Controls.Projects
          tabs.TabItems.Add(storageTab);
 
          var content = new StackPanel { Spacing = 10, Children = { tabs, status } };
+
+         // a FIXED footprint for the whole surface: the tabs are the same height, the status slot is fixed, and
+         // the dialog itself is one size from the moment it opens — switching tabs, changing containers or
+         // running a command leaves the window exactly where it was
+         content.Width = 820;
+         content.Height = TabHeight + 70;
 
          var dialog = new ContentDialog
          {

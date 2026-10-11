@@ -1,12 +1,15 @@
 using Edam.Data.Catalog.Conformance;
 using Edam.Data.Catalog.Contracts;
 using Edam.Data.Catalog.FileSystem;
+using Edam.Data.Catalog.MsSql;
 using Edam.Data.Catalog.PostgreSql;
 
 // Provider-conformance runner (ADR-0006). Same scenario, swappable providers:
 //   Edam.Data.Catalog.Conformance                          -> in-memory (offline, reference)
-//   Edam.Data.Catalog.Conformance postgres "<connection>" -> PostgreSQL (live DB)
-//   Edam.Data.Catalog.Conformance filesystem "<root dir>" -> file-system (durable, offline)
+//   Edam.Data.Catalog.Conformance filesystem "<root dir>"  -> file-system (durable, offline)
+//   Edam.Data.Catalog.Conformance postgres "<connection>"  -> PostgreSQL (live DB)
+//   Edam.Data.Catalog.Conformance mssql "<connection>"     -> MS-SQL (live DB; the ONLY provider whose
+//                                                             SQL can be wrong, so this mode exists to be run)
 var mode = args.Length > 0 ? args[0] : "memory";
 
 object store;
@@ -20,6 +23,15 @@ if (mode.Equals("postgres", StringComparison.OrdinalIgnoreCase))
     store = pg;
     content = new PostgreSqlContentStore(args[1]);
     providerName = "postgres";
+}
+else if (mode.Equals("mssql", StringComparison.OrdinalIgnoreCase))
+{
+    if (args.Length < 2) { Console.Error.WriteLine("mssql requires a connection string"); return 2; }
+    var ms = new MsSqlCatalogStore(args[1]);
+    await ms.EnsureSchemaAsync();
+    store = ms;
+    content = new MsSqlContentStore(args[1]);
+    providerName = "mssql";
 }
 else if (mode.Equals("filesystem", StringComparison.OrdinalIgnoreCase))
 {
