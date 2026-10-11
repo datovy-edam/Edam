@@ -829,6 +829,22 @@ namespace Edam.WinUI.Controls.DataModels
       public static string? ConfiguredContainerName => ConfiguredContainerId;
 
       /// <summary>
+      /// True when the catalog's storage is a <b>database reached by a connection string</b> — the only case in
+      /// which a connection string is a thing that exists here. A file-system catalog states a root path and a
+      /// service catalog a base URI; neither has a connection string to show or edit.
+      /// </summary>
+      public static Boolean CatalogIsConnectionStringBacked =>
+         string.Equals(m_StorageKind, "mssql", StringComparison.OrdinalIgnoreCase) ||
+         string.Equals(m_StorageKind, "postgres", StringComparison.OrdinalIgnoreCase);
+
+      /// <summary>
+      /// Where the catalog's storage is, as a person may read it — <b>redacted</b> (a password never reaches a
+      /// screen, ADR-0014 decision 5). Every container of the catalog shares it; a container's own part is its
+      /// namespace inside it.
+      /// </summary>
+      public static String CatalogLocationText => m_StorageLocation;
+
+      /// <summary>
       /// Forget the resolved storage so the next call rebuilds it — used when the connection string is edited in
       /// the container manager. Without this the composition root built from the OLD value would keep pointing
       /// at the old catalog, and the saved value would look inert (the defect this area keeps meeting).

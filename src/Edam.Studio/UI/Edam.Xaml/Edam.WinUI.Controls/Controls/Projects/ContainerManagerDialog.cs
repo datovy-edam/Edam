@@ -14,25 +14,23 @@ using Windows.UI;
 namespace Edam.WinUI.Controls.Projects
 {
    /// <summary>
-   /// <b>The container manager</b> (ADR-0014 decision 8 / LM-9): <b>one</b> surface that reviews and manages the
-   /// catalog's containers, so a person never has to guess where their data is or edit a configuration file to
-   /// change it.
-   /// <list type="bullet">
-   /// <item>the <b>list</b> shows each container by its <b>description</b> (the display name), with the immutable
-   /// name, how it is implemented and how much it holds beside it;</item>
-   /// <item><b>Add</b> creates a container (name validated by the registry's own rule) and seeds its shared
-   /// locations, so a project created there is runnable rather than inert;</item>
-   /// <item><b>Save description</b> edits the only part of a container that is not identity — an edit that
-   /// enlistment can never revert (the contract makes enlist idempotent, and the providers now agree);</item>
-   /// <item><b>Remove</b> takes the container and <b>everything it holds</b> (items and their content), with the
-   /// counts shown first;</item>
-   /// <item>the <b>connection string</b> is stated, with its source, and may be overridden deliberately
-   /// (Integrated Security only — a password is refused, because no secret is ever stored).</item>
-   /// </list>
+   /// <b>The container manager</b> (ADR-0014 decision 11 / LM-9): <b>one</b> surface to review and manage the
+   /// catalog's containers, and to see where their data is.
    /// <para>
-   /// It is a <c>ContentDialog</c>, not a second window: a modal over the shell needs only the panel's
-   /// <c>XamlRoot</c>, and WinUI allows <b>one</b> dialog at a time — so the removal confirmation is a state
-   /// inside this dialog, never a dialog of its own (the lesson from items 88–93).
+   /// <b>Two tabs, and the split is deliberate.</b> <b>Containers</b> is where a container is <i>selected and
+   /// managed</i> — the list, its description (the display name, the only editable part), adding and removing.
+   /// <b>Storage</b> states <i>where the data is</i>: every container in this catalog is held by <b>one</b>
+   /// storage, so that tab describes the catalog's storage and says so plainly; the only per-container facts are
+   /// the container's <b>namespace</b> inside it and how much it holds. A connection string is therefore the
+   /// catalog's, never a container's — and the field only appears when the catalog actually <i>is</i> reached by
+   /// one (a database); a file-system catalog states a root path and a service catalog a base URI, and neither
+   /// has a connection string to edit.
+   /// </para>
+   /// <para>
+   /// It is a <c>ContentDialog</c> — one modal over the shell, using the panel's <c>XamlRoot</c> — and it lays its
+   /// content out <b>vertically</b>: WinUI caps a dialog at roughly 548 DIPs by default, which is what silently
+   /// clipped a side-by-side layout. The cap is raised here and the content scrolls inside the dialog, so nothing
+   /// can be cut off on a narrow window.
    /// </para>
    /// </summary>
    public static class ContainerManagerDialog
@@ -41,20 +39,22 @@ namespace Edam.WinUI.Controls.Projects
       {
          var summaries = new List<ContainerSummary>();
          ContainerSummary? selected = null;
+         string? selectAfterReload = null;
 
          // ---- the surfaces ---------------------------------------------------------------------------
          var list = new ListView
          {
             SelectionMode = ListViewSelectionMode.Single,
-            MaxHeight = 240,
-            MinWidth = 260,
+            MaxHeight = 200,
             BorderThickness = new Thickness(1),
             BorderBrush = new SolidColorBrush(Colors.LightGray),
          };
 
-         var detail = new StackPanel { Spacing = 8, MinWidth = 320, MaxWidth = 420 };
+         var detail = new StackPanel { Spacing = 8 };
 
-         var storageText = new TextBlock
+         var storageShared = new TextBlock { TextWrapping = TextWrapping.Wrap, FontSize = 12 };
+         var storageContainer = new TextBlock { TextWrapping = TextWrapping.Wrap, FontSize = 12 };
+         var storageNote = new TextBlock
          {
             TextWrapping = TextWrapping.Wrap,
             FontSize = 12,
@@ -65,34 +65,57 @@ namespace Edam.WinUI.Controls.Projects
          {
             Header = "Catalog connection string (Integrated Security only — a password is refused)",
             TextWrapping = TextWrapping.Wrap,
-            AcceptsReturn = false,
          };
 
          var status = new TextBlock { TextWrapping = TextWrapping.Wrap, FontSize = 12 };
 
-         var body = new Grid { ColumnSpacing = 12 };
-         body.ColumnDefinitions.Add(new ColumnDefinition { Width = GridLength.Auto });
-         body.ColumnDefinitions.Add(new ColumnDefinition { Width = new GridLength(1, GridUnitType.Star) });
-         Grid.SetColumn(list, 0);
-         Grid.SetColumn(detail, 1);
-         body.Children.Add(list);
-         body.Children.Add(detail);
-
-         var header = new StackPanel { Spacing = 6 };
-         header.Children.Add(storageText);
-         header.Children.Add(connectionBox);
+         // ---- the tabs ------------------------------------------------------------------------------
+         var containersTab = new TabViewItem
+         {
+            Header = "Containers",
+            IsClosable = false,
+            Content = new ScrollViewer
+            {
+               VerticalScrollBarVisibility = ScrollBarVisibility.Auto,
+               MaxHeight = 420,
+               Content = new StackPanel { Spacing = 10, Children = { list, detail } },
+            },
+         };
 
          var connectionRow = new StackPanel { Orientation = Orientation.Horizontal, Spacing = 6 };
          var saveConnection = new Button { Content = "Use my value" };
          var clearConnection = new Button { Content = "Use the deployment's value" };
          connectionRow.Children.Add(saveConnection);
          connectionRow.Children.Add(clearConnection);
-         header.Children.Add(connectionRow);
-         header.Children.Add(status);
 
-         var content = new StackPanel { Spacing = 12 };
-         content.Children.Add(header);
-         content.Children.Add(body);
+         var storageContent = new StackPanel
+         {
+            Spacing = 10,
+            Children = { storageShared, storageContainer, storageNote, connectionBox, connectionRow },
+         };
+
+         var storageTab = new TabViewItem
+         {
+            Header = "Storage",
+            IsClosable = false,
+            Content = new ScrollViewer
+            {
+               VerticalScrollBarVisibility = ScrollBarVisibility.Auto,
+               MaxHeight = 420,
+               Content = storageContent,
+            },
+         };
+
+         var tabs = new TabView
+         {
+            IsAddTabButtonVisible = false,
+            CanDragTabs = false,
+            CanReorderTabs = false,
+         };
+         tabs.TabItems.Add(containersTab);
+         tabs.TabItems.Add(storageTab);
+
+         var content = new StackPanel { Spacing = 10, Children = { tabs, status } };
 
          var dialog = new ContentDialog
          {
@@ -103,7 +126,12 @@ namespace Edam.WinUI.Controls.Projects
             Content = content,
          };
 
-         // ---- helpers (local functions: they own this dialog's state) --------------------------------
+         // a dialog is capped by a theme resource (~548 DIPs); this one needs more room, and its content
+         // scrolls, so raising the cap can never clip anything
+         dialog.Resources["ContentDialogMaxWidth"] = 900d;
+         dialog.Resources["ContentDialogMinWidth"] = 640d;
+
+         // ---- helpers (local functions own this dialog's state) --------------------------------------
          void Report(string message, bool failed)
          {
             status.Text = message;
@@ -119,14 +147,6 @@ namespace Edam.WinUI.Controls.Projects
             _ => "database",
          };
 
-         static string KindKey(ContainerType type) => type switch
-         {
-            ContainerType.FileSystem => "filesystem",
-            ContainerType.PostgreSql => "postgres",
-            ContainerType.MsSql => "mssql",
-            _ => "postgres",
-         };
-
          TextBlock Line(string text, double size = 12, bool dim = false) => new()
          {
             Text = text,
@@ -135,67 +155,40 @@ namespace Edam.WinUI.Controls.Projects
             Foreground = new SolidColorBrush(dim ? Colors.DimGray : Colors.Black),
          };
 
-         static string Describe(ContainerSummary summary)
-            => summary.Description is { Length: > 0 }
-               ? summary.Description
-               : "(no description yet)";
+         static string DisplayName(ContainerSummary summary)
+            => summary.Description is { Length: > 0 } ? summary.Description : "(no description yet)";
 
-         static string Detail(ContainerSummary summary, bool isDefault)
-            => summary.ContainerId
-               + (isDefault ? "  ·  default" : string.Empty)
-               + "  ·  " + KindOf(summary.Type)
-               + "  ·  " + summary.Items + " item(s)";
+         bool IsDefault(ContainerSummary summary) => string.Equals(
+            summary.ContainerId, ProjectServicesHelper.ConfiguredContainerName,
+            StringComparison.OrdinalIgnoreCase);
 
-         async Task ReloadAsync()
+         void ShowStorage()
          {
-            var previous = selected?.ContainerId;
+            // ONE catalog, ONE storage: this is the catalog's storage, shared by every container — and the
+            // container's own part of it is its namespace
+            storageShared.Text = "This catalog stores everything in ONE place, shared by every container: " +
+               ProjectServicesHelper.StorageKind + " — " + ProjectServicesHelper.CatalogLocationText +
+               "  (stated by " + ProjectServicesHelper.CatalogConnectionSource + "; " +
+               (ProjectServicesHelper.IsLocalTarget ? "local" : "shared/remote") + ").";
 
-            var loaded = await ProjectServicesHelper.ContainerSummariesAsync();
-            summaries.Clear();
-            summaries.AddRange(loaded);
+            storageContainer.Text = selected is null
+               ? "Select a container on the Containers tab to see its namespace in that storage."
+               : "This container: namespace '" + selected.ContainerId + "'  ·  " +
+                 KindOf(selected.Type) + "  ·  " + selected.Items + " item(s).";
 
-            var configured = ProjectServicesHelper.ConfiguredContainerName;
-            list.Items.Clear();
+            // a connection string belongs to a catalog that IS reached by one — not to a file-system root
+            // or a service URI, and never to a container
+            var connectionBacked = ProjectServicesHelper.CatalogIsConnectionStringBacked;
+            connectionBox.Visibility = connectionBacked ? Visibility.Visible : Visibility.Collapsed;
+            connectionRow.Visibility = connectionBacked ? Visibility.Visible : Visibility.Collapsed;
 
-            foreach (var summary in summaries)
-            {
-               var isDefault = string.Equals(summary.ContainerId, configured,
-                  StringComparison.OrdinalIgnoreCase);
-
-               list.Items.Add(new ListViewItem
-               {
-                  Content = new StackPanel
-                  {
-                     Children =
-                     {
-                        Line(Describe(summary), 13),
-                        Line(Detail(summary, isDefault), 11, dim: true),
-                     },
-                  },
-                  Tag = summary,
-               });
-            }
-
-            storageText.Text = await ProjectServicesHelper.DescribeStorageAsync(previous);
             connectionBox.Text = ProjectServicesHelper.CatalogConnectionText;
 
-            var keep = summaries.FirstOrDefault(s => string.Equals(
-               s.ContainerId, previous, StringComparison.OrdinalIgnoreCase))
-               ?? summaries.FirstOrDefault(s => string.Equals(
-                  s.ContainerId, configured, StringComparison.OrdinalIgnoreCase))
-               ?? summaries.FirstOrDefault();
-
-            if (keep is not null)
-            {
-               foreach (var item in list.Items.OfType<ListViewItem>())
-               {
-                  if (ReferenceEquals(item.Tag, keep)) list.SelectedItem = item;
-               }
-            }
-            else
-            {
-               RenderEmpty();
-            }
+            storageNote.Text = connectionBacked
+               ? "The connection string is the catalog's, not a container's. Keeping your own value overrides " +
+                 "the deployment's, and 'Use the deployment's value' gives it back."
+               : "This catalog is not managed by a connection string: its storage is " +
+                 ProjectServicesHelper.StorageKind + ", stated by the deployment. Nothing to edit here.";
          }
 
          void RenderEmpty()
@@ -203,29 +196,30 @@ namespace Edam.WinUI.Controls.Projects
             selected = null;
             detail.Children.Clear();
             detail.Children.Add(Line("This catalog has no containers yet.", 13));
+
             var add = new Button { Content = "Add a container" };
             add.Click += (_, _) => RenderAdd();
             detail.Children.Add(add);
+
+            ShowStorage();
          }
 
          void RenderDetail(ContainerSummary summary)
          {
             selected = summary;
-            var isDefault = string.Equals(summary.ContainerId,
-               ProjectServicesHelper.ConfiguredContainerName, StringComparison.OrdinalIgnoreCase);
+            var isDefault = IsDefault(summary);
 
             detail.Children.Clear();
             detail.Children.Add(Line(isDefault ? "Container (default for this installation)" : "Container", 13));
 
-            // the NAME is identity: it is the address authority and the namespace content lives under
+            // the NAME is identity — the address authority and the namespace content lives under
             detail.Children.Add(Line("Name — not editable: " + summary.ContainerId, 11, dim: true));
-            detail.Children.Add(Line("Implementation: " + KindOf(summary.Type)
-               + (string.IsNullOrWhiteSpace(summary.ContainerUri) ? string.Empty : " — " + summary.ContainerUri)
-               + "  ·  " + summary.Items + " item(s)", 11, dim: true));
+            detail.Children.Add(Line("Holds " + summary.Items + " item(s)  ·  " +
+               KindOf(summary.Type), 11, dim: true));
 
             var description = new TextBox
             {
-               Header = "Description (the display name)",
+               Header = "Description (the display name; the only editable part)",
                Text = summary.Description ?? string.Empty,
                TextWrapping = TextWrapping.Wrap,
                AcceptsReturn = true,
@@ -253,12 +247,14 @@ namespace Edam.WinUI.Controls.Projects
 
             remove.Click += (_, _) => RenderRemoveConfirm(summary);
             add.Click += (_, _) => RenderAdd();
+
+            ShowStorage();
          }
 
          async void RenderRemoveConfirm(ContainerSummary summary)
          {
             detail.Children.Clear();
-            detail.Children.Add(Line("Remove '" + Describe(summary) + "'?", 13));
+            detail.Children.Add(Line("Remove '" + DisplayName(summary) + "'?", 13));
 
             var contents = await ProjectServicesHelper.DescribeContainerContentsAsync(summary.ContainerId);
             detail.Children.Add(Line("This removes " + contents + " — every catalog entry and its content — " +
@@ -294,7 +290,7 @@ namespace Edam.WinUI.Controls.Projects
 
             var name = new TextBox
             {
-               Header = "Name (its address; letters, digits, '.', '-', '_')",
+               Header = "Name (its address — letters, digits, '.', '-', '_')",
                Text = "Edam." + DateTime.Now.ToString("yyyyMMdd"),
             };
             var description = new TextBox
@@ -338,12 +334,64 @@ namespace Edam.WinUI.Controls.Projects
                var problem = await ProjectServicesHelper.AddContainerAsync(
                   name.Text, description.Text, key);
 
-               Report(problem ?? "Container '" + name.Text.Trim() + "' is ready (its shared locations " +
-                  "were seeded, so a project created in it can run).", problem is not null);
+               Report(problem ?? "Container '" + name.Text.Trim() + "' is ready (its shared locations were " +
+                  "seeded, so a project created in it can run).", problem is not null);
 
+               // show what was just made: reload SELECTS it, instead of falling back to the previous container
+               selectAfterReload = name.Text.Trim();
                await ReloadAsync();
                await refresh();
             };
+         }
+
+         async Task ReloadAsync()
+         {
+            var previous = selectAfterReload ?? selected?.ContainerId;
+            selectAfterReload = null;
+
+            var loaded = await ProjectServicesHelper.ContainerSummariesAsync();
+            summaries.Clear();
+            summaries.AddRange(loaded);
+
+            list.Items.Clear();
+
+            foreach (var summary in summaries)
+            {
+               list.Items.Add(new ListViewItem
+               {
+                  Content = new StackPanel
+                  {
+                     Children =
+                     {
+                        Line(DisplayName(summary), 13),
+                        Line(summary.ContainerId + (IsDefault(summary) ? "  ·  default" : string.Empty) +
+                           "  ·  " + KindOf(summary.Type) + "  ·  " + summary.Items + " item(s)", 11, dim: true),
+                     },
+                  },
+                  Tag = summary,
+               });
+            }
+
+            var configured = ProjectServicesHelper.ConfiguredContainerName;
+            var keep = summaries.FirstOrDefault(s => string.Equals(
+                  s.ContainerId, previous, StringComparison.OrdinalIgnoreCase))
+               ?? summaries.FirstOrDefault(s => string.Equals(
+                  s.ContainerId, configured, StringComparison.OrdinalIgnoreCase))
+               ?? summaries.FirstOrDefault();
+
+            if (keep is not null)
+            {
+               foreach (var item in list.Items.OfType<ListViewItem>())
+               {
+                  if (ReferenceEquals(item.Tag, keep)) list.SelectedItem = item;
+               }
+
+               RenderDetail(keep);
+            }
+            else
+            {
+               RenderEmpty();
+            }
          }
 
          // ---- wiring --------------------------------------------------------------------------------
