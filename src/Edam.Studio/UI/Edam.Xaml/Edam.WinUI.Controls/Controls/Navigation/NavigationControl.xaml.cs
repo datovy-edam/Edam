@@ -64,10 +64,38 @@ namespace Edam.WinUI.Controls.Navigation
 
          ApplicationHelper.SetMenuOption(MenuOption.Login);
 
+         // A COMMAND's findings (validating an arguments document, say) may need to be SEEN: the panel expands
+         // itself rather than sitting collapsed while something is wrong. The subscription follows this
+         // control's own lifecycle, so a control that is gone is never kept alive by it.
+         Loaded += (sender, args) =>
+         {
+            Edam.WinUI.Controls.DataModels.ProjectServicesHelper.AttentionRequested -= OnAttentionRequested;
+            Edam.WinUI.Controls.DataModels.ProjectServicesHelper.AttentionRequested += OnAttentionRequested;
+         };
+         Unloaded += (sender, args) =>
+            Edam.WinUI.Controls.DataModels.ProjectServicesHelper.AttentionRequested -= OnAttentionRequested;
+
          // The diagnostics side panel starts COLLAPSED: the person expands it if they are interested. It
          // collapses to the chevron rail (never to nothing), so it stays discoverable, and the width is
          // applied here so the rail is right from the first layout.
          ApplySidePanelWidth();
+      }
+
+      /// <summary>
+      /// Reveal the diagnostics panel — something was written that the person is meant to see. Marshalled to the
+      /// UI thread, whatever raised the request.
+      /// </summary>
+      private void OnAttentionRequested()
+      {
+         if (DispatcherQueue is null) return;
+
+         if (!DispatcherQueue.HasThreadAccess)
+         {
+            DispatcherQueue.TryEnqueue(() => m_ViewModel.Expander.PanelVisibility = Visibility.Visible);
+            return;
+         }
+
+         m_ViewModel.Expander.PanelVisibility = Visibility.Visible;
       }
 
       /// <summary>The collapsed width: just the chevron rail, so the panel can always be reopened.</summary>

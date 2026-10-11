@@ -202,6 +202,17 @@ namespace Edam.WinUI.Controls.DataModels
       /// </summary>
       public static event Action? ProjectsChanged;
 
+      /// <summary>
+      /// Something was written that the person is meant to <b>see</b> — today a validation that found issues — so
+      /// the diagnostics panel reveals itself instead of sitting collapsed while something is wrong. Raised by
+      /// the code that knows something is worth reading, consumed by the surface that owns the panel, which
+      /// follows its own lifecycle (subscribe while loaded, release when gone).
+      /// </summary>
+      public static event Action? AttentionRequested;
+
+      /// <summary>Ask the diagnostics surface to show itself.</summary>
+      public static void RequestAttention() => AttentionRequested?.Invoke();
+
       /// <summary>Tell the loaded surfaces that the set of projects changed (see <see cref="ProjectsChanged"/>).</summary>
       public static void NotifyProjectsChanged() => ProjectsChanged?.Invoke();
 
@@ -1473,7 +1484,8 @@ namespace Edam.WinUI.Controls.DataModels
       /// diagnostics panel carries the detail. Returns the summary when the document is invalid, else null.
       /// </summary>
       public static async Task<String?> ValidateArgumentsAsync(
-         String? path, String? text, String? projectName, CancellationToken ct = default)
+         String? path, String? text, String? projectName,
+         String? collectionId = null, CancellationToken ct = default)
       {
          if (String.IsNullOrWhiteSpace(text) || String.IsNullOrWhiteSpace(path) ||
              !path!.EndsWith(".Args.json", StringComparison.OrdinalIgnoreCase))
@@ -1491,25 +1503,121 @@ namespace Edam.WinUI.Controls.DataModels
 
             var result = validator.Validate(text, projectName);
 
-            var summary = result.Issues.Count == 0
-               ? "no issues"
-               : String.Join(" | ", result.Issues.Select(i =>
-                    i.Severity + " " + i.Code + (i.Where is null ? String.Empty : " @" + i.Where)));
+            // the validator is deliberately PURE (no I/O), so the one rule that needs the project's content is
+            // checked here: a reference that is inside the project but points at a file that is NOT there
+            var missing = await MissingReferencesAsync(path!, text!, collectionId, ct).ConfigureAwait(true);
+
+            var issues = result.Issues
+               .Select(i => i.Severity + " " + i.Code + (i.Where is null ? String.Empty : " @" + i.Where))
+               .Concat(missing)
+               .ToList();
+
+            // warnings are TOLERATED (a document stays usable), but a person who ASKED is told what was found —
+            // so anything at all is returned, and only a clean document returns null
+            var valid = result.Valid;
+            var summary = issues.Count == 0 ? "no issues" : String.Join(" | ", issues);
 
             Edam.WinUI.Controls.Logging.AppDiagnostics.Write(
-               "Arguments document '" + path + "': " + (result.Valid ? "VALID" : "INVALID") +
+               "Arguments document '" + path + "': " + (valid ? "VALID" : "INVALID") +
                (result.SchemaApplied ? String.Empty : " (no schema)") + " — " + summary,
-               result.Valid
+               valid
                   ? Microsoft.Extensions.Logging.LogLevel.Information
                   : Microsoft.Extensions.Logging.LogLevel.Warning,
                StorageCategory);
 
-            return result.Valid ? null : summary;
+            return issues.Count == 0 ? null : summary;
          }
          catch (Exception ex)
          {
             ReportOnce("the arguments document could not be validated: " + ExplainFailure(ex));
             return null;
+         }
+      }
+
+      /// <summary>
+      /// The references an arguments document makes that <b>are not there</b> — the one rule the pure validator
+      /// cannot check. Only runs when the project is known, so the answer is never a guess.
+      /// </summary>
+      private static async Task<IReadOnlyList<String>> MissingReferencesAsync(
+         String argsPath, String text, String? collectionId, CancellationToken ct)
+      {
+         var missing = new List<String>();
+
+         try
+         {
+            if (!TrySplitProjectPath(argsPath, out var projectName, out _)) return missing;
+
+            var collection = await ResolveCollectionAsync(collectionId ?? ConfiguredContainerId, ct)
+               .ConfigureAwait(true);
+            if (collection is null) return missing;
+
+            var project = await Catalog.GetProjectAsync(collection.CollectionId, projectName, ct)
+               .ConfigureAwait(true);
+            if (project is null) return missing;
+
+            foreach (var (where, reference) in ArgumentsReferences(text))
+            {
+               var path = ProjectPath.Parse(reference);
+               if (await Resources.ExistsAsync(project, path, ct).ConfigureAwait(true)) continue;
+
+               missing.Add("Warning missing @" + where + " '" + reference +
+                  "' is referenced but is not in the project");
+            }
+         }
+         catch (Exception)
+         {
+            // an existence check is best effort: the pure rules have already been reported
+         }
+
+         return missing;
+      }
+
+      /// <summary>The project-relative references an arguments document names, with where each one is stated.</summary>
+      private static IEnumerable<(String Where, String Reference)> ArgumentsReferences(String text)
+      {
+         System.Text.Json.JsonDocument? document = null;
+         try
+         {
+            document = System.Text.Json.JsonDocument.Parse(text);
+         }
+         catch (Exception)
+         {
+            yield break;
+         }
+
+         using (document)
+         {
+            var root = document.RootElement;
+
+            if (root.TryGetProperty("UriList", out var list) &&
+                list.ValueKind == System.Text.Json.JsonValueKind.Array)
+            {
+               var index = 0;
+               foreach (var entry in list.EnumerateArray())
+               {
+                  var reference = entry.GetString();
+                  if (!String.IsNullOrWhiteSpace(reference)) yield return ("UriList[" + index + "]", reference!);
+                  index++;
+               }
+            }
+
+            if (root.TryGetProperty("InputFile", out var input) &&
+                input.ValueKind == System.Text.Json.JsonValueKind.Object)
+            {
+               var folder = input.TryGetProperty("Path", out var p) ? p.GetString() : null;
+               var name = input.TryGetProperty("Name", out var n) ? n.GetString() : null;
+               if (!String.IsNullOrWhiteSpace(folder) && !String.IsNullOrWhiteSpace(name))
+               {
+                  yield return ("InputFile", folder!.TrimEnd('/') + "/" + name);
+               }
+            }
+
+            if (root.TryGetProperty("TextMapFilePath", out var map) &&
+                map.ValueKind == System.Text.Json.JsonValueKind.String)
+            {
+               var reference = map.GetString();
+               if (!String.IsNullOrWhiteSpace(reference)) yield return ("TextMapFilePath", reference!);
+            }
          }
       }
 

@@ -116,6 +116,42 @@ namespace Edam.WinUI.Controls.Projects
          SaveText();
       }
 
+      /// <summary>
+      /// <b>Validate the document being EDITED</b> (the Projects specification §2.3) — the text as it stands,
+      /// unsaved edits included, because that is what the person is looking at; a file already written to disk
+      /// tells them nothing about what they have typed since.
+      /// <para>
+      /// On demand only (nothing validates behind theirback), and the findings go to the diagnostics panel, which
+      /// <b>expands itself</b> when there are any — so the answer is visible without hunting for it. A clean
+      /// document changes nothing on screen but the one line on the record.
+      /// </para>
+      /// </summary>
+      private async void ProjectValidate_Click(object sender, RoutedEventArgs e)
+      {
+         try
+         {
+            var text = await EditorControl.ViewModel.GetEditorText();
+            var path = m_ViewModel.SelectedItem == null ? null : m_ViewModel.SelectedItem.Item.Full;
+
+            var summary = await ProjectServicesHelper.ValidateArgumentsAsync(
+               path, text,
+               ProjectServicesHelper.ProjectNameFromResourcePath(path),
+               m_ViewModel.SelectedUriItem == null ? null : m_ViewModel.SelectedUriItem.UriText);
+
+            if (summary is not null)
+            {
+               // issues were found: reveal the panel that holds them, rather than hoping the person looks
+               ProjectServicesHelper.RequestAttention();
+            }
+         }
+         catch (Exception ex)
+         {
+            Edam.WinUI.Controls.Logging.AppDiagnostics.Write(
+               "Arguments document validation failed: " + ex.Message,
+               Microsoft.Extensions.Logging.LogLevel.Warning, "Edam.Studio");
+         }
+      }
+
       private void EditorControl_KeyDown(object sender, KeyRoutedEventArgs e)
       {
          //if (e.Key == Windows.System.VirtualKey.S)

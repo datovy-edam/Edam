@@ -36,6 +36,16 @@
                <AppBarButton Icon="Play" Width="34" LabelPosition="Collapsed" 
                              Click="ProjectPlay_Click" ToolTipService.ToolTip="Play"
                              Foreground="Green" x:Name="PlayButton" />
+               <!-- Validate the document being edited (the Projects specification §2.3, against the schema the
+                    configuration states). On demand only — nothing is checked behind the person's back — and
+                    the diagnostics panel expands itself when the document has issues. -->
+               <AppBarButton Icon="Accept" Width="34" LabelPosition="Collapsed"
+                             Click="ProjectValidate_Click"
+                             ToolTipService.ToolTip="Validate this arguments document (schema + the specification's rules)">
+                  <AppBarButton.KeyboardAccelerators>
+                     <KeyboardAccelerator Modifiers="Control,Shift" Key="V"/>
+                  </AppBarButton.KeyboardAccelerators>
+               </AppBarButton>
             </StackPanel>
             <Button Margin="5,0,5,0" Background="Transparent" BorderThickness="0" Padding="6">
                <TextBlock x:Name="LoadedFileName" Text="{x:Bind m_ViewModel.SelectedItemName, Mode=TwoWay}" Foreground="DarkBlue" />
