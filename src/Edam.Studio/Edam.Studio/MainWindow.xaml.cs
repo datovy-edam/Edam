@@ -110,6 +110,14 @@ namespace Edam.Studio
       {
          m_Closed = true;
 
+         // The two lines below BRACKET our own teardown in the log, so a WinRT failure on the way out can be
+         // placed: between them it came from something we released, and after "handlers released" it came from
+         // the framework's own shutdown (XAML/WebView2 teardown), which is the difference between a defect and
+         // the harmless first-chance notice a debugger prints either way.
+         Edam.WinUI.Controls.Logging.AppDiagnostics.Write(
+            "Application closing: the window closed — releasing every signal and the poll.",
+            Microsoft.Extensions.Logging.LogLevel.Information, "Edam.Studio");
+
          // EACH step guarded on its own: with a single try around all of them, a failure in the first (a timer
          // whose dispatcher is already gone, say) would SKIP the unsubscriptions — leaving handlers attached to a
          // dead window, which is exactly the defect item 117 fixed. A failure here is recorded by the app's WinRT
@@ -128,6 +136,10 @@ namespace Edam.Studio
 
          Try(() => Activated -= OnWindowActivated);
          Try(() => Closed -= OnWindowClosed);
+
+         Edam.WinUI.Controls.Logging.AppDiagnostics.Write(
+            "Application closing: handlers released — nothing of ours can be signalled any more.",
+            Microsoft.Extensions.Logging.LogLevel.Information, "Edam.Studio");
       }
 
       /// <summary>Run one teardown step; closing must never fail, whatever a window object reports.</summary>

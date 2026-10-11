@@ -141,11 +141,14 @@ namespace Edam.Studio
       /// </summary>
       private static void OnProcessExit(object? sender, EventArgs e)
       {
-         if (m_LastWinRtFailure is null) return;
-
+         // ALWAYS state that the process reached an orderly exit: with the two "Application closing" lines this
+         // makes the log decisive — if the last lines are these, anything a debugger reported after them was
+         // thrown by the framework's own shutdown, not by the application.
          Edam.WinUI.Controls.Logging.AppDiagnostics.Write(
-            "Process exit: the last WinRT failure on the way out was " + m_LastWinRtFailure,
-            Microsoft.Extensions.Logging.LogLevel.Debug, "Edam.Studio");
+            m_LastWinRtFailure is null
+               ? "Process exit: orderly (no WinRT failure was seen on the way out)."
+               : "Process exit: orderly, and the last WinRT failure on the way out was " + m_LastWinRtFailure,
+            Microsoft.Extensions.Logging.LogLevel.Information, "Edam.Studio");
       }
 
       private static void Record(Exception? ex, String what)
