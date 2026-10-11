@@ -55,7 +55,11 @@ namespace Edam.WinUI.Controls.ViewModels
             if (m_UriItems != value)
             {
                m_UriItems = value;
-               OnPropertyChanged(nameof(m_UriItems));
+
+               // the PROPERTY, not the field. Notifying "m_UriItems" told the bound selector nothing, so a
+               // reloaded container list (after the container manager added or removed one) never reached the
+               // ComboBox and it kept showing the containers it had when the panel was first built.
+               OnPropertyChanged(nameof(UriItems));
             }
          }
       }
@@ -307,31 +311,26 @@ namespace Edam.WinUI.Controls.ViewModels
             }
 
             m_DefaultContainerId = defaultId;
-            UriItems = l;
+
+            // ONE assignment, already ordered (the default container leads): a second assignment would clear the
+            // ComboBox's selection again — and, because the selection is bound TwoWay, send a null back into
+            // SelectedUriItem and reload the projects tree for nothing
+            UriItems = new ObservableCollection<UriItemInfo>(
+               l.OrderByDescending(i => String.Equals(i.UriText, m_DefaultContainerId,
+                     StringComparison.OrdinalIgnoreCase))
+                .ThenBy(i => i.Name, StringComparer.OrdinalIgnoreCase));
+
             ClearStorageProblem();
 
-            if (UriItems.Count > 0)
-            {
-               // the default container comes FIRST and is pre-selected, so the application opens where the
-               // person is meant to work rather than on whatever the catalog happened to return first
-               UriItems = new ObservableCollection<UriItemInfo>(
-                  UriItems
-                     .OrderByDescending(i => String.Equals(i.UriText, m_DefaultContainerId,
-                        StringComparison.OrdinalIgnoreCase))
-                     .ThenBy(i => i.Name, StringComparer.OrdinalIgnoreCase));
-
-               SelectedUriItem = (previous is null
+            SelectedUriItem = UriItems.Count == 0
+               ? null
+               : (previous is null
                      ? null
                      : UriItems.FirstOrDefault(i => String.Equals(
                           i.UriText, previous, StringComparison.OrdinalIgnoreCase)))
-                  ?? UriItems.FirstOrDefault(i => String.Equals(i.UriText, m_DefaultContainerId,
-                        StringComparison.OrdinalIgnoreCase))
-                  ?? UriItems.First();
-            }
-            else
-            {
-               SelectedUriItem = null;
-            }
+                 ?? UriItems.FirstOrDefault(i => String.Equals(i.UriText, m_DefaultContainerId,
+                       StringComparison.OrdinalIgnoreCase))
+                 ?? UriItems.First();
          }
          catch (Exception ex)
          {

@@ -84,6 +84,11 @@ namespace Edam.WinUI.Controls.Projects
       private async void ContainerManager_Click(object sender, RoutedEventArgs e)
       {
          await ContainerManagerDialog.ShowAsync(this.XamlRoot, m_ViewModel.RefreshCollectionsAsync);
+
+         // and once more when the modal CLOSES: the containers may have been added, described or removed inside
+         // it, and the selector beside this button must show what is really there — not the list it was built
+         // with when the panel first loaded
+         await m_ViewModel.RefreshCollectionsAsync();
       }
 
       private void TreeViewItem_PointerPressed(
