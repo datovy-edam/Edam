@@ -75,6 +75,12 @@
                            <MenuFlyoutItem Text="Edit" Icon="Edit" Click="TreeItemEdit_Click" />
                            <MenuFlyoutItem Text="Copy" Icon="Copy" Click="TreeItemCopy_Click" />
                            <MenuFlyoutItem Text="Add Items" Icon="Add" Click="TreeAddItems_Click" />
+                           <!-- Offered ONLY on a project's Arguments folder: that is where the specification
+                                (§2.2) puts arguments documents, and a document anywhere else is one the runner
+                                will not look for. Creates the §2.3 scaffold, so the file is born VALID. -->
+                           <MenuFlyoutItem Text="New Arguments File…" Icon="Page"
+                                           Click="TreeAddArgumentsFile_Click"
+                                           IsEnabled="{x:Bind CanAddArgumentsFile, Mode=OneWay}" />
                            <MenuFlyoutSeparator/>
                            <MenuFlyoutItem Text="Delete" Icon="Delete" Click="TreeItemDelete_Click" />
                         </MenuFlyout>

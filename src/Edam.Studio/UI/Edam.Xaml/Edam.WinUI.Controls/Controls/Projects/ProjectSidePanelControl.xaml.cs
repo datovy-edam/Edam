@@ -148,6 +148,186 @@ namespace Edam.WinUI.Controls.Projects
          ItemSelected();
       }
 
+      /// <summary>
+      /// Create a <b>skeleton arguments document</b> in a project's Arguments folder. Offered only there (§2.2),
+      /// never overwriting anything, and written through the platform's resource seam so it lands correctly for
+      /// a file-system or a catalog project alike. It carries every §2.3 section with placeholders, so it is
+      /// <b>born valid</b> and Validate (Ctrl+Shift+V) names what is still to be filled in.
+      /// </summary>
+      private async void TreeAddArgumentsFile_Click(object sender, RoutedEventArgs e)
+      {
+         try
+         {
+            m_ViewModel.SetItem(TreeView.SelectedItem);
+            var folder = m_ViewModel.SelectedItem;
+
+            if (folder?.Item?.Full is null || folder.Item.Full.Length == 0)
+            {
+               Edam.WinUI.Controls.Logging.AppDiagnostics.Write(
+                  "No project folder was selected, so no arguments file was created.",
+                  Microsoft.Extensions.Logging.LogLevel.Warning, "Edam.Studio");
+               return;
+            }
+
+            var projectName = ProjectServicesHelper.ProjectNameFromResourcePath(folder.Item.Full)
+               ?? folder.Name;
+
+            var stated = await AskForArgumentsFileNameAsync(projectName);
+            if (String.IsNullOrWhiteSpace(stated)) return;
+
+            var name = stated!.Trim();
+            if (name.EndsWith(".json", StringComparison.OrdinalIgnoreCase))
+            {
+               name = name.Substring(0, name.Length - ".json".Length);
+            }
+            if (!name.EndsWith(".Args", StringComparison.OrdinalIgnoreCase))
+            {
+               name += ".Args";
+            }
+            name += ".json";
+
+            var path = folder.Item.Full.Replace('\\', '/').TrimEnd('/') + "/" + name;
+            var collectionId = m_ViewModel.SelectedUriItem?.UriText;
+
+            if (await ProjectServicesHelper.ReadProjectTextAsync(path, collectionId) is not null)
+            {
+               Edam.WinUI.Controls.Logging.AppDiagnostics.Write(
+                  "'" + name + "' is already there — nothing was overwritten.",
+                  Microsoft.Extensions.Logging.LogLevel.Warning, "Edam.Studio");
+               return;
+            }
+
+            var created = await ProjectServicesHelper.WriteProjectTextAsync(
+               path, ArgumentsSkeleton(projectName, name), collectionId);
+
+            Edam.WinUI.Controls.Logging.AppDiagnostics.Write(
+               created
+                  ? "Created the arguments skeleton '" + path + "' — press Validate (Ctrl+Shift+V) to see what " +
+                    "is still to be filled in."
+                  : "The arguments skeleton '" + path + "' could not be created.",
+               created
+                  ? Microsoft.Extensions.Logging.LogLevel.Information
+                  : Microsoft.Extensions.Logging.LogLevel.Warning,
+               "Edam.Studio");
+
+            if (created)
+            {
+               // the tree lists the new document without a restart
+               ProjectServicesHelper.NotifyProjectsChanged();
+            }
+         }
+         catch (Exception ex)
+         {
+            Edam.WinUI.Controls.Logging.AppDiagnostics.Write(
+               "The arguments file could not be created: " + ex.Message,
+               Microsoft.Extensions.Logging.LogLevel.Warning, "Edam.Studio");
+         }
+      }
+
+      /// <summary>Ask for the file name; null when the person cancels.</summary>
+      private async System.Threading.Tasks.Task<String?> AskForArgumentsFileNameAsync(String projectName)
+      {
+         var input = new TextBox
+         {
+            Text = "NewProcess.Args.json",
+            PlaceholderText = "name.Args.json",
+         };
+
+         var dialog = new ContentDialog
+         {
+            XamlRoot = this.XamlRoot,
+            Title = "New arguments file",
+            Content = new StackPanel
+            {
+               Spacing = 8,
+               Children =
+               {
+                  new TextBlock
+                  {
+                     Text = "Created in " + projectName + "/Arguments from the specification's skeleton " +
+                            "(§2.3), with placeholders for what only you know.",
+                     TextWrapping = TextWrapping.Wrap,
+                  },
+                  input,
+               },
+            },
+            PrimaryButtonText = "Create",
+            CloseButtonText = "Cancel",
+            DefaultButton = ContentDialogButton.Primary,
+         };
+
+         var answer = await dialog.ShowAsync();
+         return answer == ContentDialogResult.Primary ? input.Text : null;
+      }
+
+      /// <summary>
+      /// The skeleton: every section §2.3 defines, with the project's <b>name</b> already correct (step 4 demands
+      /// it) and a procedure the runner really knows (step 5), so the document validates from the first second.
+      /// The placeholders are exactly what the specification cannot know — they are reported as warnings until
+      /// they are filled in, which is the point of creating the file from here.
+      /// </summary>
+      private static String ArgumentsSkeleton(String projectName, String fileName)
+      {
+         var process = System.IO.Path.GetFileNameWithoutExtension(
+            System.IO.Path.GetFileNameWithoutExtension(fileName));
+         if (String.IsNullOrWhiteSpace(process)) process = "NewProcess";
+
+         return """
+         {
+            "@context": { "edam": "http://www.datovy.com/edam/arguments" },
+            "Domain": {
+               "DomainId": "<project>",
+               "Description": ""
+            },
+            "Namespace": {
+               "OrganizationDomainId": "",
+               "Uri": "",
+               "Prefix": "",
+               "Extension": "",
+               "RootElementName": ""
+            },
+            "Project": {
+               "Name": "<project>",
+               "VersionId": "v1r0"
+            },
+            "Process": {
+               "RecordId": null,
+               "Name": "<project>.<process>",
+               "OrganizationId": "Datovy",
+               "OrganizationDomainUri": null,
+               "ProcedureName": "XsdToAssets",
+               "ProcedureTag": "",
+               "ScanFilesFolder": false,
+               "SchemaType": 1,
+               "NextProcess": null,
+               "NextProcedure": []
+            },
+            "InputFile": {
+               "Extension": "xsd",
+               "Name": "<process>",
+               "Path": "./Files",
+               "Full": null
+            },
+            "OutputFile": {
+               "Extension": "xlsx",
+               "Name": "<process>",
+               "Path": "./Documents",
+               "Full": null
+            },
+            "UriList": [
+               "./Files/<process>.xsd"
+            ],
+            "InspectArguments": {
+               "ListLength": "1",
+               "MaxThreshold": "1"
+            },
+            "ConnectionString": "",
+            "ElementTransform": null,
+            "TextMapFilePath": "./TextMaps/XsdTextMap.json"
+         }
+         """.Replace("<project>", projectName).Replace("<process>", process);
+      }
+
       private void TreeItemEdit_Click(object sender, RoutedEventArgs e)
       {
          ItemSelected();

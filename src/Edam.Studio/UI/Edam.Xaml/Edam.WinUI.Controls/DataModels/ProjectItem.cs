@@ -1,4 +1,4 @@
-﻿using System;
+using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Text;
@@ -36,6 +36,27 @@ namespace Edam.WinUI.Controls.DataModels
       public string NameFull
       {
          get { return Item.NameFull; }
+      }
+
+      /// <summary>
+      /// True when this node is a project's <b>Arguments</b> folder — the one place the Projects specification
+      /// (§2.2) keeps arguments documents, and therefore the only node that offers "New Arguments File…": a
+      /// command that cannot do what it says is worse than no command at all.
+      /// </summary>
+      public Boolean CanAddArgumentsFile
+      {
+         get
+         {
+            if (!String.Equals(Name, "Arguments", StringComparison.OrdinalIgnoreCase))
+            {
+               return false;
+            }
+
+            var path = (Item?.Full ?? String.Empty).Replace('\\', '/');
+            return path.Length == 0 ||
+                   path.IndexOf('/' + Edam.Data.Projects.Contracts.ProjectCollectionFolders.Projects + '/',
+                      StringComparison.OrdinalIgnoreCase) >= 0;
+         }
       }
 
       public NamespaceInfo Namespace
