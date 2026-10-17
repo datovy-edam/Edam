@@ -158,14 +158,18 @@ namespace Edam.WinUI.Controls.Projects
       {
          try
          {
-            m_ViewModel.SetItem(TreeView.SelectedItem);
-            var folder = m_ViewModel.SelectedItem;
+            // The node comes from the MENU ITEM's own Tag (the template binds it to the item the menu belongs
+            // to). A right-click does not necessarily SELECT a node, so TreeView.SelectedItem is the wrong source
+            // — leaning on it made this command return early and report into a collapsed panel, which is exactly
+            // what "nothing happened" was. The current selection stays only as a last resort.
+            var folder = (sender as MenuFlyoutItem)?.Tag as ProjectItem
+               ?? m_ViewModel.SelectedItem;
 
-            if (folder?.Item?.Full is null || folder.Item.Full.Length == 0)
+            if (folder is null || folder.Item?.Full is null || folder.Item.Full.Length == 0)
             {
-               Edam.WinUI.Controls.Logging.AppDiagnostics.Write(
-                  "No project folder was selected, so no arguments file was created.",
-                  Microsoft.Extensions.Logging.LogLevel.Warning, "Edam.Studio");
+               await ShowArgumentsProblemAsync(
+                  "No project folder was identified. Right-click the project's \"Arguments\" folder and choose " +
+                  "this command again.");
                return;
             }
 
@@ -191,37 +195,65 @@ namespace Edam.WinUI.Controls.Projects
 
             if (await ProjectServicesHelper.ReadProjectTextAsync(path, collectionId) is not null)
             {
-               Edam.WinUI.Controls.Logging.AppDiagnostics.Write(
-                  "'" + name + "' is already there — nothing was overwritten.",
-                  Microsoft.Extensions.Logging.LogLevel.Warning, "Edam.Studio");
+               await ShowArgumentsProblemAsync("'" + name + "' is already there — nothing was overwritten.");
                return;
             }
 
             var created = await ProjectServicesHelper.WriteProjectTextAsync(
                path, ArgumentsSkeleton(projectName, name), collectionId);
 
-            Edam.WinUI.Controls.Logging.AppDiagnostics.Write(
-               created
-                  ? "Created the arguments skeleton '" + path + "' — press Validate (Ctrl+Shift+V) to see what " +
-                    "is still to be filled in."
-                  : "The arguments skeleton '" + path + "' could not be created.",
-               created
-                  ? Microsoft.Extensions.Logging.LogLevel.Information
-                  : Microsoft.Extensions.Logging.LogLevel.Warning,
-               "Edam.Studio");
-
-            if (created)
+            if (!created)
             {
-               // the tree lists the new document without a restart
-               ProjectServicesHelper.NotifyProjectsChanged();
+               await ShowArgumentsProblemAsync(
+                  "The arguments skeleton '" + path + "' could not be created. The diagnostics panel carries the " +
+                  "detail — the collection may be read-only, or the platform may not write there yet.");
+               return;
             }
+
+            Edam.WinUI.Controls.Logging.AppDiagnostics.Write(
+               "Created the arguments skeleton '" + path + "' — press Validate (Ctrl+Shift+V) to see what is " +
+               "still to be filled in.",
+               Microsoft.Extensions.Logging.LogLevel.Information, "Edam.Studio");
+
+            // the tree lists the new document without a restart, and the panel (which says where it went and what
+            // is still to be filled in) shows itself
+            ProjectServicesHelper.NotifyProjectsChanged();
+            ProjectServicesHelper.RequestAttention();
          }
          catch (Exception ex)
          {
-            Edam.WinUI.Controls.Logging.AppDiagnostics.Write(
-               "The arguments file could not be created: " + ex.Message,
-               Microsoft.Extensions.Logging.LogLevel.Warning, "Edam.Studio");
+            await ShowArgumentsProblemAsync("The arguments file could not be created: " + ex.Message);
          }
+      }
+
+      /// <summary>
+      /// A command the person INVOKED has to answer them. Its outcome is shown where the command was pressed and
+      /// not merely written to a panel that may be collapsed — going quiet is precisely what "nothing happened"
+      /// looked like.
+      /// </summary>
+      private async System.Threading.Tasks.Task ShowArgumentsProblemAsync(String message)
+      {
+         try
+         {
+            var dialog = new ContentDialog
+            {
+               XamlRoot = this.XamlRoot,
+               Title = "New arguments file",
+               Content = new TextBlock { Text = message, TextWrapping = TextWrapping.Wrap },
+               CloseButtonText = "Close",
+            };
+
+            await dialog.ShowAsync();
+         }
+         catch (Exception)
+         {
+            // the panel below still carries it
+         }
+
+         Edam.WinUI.Controls.Logging.AppDiagnostics.Write(message,
+            Microsoft.Extensions.Logging.LogLevel.Warning, "Edam.Studio");
+
+         ProjectServicesHelper.RequestAttention();
       }
 
       /// <summary>Ask for the file name; null when the person cancels.</summary>

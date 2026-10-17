@@ -79,6 +79,7 @@
                                 (§2.2) puts arguments documents, and a document anywhere else is one the runner
                                 will not look for. Creates the §2.3 scaffold, so the file is born VALID. -->
                            <MenuFlyoutItem Text="New Arguments File…" Icon="Page"
+                                           Tag="{x:Bind}"
                                            Click="TreeAddArgumentsFile_Click"
                                            IsEnabled="{x:Bind CanAddArgumentsFile, Mode=OneWay}" />
                            <MenuFlyoutSeparator/>
