@@ -201,8 +201,11 @@ namespace Edam.WinUI.Controls.Projects
             const string argumentsSegment = "/Arguments";
             if (projectFolderPath.EndsWith(argumentsSegment, StringComparison.OrdinalIgnoreCase))
             {
+               // Substring(0, length - segment): REMOVE the segment. Without the leading 0 this returned the
+               // segment itself, so the project root became "/Arguments" and every copy target was rejected as
+               // "not a project address" — which is exactly what the diagnostics said.
                projectFolderPath = projectFolderPath.Substring(
-                  projectFolderPath.Length - argumentsSegment.Length);
+                  0, projectFolderPath.Length - argumentsSegment.Length);
             }
 
             // the map, found by KIND through ADR-0015's convention and copied into the project
