@@ -239,7 +239,15 @@ namespace Edam.WinUI.Controls.Projects
             // extension behave), appended to this folder's bound Children, and selected; nothing else moves.
             try
             {
-               var child = folder.GetProjectItem(path);
+               // `ItemBaseInfo.FromFullPath` does NOT decide WHAT the thing is (the repository's own code sets
+               // `Type` afterwards for exactly this reason), so leaving it to the default announced the new
+               // document as a FOLDER — which is what appeared in the tree. It is a file, so say so before the
+               // node is built (the icon and the expander are derived from it).
+               var info = new Edam.InOut.ItemBaseInfo();
+               info.FromFullPath(path, null);
+               info.Type = Edam.InOut.ItemType.File;
+
+               var child = new ProjectItem(info);
                folder.Children.Add(child);
                m_ViewModel.SetItem(child);
 
