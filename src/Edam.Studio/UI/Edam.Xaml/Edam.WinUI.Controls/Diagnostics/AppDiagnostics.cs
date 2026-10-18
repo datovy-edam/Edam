@@ -60,18 +60,40 @@ namespace Edam.WinUI.Controls.Logging
       /// <param name="message">message to show</param>
       /// <param name="level">MEL severity (defaults to Information)</param>
       /// <param name="category">optional source/category</param>
+      /// <param name="origin">
+      /// The emitting member, supplied by the compiler — so a line names <b>where</b> it came from. A diagnostic
+      /// that reports only the symptom ("this operation is not supported for a relative URI") cannot be acted on;
+      /// the caller pays nothing for this because the attributes fill it in at the call site.
+      /// </param>
       public static void Write(String message,
-         LogLevel level = LogLevel.Information, String category = null)
+         LogLevel level = LogLevel.Information, String category = null,
+         [System.Runtime.CompilerServices.CallerMemberName] String origin = null,
+         [System.Runtime.CompilerServices.CallerFilePath] String originFile = null,
+         [System.Runtime.CompilerServices.CallerLineNumber] Int32 originLine = 0)
       {
          if (String.IsNullOrWhiteSpace(message))
          {
             return;
          }
 
-         WriteToFile(level, message, category ?? "Edam.Studio");
+         var source = category ?? "Edam.Studio";
+
+         // WHERE it was emitted: file : member (line), appended so the same line is useful in the panel and in the
+         // log file. The compiler supplies all three; a caller never has to remember to pass them.
+         if (!String.IsNullOrWhiteSpace(origin))
+         {
+            var file = String.IsNullOrWhiteSpace(originFile)
+               ? String.Empty
+               : System.IO.Path.GetFileName(originFile!);
+
+            message = message + "   ⟨" + (file.Length > 0 ? file + ":" : String.Empty) + origin +
+                      (originLine > 0 ? ":" + originLine : String.Empty) + "⟩";
+         }
+
+         WriteToFile(level, message, source);
 
          InMemoryLoggerProvider.Shared
-            .CreateLogger(category ?? "Edam.Studio")
+            .CreateLogger(source)
             .Log(level, message);
       }
 
