@@ -209,4 +209,7 @@
   <ItemGroup>
     <PRIResource Remove="BundleArtifacts\**" />
   </ItemGroup>
+  <ItemGroup>
+    <Content Remove="..\..\..\app-data\Edam.App.Data\TextMaps\EditorLanguageTextMap.json" />
+  </ItemGroup>
 </Project>
