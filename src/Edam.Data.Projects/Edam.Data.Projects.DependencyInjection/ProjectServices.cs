@@ -107,6 +107,13 @@ public static class ProjectServices
       services.AddSingleton<IProjectResources>(sp =>
          new FileSystemProjectResources(root, sp.GetRequiredService<IProjectCatalog>()));
 
+      // S3-2: the DEFAULT text-map catalog, registered here so GetRequiredService<ITextMapCatalog>() always
+      // answers and a component presented at project initialization is simply the one the container returns.
+      // The application's own shipped maps are a HOST fact (an app-data path), so the host supplies those seed
+      // folders when it needs them; the composition root guarantees the seam exists and never invents a path.
+      services.AddSingleton<ITextMapCatalog>(sp =>
+         new DefaultTextMapCatalog(sp.GetRequiredService<IProjectResources>()));
+
       // LM-5: seeding is a separate, replaceable capability from scaffolding (structure-only).
       services.AddSingleton<IProjectSeeder>(sp =>
          new FileSystemProjectSeeder(root, sp.GetRequiredService<IProjectResources>()));
@@ -201,6 +208,10 @@ public static class ProjectServices
       });
 
       // LM-5: seeding is a separate, replaceable capability from scaffolding (structure-only).
+      // S3-2: the same DEFAULT text-map catalog for the catalog target — one seam, both targets.
+      services.AddSingleton<ITextMapCatalog>(provider =>
+         new DefaultTextMapCatalog(provider.GetRequiredService<IProjectResources>()));
+
       services.AddSingleton<IProjectSeeder>(provider =>
       {
          var surfaces = ResolveSurfaces(provider);

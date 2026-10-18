@@ -1,7 +1,8 @@
 # Sprint S3 — Arguments documents, text-map resolution, and the explorer that stays put
 
-> **Status:** **In progress (2026-10-11)** — **S3-1 delivered** (build-verified; the user's runtime pass pending);
-> **S3-2…S3-6 planned**.
+> **Status:** **In progress (2026-10-11)** — **S3-1 delivered**; **S3-2 delivered** (build-verified; the
+> application's seed folders are host-supplied and land with S3-4's wiring); **S3-3 in progress** (ADR accepted;
+> the conformance group remains); **S3-4…S3-6 planned**.
 > **Authority:** the rulings in `docs/HANDOFF.md` item 134 (and item 133's lesson) are the requirement for this
 > sprint; the Projects source specification is `docs/reference/0010 - Edam.Studio.Understanding.Projects.v0.docx`
 > (§2.1 locations, §2.3 arguments document). Per `AGENTS.md` §2 the live repository is the authority; this plan is
@@ -44,6 +45,13 @@ root that searches the project's **`./TextMaps` first**, then the app-data **`Te
 (`app:textmaps` — an existing declared location, so it serves file-system *and* catalog collections). A component
 supplied at project initialization is simply the one used; every discovery decision is **reported to the
 diagnostics**.
+**State (2026-10-11):** **delivered, build-verified.** `ProjectServices` now registers
+`DefaultTextMapCatalog` as the `ITextMapCatalog` default **in both composition branches** (file-system and catalog),
+so `GetRequiredService<ITextMapCatalog>()` answers and a component presented at project initialization is simply the
+one returned. The application's **seed folders** are deliberately **not** guessed by the composition root (an
+app-data path is a host fact); the host supplies them, and that wiring is delivered with S3-4 where `app:textmaps`
+is resolvable.
+
 **Done when:** the resolver is reachable through DI, its `SupportedKinds` drives what the UI offers, and a replaced
 implementation changes behaviour with no UI change.
 
