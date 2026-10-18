@@ -1,8 +1,7 @@
 # Sprint S3 — Arguments documents, text-map resolution, and the explorer that stays put
 
-> **Status:** **In progress (2026-10-11)** — **S3-1 delivered**; **S3-2 delivered** (build-verified; the
-> application's seed folders are host-supplied and land with S3-4's wiring); **S3-3 in progress** (ADR accepted;
-> the conformance group remains); **S3-4…S3-6 planned**.
+> **Status:** **In progress (2026-10-11)** — **S3-1 delivered**; **S3-2 delivered**; **S3-3 delivered** (ADR-0015
+> accepted + `text maps` group **ALL CONFORM, 14 checks**); **S3-4…S3-6 planned**.
 > **Authority:** the rulings in `docs/HANDOFF.md` item 134 (and item 133's lesson) are the requirement for this
 > sprint; the Projects source specification is `docs/reference/0010 - Edam.Studio.Understanding.Projects.v0.docx`
 > (§2.1 locations, §2.3 arguments document). Per `AGENTS.md` §2 the live repository is the authority; this plan is
@@ -79,6 +78,15 @@ marker not at the start). Record the convention as a short **ADR** ("component i
 documentation section, since the next discoverable family reuses the shape.
 **Done when:** the parser is the only place the rule lives, and every rejection appears in the diagnostics with the
 rule it broke.
+
+**State (2026-10-11):** **delivered.** `TextMapConvention` (Contracts) is the single owner of the rule; ADR-0015
+records the decision; the new conformance group **`text maps (ADR-0015)` — ALL CONFORM (14 checks)** accepts
+`XsdTextMap.json`, `SqlTextMap.json`, `GqlTextMap.json`, `JsDTextMap.json` (case-insensitive id → canonical
+spelling), `XsdTextMap.B2B.json` and `JsdTextMap.HL7.Fhir.json`; keeps `HL7.Fhir` **verbatim** with `fhir`/`HL7`
+matching as tags and `B2B` not; and **refuses with its reason** every malformed name (`MyMapping.json` no marker ·
+`TextMapXsd.json` marker at the start · `FooTextMap.json` unknown id · `XsdTextMap.txt` wrong extension ·
+`XsdTextMap..json` empty purpose · `XsdTextMapB2B.json` no dot), so a rejected file can never be mistaken for a
+missing one. The capability list is proven **derived** from the six known identifiers.
 
 ### S3-4 — Creating a document asks the KIND, and the document ends up concrete
 

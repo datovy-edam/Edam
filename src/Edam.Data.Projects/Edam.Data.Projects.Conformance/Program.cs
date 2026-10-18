@@ -310,6 +310,9 @@ try
    // ---- 10h-2. the arguments-file schema and the rules a schema cannot express (Projects spec §2.3) -------
    all["arguments (§2.3)"] = ArgumentsSchemaScenario.Run();
 
+   // ---- 10h-3. map-file identity by convention (ADR-0015, S3-3) -------------------------------------------
+   all["text maps (ADR-0015)"] = TextMapConventionScenario.Run();
+
    // ---- 10i. the answers: overlay + marker + the ask loop (CF-3, ADR-0013) --------------------
    all["state (CF-3)"] = StateScenario.Run(Path.Combine(temp, "state"));
 
