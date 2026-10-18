@@ -47,6 +47,17 @@ diagnostics**.
 **Done when:** the resolver is reachable through DI, its `SupportedKinds` drives what the UI offers, and a replaced
 implementation changes behaviour with no UI change.
 
+**State (2026-10-11):** **partially delivered, build-verified.** In place: `ITextMapCatalog`, `TextMapOption`,
+`TextMapKind`, `SupportedKinds`, and the **one parser that owns the identity rule** (`TextMapConvention.TryParse`,
+S3-3's rule, with a reason for every refusal) in `Edam.Data.Projects.Contracts`; and
+`DefaultTextMapCatalog` in `Edam.Data.Projects.DependencyInjection` — project `TextMaps/` first (through
+`IProjectResources`), then the application's seed folders, reporting every rejected or unreadable candidate.
+`Edam.Data.Projects.slnx` builds **0 errors** and the suite is **ALL CONFORM**. **Remaining for this item:**
+the DI registration in the composition root's two branches (file-system at `ProjectServices.cs` ~104–114 and the
+catalog branch ~184–211) so the default is what `GetRequiredService<ITextMapCatalog>()` returns, and the wiring that
+feeds the application's seed folder (`app:textmaps`) into the provider. Those, plus the UI offer, are carried into
+S3-4.
+
 ### S3-3 — Map-file identity by convention, with reasons for every rejection
 
 **Why:** a convention that is only in people's heads cannot be relied on, and silence about a rejected file is
