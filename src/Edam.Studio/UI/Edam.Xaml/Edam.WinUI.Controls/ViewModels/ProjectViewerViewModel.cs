@@ -751,7 +751,7 @@ namespace Edam.WinUI.Controls.ViewModels
                // catalog address — that is what threw DirectoryNotFoundException at a click.
                if (!ProjectServicesHelper.UsesPhysicalPaths)
                {
-                  _ = DeleteResourceAndRefreshAsync(item);
+                  _ = DeleteResourceInPlaceAsync(item);
                   return;
                }
 
@@ -770,6 +770,68 @@ namespace Edam.WinUI.Controls.ViewModels
                ManageResults(results);
             }
          }
+      }
+
+      /// <summary>
+      /// <b>Delete one resource and take its node OUT OF THE TREE</b> instead of reloading the tree: a reload
+      /// rebuilds every branch, so a person who deleted one file lost their place in the project (item 142 — the same
+      /// "rebuild instead of update in place" defect item 136 fixed for creation). The reload survives only for the
+      /// case where the node cannot be found in the tree, and that is reported rather than silently done.
+      /// </summary>
+      private async System.Threading.Tasks.Task DeleteResourceInPlaceAsync(ProjectItem item)
+      {
+         var results = new Diagnostics.ResultLog();
+
+         try
+         {
+            var collectionId = SelectedUriItem == null ? null : SelectedUriItem.UriText;
+            var deleted = await ProjectServicesHelper.DeleteResourceAsync(
+               item.Item.Full, collectionId).ConfigureAwait(true);
+
+            if (!deleted)
+            {
+               results.Failed("'" + item.Item.NameFull + "' could not be deleted.");
+               ManageResults(results);
+               return;
+            }
+
+            if (!RemoveNodeInPlace(item))
+            {
+               // the node was not where it should be: at least make the tree tell the truth
+               ProjectServicesHelper.NotifyProjectsChanged();
+            }
+         }
+         catch (Exception ex)
+         {
+            results.Failed(ex);
+            ManageResults(results);
+         }
+      }
+
+      /// <summary>Remove a node from the collection that holds it, at any depth.</summary>
+      public Boolean RemoveNodeInPlace(ProjectItem target)
+      {
+         if (target is null || TreeView is null) return false;
+
+         Boolean Remove(System.Collections.ObjectModel.ObservableCollection<ProjectItem> nodes)
+         {
+            if (nodes is null || nodes.Count == 0) return false;
+
+            if (nodes.Contains(target))
+            {
+               nodes.Remove(target);
+               return true;
+            }
+
+            foreach (var node in nodes)
+            {
+               if (Remove(node.Children)) return true;
+            }
+
+            return false;
+         }
+
+         return Remove(TreeView.Children);
       }
 
       /// <summary>
