@@ -1472,6 +1472,54 @@ namespace Edam.WinUI.Controls.DataModels
       // the arguments document, validated against the schema (§2.3)
       // ---------------------------------------------------------------------
 
+      /// <summary>
+      /// <b>S3-4: the text map for a KIND</b> — taken from the application's shipped maps by the convention
+      /// (ADR-0015) and <b>copied into the project</b>, so the document keeps one project-relative reference and the
+      /// project stays self-contained (which the catalog target needs). Returns <c>./TextMaps/&lt;name&gt;</c>, or
+      /// null when nothing serves that kind — the caller then leaves the field EMPTY instead of inventing a path.
+      /// </summary>
+      public static async Task<String?> SeedTextMapAsync(
+         Edam.Data.Projects.Contracts.TextMapKind kind,
+         String? projectFolderPath,
+         String? collectionId = null,
+         Action<String>? report = null,
+         CancellationToken ct = default)
+      {
+         if (String.IsNullOrWhiteSpace(projectFolderPath)) return null;
+
+         var folder = FindSeedFolder(ProjectLocations.TextMaps);
+         var maps = Edam.WinUI.Controls.Projects.ArgumentsScaffold.FindIn(folder, report);
+         var map = Edam.WinUI.Controls.Projects.ArgumentsScaffold.ForKind(maps, kind);
+
+         if (map is null)
+         {
+            report?.Invoke("No shipped text map serves " + kind + " — the field is left empty and Validate names it.");
+            return null;
+         }
+
+         try
+         {
+            var content = await File.ReadAllTextAsync(map.FullPath, ct).ConfigureAwait(true);
+            var target = projectFolderPath!.Replace('\\', '/').TrimEnd('/') +
+                         "/" + ProjectLocations.TextMaps + "/" + map.Name;
+
+            if (await WriteProjectTextAsync(target, content, collectionId, ct).ConfigureAwait(true))
+            {
+               report?.Invoke("Copied the text map '" + map.Name + "' (" + map.Option.Description +
+                              ") into the project.");
+               return "./" + ProjectLocations.TextMaps + "/" + map.Name;
+            }
+
+            report?.Invoke("The text map '" + map.Name + "' could not be copied into the project.");
+         }
+         catch (Exception ex)
+         {
+            report?.Invoke("The text map '" + map.Name + "' could not be copied: " + ExplainFailure(ex));
+         }
+
+         return null;
+      }
+
       /// <summary>The schema the configuration states, else the one that ships beside the templates.</summary>
       public static String ConfiguredArgumentsSchema
          => AppSettings.GetString(ConfigurableItems.ARGUMENTS_SCHEMA_KEY) is { Length: > 0 } stated

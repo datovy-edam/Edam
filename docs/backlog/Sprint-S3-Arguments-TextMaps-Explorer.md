@@ -1,7 +1,9 @@
 # Sprint S3 — Arguments documents, text-map resolution, and the explorer that stays put
 
 > **Status:** **In progress (2026-10-11)** — **S3-1 delivered**; **S3-2 delivered**; **S3-3 delivered** (ADR-0015
-> accepted + `text maps` group **ALL CONFORM, 14 checks**); **S3-4…S3-6 planned**.
+> accepted + `text maps` group **ALL CONFORM, 14 checks**); **S3-4 in progress** (the kind→extension/procedure
+> mapping and the copy-into-project resolver are built and compiling; the dialog's kind question and the skeleton's
+> parameters are the remaining wiring); **S3-5…S3-6 planned**.
 > **Authority:** the rulings in `docs/HANDOFF.md` item 134 (and item 133's lesson) are the requirement for this
 > sprint; the Projects source specification is `docs/reference/0010 - Edam.Studio.Understanding.Projects.v0.docx`
 > (§2.1 locations, §2.3 arguments document). Per `AGENTS.md` §2 the live repository is the authority; this plan is
