@@ -176,10 +176,12 @@ namespace Edam.WinUI.Controls.Projects
             var projectName = ProjectServicesHelper.ProjectNameFromResourcePath(folder.Item.Full)
                ?? folder.Name;
 
-            var stated = await AskForArgumentsFileNameAsync(projectName);
-            if (String.IsNullOrWhiteSpace(stated)) return;
+            // S3-4: the person says WHAT KIND of schema the process reads — that is what they know — and the
+            // extension, the procedure and the text map are all derived from it. Nothing is assumed to be XSD.
+            var ask = await AskForArgumentsFileNameAsync(projectName);
+            if (String.IsNullOrWhiteSpace(ask.Name)) return;
 
-            var name = stated!.Trim();
+            var name = ask.Name!.Trim();
             if (name.EndsWith(".json", StringComparison.OrdinalIgnoreCase))
             {
                name = name.Substring(0, name.Length - ".json".Length);
@@ -193,6 +195,22 @@ namespace Edam.WinUI.Controls.Projects
             var path = folder.Item.Full.Replace('\\', '/').TrimEnd('/') + "/" + name;
             var collectionId = m_ViewModel.SelectedUriItem?.UriText;
 
+            // the project root: the Arguments folder's parent, because every reference in the document is
+            // project-relative (ADR-0011)
+            var projectFolderPath = folder.Item.Full.Replace('\\', '/').TrimEnd('/');
+            const string argumentsSegment = "/Arguments";
+            if (projectFolderPath.EndsWith(argumentsSegment, StringComparison.OrdinalIgnoreCase))
+            {
+               projectFolderPath = projectFolderPath.Substring(
+                  projectFolderPath.Length - argumentsSegment.Length);
+            }
+
+            // the map, found by KIND through ADR-0015's convention and copied into the project
+            var textMap = await ProjectServicesHelper.SeedTextMapAsync(
+               ask.Kind, projectFolderPath, collectionId,
+               message => Edam.WinUI.Controls.Logging.AppDiagnostics.Write(message,
+                  Microsoft.Extensions.Logging.LogLevel.Information, "Edam.Studio"));
+
             if (await ProjectServicesHelper.ReadProjectTextAsync(path, collectionId) is not null)
             {
                await ShowArgumentsProblemAsync("'" + name + "' is already there — nothing was overwritten.");
@@ -200,7 +218,7 @@ namespace Edam.WinUI.Controls.Projects
             }
 
             var created = await ProjectServicesHelper.WriteProjectTextAsync(
-               path, ArgumentsSkeleton(projectName, name), collectionId);
+               path, ArgumentsSkeleton(projectName, name, ask.Kind, textMap), collectionId);
 
             if (!created)
             {
@@ -278,14 +296,29 @@ namespace Edam.WinUI.Controls.Projects
          ProjectServicesHelper.RequestAttention();
       }
 
-      /// <summary>Ask for the file name; null when the person cancels.</summary>
-      private async System.Threading.Tasks.Task<String?> AskForArgumentsFileNameAsync(String projectName)
+      /// <summary>
+      /// Ask for the file name <b>and the KIND of schema it processes</b> (S3-4): the kind is what a person knows,
+      /// and it decides the extension, the procedure and the text map. Null name means cancelled.
+      /// </summary>
+      private async System.Threading.Tasks.Task<(String? Name, Edam.Data.Projects.Contracts.TextMapKind Kind)>
+         AskForArgumentsFileNameAsync(String projectName)
       {
          var input = new TextBox
          {
             Text = "NewProcess.Args.json",
             PlaceholderText = "name.Args.json",
          };
+
+         var kinds = new ComboBox { HorizontalAlignment = HorizontalAlignment.Stretch };
+         foreach (var choice in ArgumentsScaffold.Choices)
+         {
+            kinds.Items.Add(new ComboBoxItem
+            {
+               Content = choice.Label,
+               Tag = choice.Kind,
+            });
+         }
+         kinds.SelectedIndex = 0;
 
          var dialog = new ContentDialog
          {
@@ -298,10 +331,11 @@ namespace Edam.WinUI.Controls.Projects
                {
                   new TextBlock
                   {
-                     Text = "Created in " + projectName + "/Arguments from the specification's skeleton " +
-                            "(§2.3), with placeholders for what only you know.",
+                     Text = "Created in " + projectName + "/Arguments. Choose the KIND of schema the process " +
+                            "reads: the extension, the procedure and the text map follow from it.",
                      TextWrapping = TextWrapping.Wrap,
                   },
+                  kinds,
                   input,
                },
             },
@@ -311,7 +345,16 @@ namespace Edam.WinUI.Controls.Projects
          };
 
          var answer = await dialog.ShowAsync();
-         return answer == ContentDialogResult.Primary ? input.Text : null;
+         if (answer != ContentDialogResult.Primary)
+         {
+            return (null, Edam.Data.Projects.Contracts.TextMapKind.Xsd);
+         }
+
+         var kind = (kinds.SelectedItem as ComboBoxItem)?.Tag is Edam.Data.Projects.Contracts.TextMapKind stated
+            ? stated
+            : Edam.Data.Projects.Contracts.TextMapKind.Xsd;
+
+         return (input.Text, kind);
       }
 
       /// <summary>
@@ -320,11 +363,16 @@ namespace Edam.WinUI.Controls.Projects
       /// The placeholders are exactly what the specification cannot know — they are reported as warnings until
       /// they are filled in, which is the point of creating the file from here.
       /// </summary>
-      private static String ArgumentsSkeleton(String projectName, String fileName)
+      private static String ArgumentsSkeleton(
+         String projectName, String fileName,
+         Edam.Data.Projects.Contracts.TextMapKind kind, String? textMapPath)
       {
          var process = System.IO.Path.GetFileNameWithoutExtension(
             System.IO.Path.GetFileNameWithoutExtension(fileName));
          if (String.IsNullOrWhiteSpace(process)) process = "NewProcess";
+
+         var extension = ArgumentsScaffold.Extension(kind);
+         var procedure = ArgumentsScaffold.Procedure(kind);
 
          return """
          {
@@ -349,7 +397,7 @@ namespace Edam.WinUI.Controls.Projects
                "Name": "<project>.<process>",
                "OrganizationId": "Datovy",
                "OrganizationDomainUri": null,
-               "ProcedureName": "XsdToAssets",
+               "ProcedureName": "<procedure>",
                "ProcedureTag": "",
                "ScanFilesFolder": false,
                "SchemaType": 1,
@@ -357,7 +405,7 @@ namespace Edam.WinUI.Controls.Projects
                "NextProcedure": []
             },
             "InputFile": {
-               "Extension": "xsd",
+               "Extension": "<extension>",
                "Name": "<process>",
                "Path": "./Files",
                "Full": null
@@ -369,7 +417,7 @@ namespace Edam.WinUI.Controls.Projects
                "Full": null
             },
             "UriList": [
-               "./Files/<process>.xsd"
+               "./Files/<process>.<extension>"
             ],
             "InspectArguments": {
                "ListLength": "1",
@@ -377,9 +425,13 @@ namespace Edam.WinUI.Controls.Projects
             },
             "ConnectionString": "",
             "ElementTransform": null,
-            "TextMapFilePath": "./TextMaps/XsdTextMap.json"
+            "TextMapFilePath": "<textmap>"
          }
-         """.Replace("<project>", projectName).Replace("<process>", process);
+         """.Replace("<project>", projectName)
+             .Replace("<process>", process)
+             .Replace("<extension>", extension)
+             .Replace("<procedure>", procedure)
+             .Replace("<textmap>", textMapPath ?? String.Empty);
       }
 
       private void TreeItemEdit_Click(object sender, RoutedEventArgs e)
