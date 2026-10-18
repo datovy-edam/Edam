@@ -215,9 +215,31 @@ namespace Edam.WinUI.Controls.Projects
                "still to be filled in.",
                Microsoft.Extensions.Logging.LogLevel.Information, "Edam.Studio");
 
-            // the tree lists the new document without a restart, and the panel (which says where it went and what
-            // is still to be filled in) shows itself
-            ProjectServicesHelper.NotifyProjectsChanged();
+            // S3-1: the node appears IN PLACE. A reload rebuilt the whole tree, collapsing every folder and
+            // throwing the person back to the root — for a file that simply arrived in the folder they were
+            // already looking at. The child is built exactly as the tree builds its own (so the icon and the
+            // extension behave), appended to this folder's bound Children, and selected; nothing else moves.
+            try
+            {
+               var child = folder.GetProjectItem(path);
+               folder.Children.Add(child);
+               m_ViewModel.SetItem(child);
+
+               // selection is driven through the container: the tree binds ItemsSource, not SelectedItem
+               TreeView.SelectedItem = child;
+            }
+            catch (Exception insertProblem)
+            {
+               // the document IS created: if it cannot be shown in place, fall back to the reload (which at least
+               // makes it reachable) and say so instead of pretending
+               Edam.WinUI.Controls.Logging.AppDiagnostics.Write(
+                  "The new arguments document was created but could not be added to the tree in place (" +
+                  insertProblem.Message + ") — the tree is being reloaded instead.",
+                  Microsoft.Extensions.Logging.LogLevel.Warning, "Edam.Studio");
+
+               ProjectServicesHelper.NotifyProjectsChanged();
+            }
+
             ProjectServicesHelper.RequestAttention();
          }
          catch (Exception ex)

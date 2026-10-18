@@ -1,6 +1,7 @@
 # Sprint S3 — Arguments documents, text-map resolution, and the explorer that stays put
 
-> **Status:** Planned (2026-10-11) — not started.
+> **Status:** **In progress (2026-10-11)** — **S3-1 delivered** (build-verified; the user's runtime pass pending);
+> **S3-2…S3-6 planned**.
 > **Authority:** the rulings in `docs/HANDOFF.md` item 134 (and item 133's lesson) are the requirement for this
 > sprint; the Projects source specification is `docs/reference/0010 - Edam.Studio.Understanding.Projects.v0.docx`
 > (§2.1 locations, §2.3 arguments document). Per `AGENTS.md` §2 the live repository is the authority; this plan is
@@ -24,6 +25,12 @@ file.
 only as a fallback, and when it is used restore the expanded path and the selection.
 **Done when:** creating a document leaves every other node exactly as it was, the new node is selected, and the
 editor follows it.
+
+**State (2026-10-11):** delivered, build-verified. The node is built with the tree's own factory
+(`ProjectItem.GetProjectItem`), appended to the folder's bound `Children` (only that folder updates) and selected
+(`TreeView.SelectedItem` — the sprint's one open question, settled: the setter exists). The reload is kept **only**
+as a stated fallback when the in-place insert throws. **User's F5:** the folder must stay expanded and the editor
+follow the selection.
 
 ### S3-2 — `ITextMapCatalog`: resolution by schema kind, injected, never hardcoded
 
