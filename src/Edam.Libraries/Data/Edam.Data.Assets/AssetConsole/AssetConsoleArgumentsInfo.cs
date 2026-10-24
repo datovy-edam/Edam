@@ -1,4 +1,4 @@
-﻿using System;
+using System;
 using System.Collections.Generic;
 using System.Text.Json;
 using System.Text.Json.Serialization;
@@ -227,8 +227,12 @@ namespace Edam.Data.AssetConsole
       [JsonIgnore]
       public String NamespaceUri
       {
-         get { return Namespace.Uri.AbsoluteUri; }
-         set { Namespace.Uri = new Uri(value); }
+         // an UNSET namespace URI is not an error, and `new Uri("")` throws
+         //   "This operation is not supported for a relative URI"
+         // — which is exactly what a skeleton carrying `"Uri": ""` produced when the document was loaded, and the
+         // failed load is why the domain could not be identified and the assets window asked for it again.
+         get { return Namespace.Uri == null ? String.Empty : Namespace.Uri.AbsoluteUri; }
+         set { Namespace.Uri = String.IsNullOrWhiteSpace(value) ? null : new Uri(value); }
       }
       [JsonIgnore]
       public String RootElementName

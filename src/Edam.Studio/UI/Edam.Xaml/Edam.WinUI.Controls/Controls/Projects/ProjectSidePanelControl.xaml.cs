@@ -399,7 +399,7 @@ namespace Edam.WinUI.Controls.Projects
             },
             "Namespace": {
                "OrganizationDomainId": "",
-               "Uri": "",
+               "Uri": "http://www.datovy.com/CHANGE-ME",
                "Prefix": "",
                "Extension": "",
                "RootElementName": ""
