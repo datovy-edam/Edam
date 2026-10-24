@@ -102,13 +102,34 @@ namespace Edam.WinUI.Controls.Projects
 
       #region -- 4.00 - Save Editor Text in File or Storage...
 
+      /// <summary>
+      /// <b>S3-6: the banner's Save does what its label says.</b> It used to read the editor text and then throw
+      /// it away — the <c>ItemSave</c> call was commented out — so the only way to save was the editor's own
+      /// Ctrl-S, and a button that looks like Save and does nothing is the same defect class as the silent command
+      /// (item 133). It now saves through the <b>same</b> path Ctrl-S uses (<c>ItemSave</c>), so the two ways of
+      /// saving cannot diverge, and it <b>answers</b>: the document title states it, the diagnostics record it, and a
+      /// failure is reported instead of swallowed.
+      /// </summary>
       public async void SaveText()
       {
-         var text = await EditorControl.ViewModel.GetEditorText();
-         //if (text != null)
-         //{
-         //   m_ViewModel.ItemSave(LoadedFileName.Text, text);
-         //}
+         try
+         {
+            var text = await EditorControl.ViewModel.GetEditorText();
+            if (text is null) return;
+
+            m_ViewModel.ItemSave(LoadedFileName.Text, text);
+
+            m_ViewModel.NotifiedMessageText = "Saved " + LoadedFileName.Text;
+            Edam.WinUI.Controls.Logging.AppDiagnostics.Write(
+               "Saved '" + LoadedFileName.Text + "' (Save in the editor banner).",
+               Microsoft.Extensions.Logging.LogLevel.Information, "Edam.Studio");
+         }
+         catch (Exception ex)
+         {
+            Edam.WinUI.Controls.Logging.AppDiagnostics.Write(
+               "'" + LoadedFileName.Text + "' could not be saved: " + ex.Message,
+               Microsoft.Extensions.Logging.LogLevel.Warning, "Edam.Studio");
+         }
       }
 
       private void ProjectSave_Click(object sender, RoutedEventArgs e)

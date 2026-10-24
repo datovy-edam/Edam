@@ -3,7 +3,7 @@
 > **Status:** **In progress (2026-10-11)** — **S3-1 delivered**; **S3-2 delivered**; **S3-3 delivered** (ADR-0015
 > accepted + `text maps` group **ALL CONFORM, 14 checks**); **S3-4 delivered** (the dialog asks the KIND; extension,
 > procedure and text map are derived; the shipped map is copied into the project; empty when none serves the kind —
-> build-verified, the runtime pass is the user's); **S3-5 delivered** (the `text map resolution (S3-5)` group is ALL CONFORM, 7 checks); **S3-6 planned**.
+> build-verified, the runtime pass is the user's); **S3-5 delivered** (the `text map resolution (S3-5)` group is ALL CONFORM, 7 checks); **S3-6 delivered** (the banner Save saves through the same path as Ctrl-S and reports it) — **sprint complete**.
 > **Authority:** the rulings in `docs/HANDOFF.md` item 134 (and item 133's lesson) are the requirement for this
 > sprint; the Projects source specification is `docs/reference/0010 - Edam.Studio.Understanding.Projects.v0.docx`
 > (§2.1 locations, §2.3 arguments document). Per `AGENTS.md` §2 the live repository is the authority; this plan is
@@ -142,5 +142,6 @@ like Save and does nothing is the same defect class as item 133.
   values, and let the conformance group assert every offered pair is a real procedure.
 - **`app:textmaps` may not exist** in a given installation (seed not deployed). Mitigation: search order plus an
   explicit diagnostic, never a silent empty field.
+
 
 
