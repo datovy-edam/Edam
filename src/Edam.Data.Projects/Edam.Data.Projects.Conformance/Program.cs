@@ -313,6 +313,10 @@ try
    // ---- 10h-3. map-file identity by convention (ADR-0015, S3-3) -------------------------------------------
    all["text maps (ADR-0015)"] = TextMapConventionScenario.Run();
 
+   // ---- 10h-4. the seam over a REAL collection, the copy, and the DI replacement (S3-5) -------------------
+   all["text map resolution (S3-5)"] =
+      TextMapResolutionScenario.Run(temp, CancellationToken.None).GetAwaiter().GetResult();
+
    // ---- 10i. the answers: overlay + marker + the ask loop (CF-3, ADR-0013) --------------------
    all["state (CF-3)"] = StateScenario.Run(Path.Combine(temp, "state"));
 
