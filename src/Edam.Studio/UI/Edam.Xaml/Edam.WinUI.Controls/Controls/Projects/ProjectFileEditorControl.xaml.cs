@@ -71,6 +71,10 @@ namespace Edam.WinUI.Controls.Projects
             if (text != null)
             {
                m_ViewModel.ItemSave(LoadedFileName.Text, text.Text);
+
+               // Ctrl-S saves through here, and the banner's Save through SaveText — the SAME report must come
+               // out of both, or one of the two ways of saving looks like it did nothing.
+               ReportSaved(LoadedFileName.Text);
             }
             return;
          }
@@ -82,6 +86,19 @@ namespace Edam.WinUI.Controls.Projects
          // This is the editor's DOCUMENT title area: it reports file/data-set activity only. Diagnostics
          // (including the code editor's own status) go to the diagnostics view — see AppDiagnostics.
          m_ViewModel.NotifiedMessageText = "Loaded " + args.MessageText;
+      }
+
+      /// <summary>
+      /// Say that the document was saved — <b>one</b> definition, used by the banner's Save and by the editor's
+      /// Ctrl-S, so the two cannot diverge (item 131's lesson: a command must answer, however it was invoked).
+      /// </summary>
+      private void ReportSaved(String name)
+      {
+         m_ViewModel.NotifiedMessageText = "Saved " + name;
+
+         Edam.WinUI.Controls.Logging.AppDiagnostics.Write(
+            "Saved '" + name + "'.",
+            Microsoft.Extensions.Logging.LogLevel.Information, "Edam.Studio");
       }
 
       public void SetEditorText(ProjectItem item, string text)
@@ -119,10 +136,7 @@ namespace Edam.WinUI.Controls.Projects
 
             m_ViewModel.ItemSave(LoadedFileName.Text, text);
 
-            m_ViewModel.NotifiedMessageText = "Saved " + LoadedFileName.Text;
-            Edam.WinUI.Controls.Logging.AppDiagnostics.Write(
-               "Saved '" + LoadedFileName.Text + "' (Save in the editor banner).",
-               Microsoft.Extensions.Logging.LogLevel.Information, "Edam.Studio");
+            ReportSaved(LoadedFileName.Text);
          }
          catch (Exception ex)
          {
