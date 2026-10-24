@@ -256,6 +256,11 @@ namespace Edam.WinUI.Controls.Projects
 
                // selection is driven through the container: the tree binds ItemsSource, not SelectedItem
                TreeView.SelectedItem = child;
+
+               // and SHOW it: setting SelectedItem does not raise the panel's click path, so the editor stayed
+               // empty until the person clicked the name. ItemSelected is that same path (it loads the document
+               // and notifies the editor), so the created file's JSON is on screen immediately.
+               ItemSelected(child);
             }
             catch (Exception insertProblem)
             {
