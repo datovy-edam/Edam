@@ -106,6 +106,28 @@ namespace Edam.Diagnostics
 
       public string ReturnText { get; set; }
 
+      /// <summary>
+      /// <b>WHERE this log was created</b> — <c>file:member:line</c>, supplied by the compiler at the call site.
+      /// <para>
+      /// A bridged message loses its source: it arrives through one handler, so the diagnostics view could only
+      /// say "the bridge said it". The log now carries the place it was made, which is what lets a line like
+      /// <i>"This operation is not supported for a relative URI"</i> be traced to the call that produced it.
+      /// </para>
+      /// </summary>
+      public String Origin { get; }
+
+      private static String ComposeOrigin(String origin, String originFile, Int32 originLine)
+      {
+         if (String.IsNullOrWhiteSpace(origin)) return null;
+
+         var file = String.IsNullOrWhiteSpace(originFile)
+            ? String.Empty
+            : System.IO.Path.GetFileName(originFile!);
+
+         return (file.Length > 0 ? file + ":" : String.Empty) + origin +
+                (originLine > 0 ? ":" + originLine.ToString() : String.Empty);
+      }
+
       #endregion
       #region    -- 1.13 ResultValueObject and Tag Properties Support
 
@@ -893,8 +915,12 @@ namespace Edam.Diagnostics
          Clear();
       }
 
-      public ResultLog()
+      public ResultLog(
+         [System.Runtime.CompilerServices.CallerMemberName] String origin = null,
+         [System.Runtime.CompilerServices.CallerFilePath] String originFile = null,
+         [System.Runtime.CompilerServices.CallerLineNumber] Int32 originLine = 0)
       {
+         Origin = ComposeOrigin(origin, originFile, originLine);
          InitializeLog();
       }
 

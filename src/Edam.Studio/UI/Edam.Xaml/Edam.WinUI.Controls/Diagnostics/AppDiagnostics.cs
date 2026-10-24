@@ -159,7 +159,19 @@ namespace Edam.WinUI.Controls.Logging
             return;
          }
 
-         Write(message.ErrorMessage,
+         // the log's ORIGIN, not the bridge's: without it a bridged line could only say "the bridge said it", which is
+         // how "This operation is not supported for a relative URI" stayed unactionable.
+         // Edam.System is consumed here as a PACKAGE, so the new ResultLog.Origin is read reflectively until that
+         // package is repacked (the feed chain, item 65). The moment it is, this line names the real emitter with no
+         // code change; then replace the reflection with `(e.ParentLog as ResultLog)?.Origin`.
+         var text = message.ErrorMessage;
+         var origin = e.ParentLog?.GetType().GetProperty("Origin")?.GetValue(e.ParentLog) as String;
+         if (!String.IsNullOrWhiteSpace(origin))
+         {
+            text = text + "   ⟨" + origin + "⟩";
+         }
+
+         Write(text,
             ToLogLevel(message.Severity),
             e.ParentLog != null ? e.ParentLog.GetType().Name : null);
       }
