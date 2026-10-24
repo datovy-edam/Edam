@@ -1941,7 +1941,10 @@ namespace Edam.WinUI.Controls.DataModels
                ? new AssetConsoleArgumentsInfo()
                : AssetConsoleArgumentsInfo.Duplicate(template);
             arguments.Procedure = procedure;
-            arguments.UriList = new List<Uri> { new Uri(input) };
+            // the runner wants Uris, and `new Uri(rawPath)` is fragile (a relative or non-canonical value throws
+            // "This operation is not supported for a relative URI"). The artifact is a real temp file, so make the
+            // path canonical and absolute first — never let a path become a Uri by assumption.
+            arguments.UriList = new List<Uri> { new Uri(Path.GetFullPath(input)) };
             if (arguments.InputFile is not null) arguments.InputFile.Full = input;
 
             switch (procedure)
