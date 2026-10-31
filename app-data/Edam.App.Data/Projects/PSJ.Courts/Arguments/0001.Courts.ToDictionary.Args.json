@@ -1,0 +1,56 @@
+{
+   "@context": {
+      "edam": "http://www.datovy.com/edam/arguments"
+   },
+   "Domain": {
+      "DomainId": "PSJ_COURT_CANONICAL",
+      "Description": "Court Criminal Case Entities"
+   },
+   "Namespace": {
+      "OrganizationDomainId": "Courts",
+      "Uri": "http://www.courts.com/db/canonical",
+      "Prefix": "cc",
+      "Extension": "",
+      "RootElementName": "cc:Psj_Court_Canonical_Document"
+   },
+   "Project": {
+      "Name": "Courts",
+      "VersionId": "v1r0"
+   },
+   "Process": {
+      "RecordId": null,
+      "Name": "Courts.Messages.ToAssets",
+      "OrganizationId": "Courts",
+      "OrganizationDomainUri": null,
+      "ProcedureName": "DdlImportToAssets",
+      "ProcedureTag": "DDL.DdlImportFileReader",
+      "ScanFilesFolder": false,
+      "SchemaType": 1,
+      "NextProcess": "",
+      "NextProcedure": [
+         ""
+      ]
+   },
+   "InputFile": {
+      "Extension": "xlsx",
+      "Name": "courts.api.msg.mdf",
+      "Path": "./Files",
+      "Full": null
+   },
+   "OutputFile": {
+      "Extension": "xlsx",
+      "Name": "court.case.criminal.dictionary",
+      "Path": "./Documents",
+      "Full": "./Documents/court.case.criminal.dictionary.xlsx"
+   },
+   "UriList": [
+      "./Archive/court.case_canonical_schema.xlsx"
+   ],
+   "InspectArguments": {
+      "ListLength": "1",
+      "MaxThreshold": "1"
+   },
+   "ConnectionString": "",
+   "ElementTransform": null,
+   "TextMapFilePath": "./Archive/DdlTextMap.json"
+}

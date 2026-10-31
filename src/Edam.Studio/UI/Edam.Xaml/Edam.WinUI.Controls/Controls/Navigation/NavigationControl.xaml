@@ -63,6 +63,7 @@
          MenuItemsSource="{x:Bind ViewModel.VisibleItems, Mode=OneWay}"
          PaneDisplayMode="{x:Bind ViewModel.DisplayMode, Mode=OneWay}"
          SelectionChanged="PageNavigation_SelectionChanged"
+         ItemInvoked="PageNavigation_ItemInvoked"
          Visibility="Collapsed">
          <Frame x:Name="PanelContent" Margin="0,0,0,0" />
       </NavigationView>

@@ -11,6 +11,12 @@
 
   <ItemGroup>
     <ProjectReference Include="..\Edam.Services\Edam.Services.Core\Edam.Services.Core.csproj" />
+    <!-- ADR-0016: the settings surface is drivable from a terminal, with no UI in the loop — the same catalog
+         and the same service the desktop page uses. -->
+    <ProjectReference Include="..\Edam.Data.Projects\Edam.Data.Projects.DependencyInjection\Edam.Data.Projects.DependencyInjection.csproj" />
+    <PackageReference Include="Microsoft.Extensions.Configuration" Version="10.0.11" />
+    <PackageReference Include="Microsoft.Extensions.Configuration.EnvironmentVariables" Version="10.0.11" />
+    <PackageReference Include="Microsoft.Extensions.Configuration.Json" Version="10.0.11" />
     <PackageReference Include="Microsoft.Extensions.DependencyInjection" Version="10.0.0" />
     <PackageReference Include="Microsoft.Extensions.Logging" Version="10.0.0" />
     <PackageReference Include="Microsoft.Extensions.Logging.Console" Version="10.0.0" />

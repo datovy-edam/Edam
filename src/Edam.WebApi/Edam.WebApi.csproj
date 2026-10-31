@@ -9,6 +9,9 @@
   <ItemGroup>
     <ProjectReference Include="..\Edam.ServiceDefaults\Edam.ServiceDefaults.csproj" />
     <ProjectReference Include="..\Edam.Services\Edam.Services.Core\Edam.Services.Core.csproj" />
+    <!-- ADR-0016: the settings surface is a platform feature, not a WinUI one — the API serves the SAME
+         catalog and service the desktop page renders, so a web host, a CLI and an MCP tool give one answer. -->
+    <ProjectReference Include="..\Edam.Data.Projects\Edam.Data.Projects.DependencyInjection\Edam.Data.Projects.DependencyInjection.csproj" />
   </ItemGroup>
 
 </Project>

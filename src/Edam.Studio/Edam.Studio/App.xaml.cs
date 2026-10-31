@@ -73,11 +73,13 @@ namespace Edam.Studio
          try
          {
             StartupDiagnostics.Trace("OnLaunched: begin");
-            EdamAppData.SetApplicationDataLocation(
-               Windows.Storage.ApplicationData.Current.LocalFolder.Path);
-            StartupDiagnostics.Trace("OnLaunched: package-local app-data root configured");
+            ConfigureApplicationDataRoot();
+            StartupDiagnostics.Trace("OnLaunched: application data root resolved");
             ApplicationHelper.InitializeApplication();
             StartupDiagnostics.Trace("OnLaunched: InitializeApplication completed");
+
+            // a degraded app-data root is reported where the person can see it, now that diagnostics exist
+            ReportApplicationDataRootProblem();
 
             m_window = new MainWindow();
             StartupDiagnostics.Trace("OnLaunched: MainWindow created");
@@ -96,6 +98,284 @@ namespace Edam.Studio
             StartupDiagnostics.Report(ex);
             throw;
          }
+      }
+
+      /// <summary>
+      /// Describe the security context the process is actually running in.
+      /// <para>
+      /// A location that is writable for the account can still be refused to <b>this</b> process: an AppContainer,
+      /// a low-integrity token or a restricted token all answer <c>Access is denied</c> for a folder the same user
+      /// can create from a normal shell. Rather than guess which one it is, the facts are recorded in the startup
+      /// trace — the account, the integrity level and whether a package (AppContainer) SID is present.
+      /// </para>
+      /// </summary>
+      /// <returns>One line describing the process' security context, or why it could not be read</returns>
+      private static String DescribeProcessSecurity()
+      {
+         try
+         {
+            using (var identity = System.Security.Principal.WindowsIdentity.GetCurrent())
+            {
+               var integrity = "unknown";
+               var appContainer = "no";
+
+               foreach (var group in identity.Groups)
+               {
+                  var value = group?.Value;
+                  if (String.IsNullOrEmpty(value))
+                  {
+                     continue;
+                  }
+
+                  if (value.StartsWith("S-1-16-", StringComparison.OrdinalIgnoreCase))
+                  {
+                     integrity = value;
+                  }
+                  else if (value.StartsWith("S-1-15-2-", StringComparison.OrdinalIgnoreCase))
+                  {
+                     appContainer = "yes (" + value + ")";
+                  }
+               }
+
+               return "user=" + identity.Name + " integrity=" + integrity + " appcontainer=" + appContainer +
+                  " auth=" + identity.AuthenticationType + " interactive=" + Environment.UserInteractive;
+            }
+         }
+         catch (Exception ex)
+         {
+            return "unavailable (" + ex.HResult.ToString("X8") + ": " + ex.Message.Trim() + ")";
+         }
+      }
+
+      /// <summary>
+      /// The per-user application-data root, and the ONE place package identity is asked for.
+      /// <para>
+      /// <c>ApplicationData.Current</c> needs package identity <b>and</b> a working application-data handle. When
+      /// either is unavailable it throws <c>Access is denied</c> — and because this runs before any window exists,
+      /// that used to be an <b>unexplained death on launch</b>: nothing on screen, and nothing to act on. A root
+      /// is therefore <b>chosen and proved writable</b> here, in order, and the reason for every rejected
+      /// candidate is kept so it can be <b>reported</b> rather than guessed at:
+      /// packaged app data, an explicit override, a development-only loose-deployment root, then the per-user
+      /// local folder and temp folder. If none can be written the application says so <b>visibly</b> and stops,
+      /// because an app that cannot write anywhere cannot work.
+      /// </para>
+      /// <para>
+      /// Deliberately <b>not</b> "Documents": on a machine where Documents is redirected to OneDrive it may be a
+      /// cloud placeholder that refuses writes (observed on this machine: <c>…\OneDrive\Documents\Edam.Studio</c>
+      /// is a reparse point and creating a folder inside it is denied), which would replace one unexplained
+      /// startup death with another.
+      /// </para>
+      /// </summary>
+      private static void ConfigureApplicationDataRoot()
+      {
+         var rejected = new List<String>();
+
+         StartupDiagnostics.Trace("OnLaunched: security " + DescribeProcessSecurity());
+
+         // 1. the packaged location — what everything expects when the deployment is healthy
+         try
+         {
+            var id = Package.Current.Id;
+            StartupDiagnostics.Trace(
+               "OnLaunched: identity=" + id.Name + " family=" + id.FamilyName +
+               " version=" + id.Version + " arch=" + id.Architecture);
+
+            var localFolder = Windows.Storage.ApplicationData.Current.LocalFolder;
+            EdamAppData.SetApplicationDataLocation(localFolder.Path);
+            StartupDiagnostics.Trace("OnLaunched: package-local app-data root configured");
+            return;
+         }
+         catch (Exception ex)
+         {
+            rejected.Add("packaged application data (0x" + ex.HResult.ToString("X8") + ": " +
+               ex.Message.Trim() + ")");
+         }
+
+         // an explicit root named by the environment, for hosts where the profile is not writable.
+         // A machine can confine a process so thoroughly that its own %LOCALAPPDATA% refuses it while a plain
+         // shell writes there happily; when that happens the user still needs to run the application, and
+         // pointing it at a folder it CAN write is the difference between "unusable" and "works".
+         var overrideRoot = Environment.GetEnvironmentVariable("EDAM_STUDIO_DATA_ROOT");
+
+         if (!String.IsNullOrWhiteSpace(overrideRoot))
+         {
+            try
+            {
+               var probe = System.IO.Path.Combine(overrideRoot, "Edam.Studio");
+               Directory.CreateDirectory(probe);
+
+               EdamAppData.SetApplicationDataLocation(overrideRoot);
+               m_ApplicationDataRootProblem = "This application is using the data root named by " +
+                  "EDAM_STUDIO_DATA_ROOT ('" + probe + "').";
+
+               StartupDiagnostics.Trace("OnLaunched: app-data root from EDAM_STUDIO_DATA_ROOT: '" + probe + "'");
+               return;
+            }
+            catch (Exception ex)
+            {
+               rejected.Add("EDAM_STUDIO_DATA_ROOT '" + overrideRoot + "' (0x" + ex.HResult.ToString("X8") +
+                  ": " + ex.Message.Trim() + ")");
+            }
+         }
+
+         // 2. Visual Studio's loose/development AppX registration has package identity, but on some Windows
+         // builds its ApplicationData redirection guard is unavailable. In that case ApplicationData.Current,
+         // LOCALAPPDATA and TEMP can all be denied even though the account itself can write to them. Keep the
+         // convenient VS deployment usable with a root beside the loose deployment, but only for a development
+         // registration. A signed MSIX never takes this branch and continues to use its package LocalState.
+         if (IsDevelopmentPackage())
+         {
+            try
+            {
+               var looseRoot = System.IO.Path.Combine(AppContext.BaseDirectory, ".local-data");
+               var probe = System.IO.Path.Combine(looseRoot, "Edam.Studio");
+               Directory.CreateDirectory(probe);
+
+               EdamAppData.SetApplicationDataLocation(looseRoot);
+               m_ApplicationDataRootProblem =
+                  "Visual Studio's loose development deployment could not use packaged application data. " +
+                  "For development only, this run is using '" + probe + "'. A signed MSIX uses package LocalState.";
+
+               StartupDiagnostics.Trace(
+                  "OnLaunched: loose development package app-data root configured at '" + probe + "'");
+               return;
+            }
+            catch (Exception ex)
+            {
+               rejected.Add("loose development app-data root (0x" + ex.HResult.ToString("X8") + ": " +
+                  ex.Message.Trim() + ")");
+            }
+         }
+
+         // 3./4. per-user local folder, then temp — each one PROVED writable before it is adopted
+         var candidates = new List<String>
+         {
+            Environment.GetFolderPath(Environment.SpecialFolder.LocalApplicationData),
+            System.IO.Path.GetTempPath()
+         };
+
+         foreach (var candidate in candidates)
+         {
+            if (String.IsNullOrWhiteSpace(candidate))
+            {
+               continue;
+            }
+
+            try
+            {
+               var probe = System.IO.Path.Combine(candidate, "Edam.Studio");
+               Directory.CreateDirectory(probe);
+
+               EdamAppData.SetApplicationDataLocation(candidate);
+               m_ApplicationDataRootProblem =
+                  "This application is not using its packaged application data: " +
+                  String.Join("; ", rejected) + ". Its data is in '" + probe + "' for this run, so the answers " +
+                  "recorded for this installation (the first-run markers) cannot be read or written.";
+
+               StartupDiagnostics.Trace(
+                  "OnLaunched: app-data root fell back to '" + probe + "' — " + m_ApplicationDataRootProblem);
+               return;
+            }
+            catch (Exception ex)
+            {
+               rejected.Add("'" + candidate + "' (0x" + ex.HResult.ToString("X8") + ": " +
+                  ex.Message.Trim() + ")");
+            }
+         }
+
+         // nothing is writable: say it where the person is, instead of vanishing
+         var detail =
+            "EDAM Studio cannot start: it has nowhere to keep its data." + Environment.NewLine +
+            Environment.NewLine +
+            "Tried: " + String.Join("; ", rejected) + Environment.NewLine +
+            Environment.NewLine +
+            "Two things produce this, and they are easy to tell apart. Either the deployment is unhealthy — " +
+            "re-deploy it (in Visual Studio: Clean, Rebuild, Deploy) and start it from its Start-menu entry, not " +
+            "from the build output — or the process was started from a shell that is itself restricted (a " +
+            "low-integrity or sandboxed terminal, such as an agent's shell, refuses these writes to every process " +
+            "it starts even though the same account can create them from Explorer). If you are unsure, launch the " +
+            "application from Explorer or the Start menu, where the restriction does not apply." + Environment.NewLine +
+            Environment.NewLine +
+            "Security context: " + DescribeProcessSecurity() + Environment.NewLine +
+            Environment.NewLine +
+            "If this machine will not let the application write to your profile at all, name a folder it can " +
+            "write and start it again: set EDAM_STUDIO_DATA_ROOT (for example to a folder inside this " +
+            "repository) and the application will keep its data there." + Environment.NewLine +
+            Environment.NewLine +
+            "Details were written to: " + StartupDiagnostics.TracePath;
+
+         StartupDiagnostics.Trace("OnLaunched: FATAL — " + detail);
+         ShowStartupFailure("EDAM Studio cannot start", detail);
+
+         // stop here on purpose: continuing would throw somewhere less explicable, with no window to show it in
+         Environment.Exit(1);
+      }
+
+      /// <summary>
+      /// Returns true only for the loose AppX layout registered by Visual Studio. A signed MSIX may be
+      /// developer-signed, but it is installed under WindowsApps and must keep its normal package LocalState.
+      /// </summary>
+      private static Boolean IsDevelopmentPackage()
+      {
+         try
+         {
+            var installedLocation = Package.Current.InstalledLocation.Path;
+            return String.Equals(
+               System.IO.Path.GetFileName(
+                  installedLocation.TrimEnd(
+                     System.IO.Path.DirectorySeparatorChar,
+                     System.IO.Path.AltDirectorySeparatorChar)),
+               "AppX",
+               StringComparison.OrdinalIgnoreCase);
+         }
+         catch (Exception)
+         {
+            // An unpackaged process has no Package.Current; it must use the explicit override or normal fallback.
+            return false;
+         }
+      }
+
+      [System.Runtime.InteropServices.DllImport("user32.dll", CharSet =
+         System.Runtime.InteropServices.CharSet.Unicode, SetLastError = true)]
+      private static extern Int32 MessageBoxW(IntPtr hWnd, String text, String caption, UInt32 type);
+
+      /// <summary>
+      /// A native message box, because this failure happens <b>before</b> a window exists: a WinUI dialog would need
+      /// a XamlRoot that does not exist yet, and the diagnostics panel needs the very app data that is missing.
+      /// </summary>
+      private static void ShowStartupFailure(String caption, String detail)
+      {
+         const UInt32 MB_ICONERROR = 0x00000010;
+         const UInt32 MB_SETFOREGROUND = 0x00010000;
+
+         try
+         {
+            MessageBoxW(IntPtr.Zero, detail, caption, MB_ICONERROR | MB_SETFOREGROUND);
+         }
+         catch
+         {
+            // a failure to explain the failure is still not allowed to throw
+         }
+      }
+
+      private static String? m_ApplicationDataRootProblem;
+
+      /// <summary>
+      /// Report the app-data problem where the person can actually see it — the diagnostics panel, which only
+      /// exists after <c>InitializeApplication</c>. Called from there so a startup degradation is never silent.
+      /// </summary>
+      public static void ReportApplicationDataRootProblem()
+      {
+         if (m_ApplicationDataRootProblem is null)
+         {
+            return;
+         }
+
+         Edam.WinUI.Controls.Logging.AppDiagnostics.Write(
+            m_ApplicationDataRootProblem,
+            Microsoft.Extensions.Logging.LogLevel.Warning, "Edam.Studio.Startup");
+
+         m_ApplicationDataRootProblem = null;
       }
 
       private Window m_window;

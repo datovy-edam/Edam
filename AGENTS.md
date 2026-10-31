@@ -90,6 +90,37 @@ Before implementing work:
 
 ---
 
+# 5A. `deploy-app` Command
+
+When the user gives the `deploy-app` command for the WinUI Studio application, perform a **signed MSIX deployment**. Visual Studio's ordinary **Clean → Rebuild → Deploy** flow is a loose/development AppX registration and is not valid packaged-runtime evidence for this repository; it can reproduce the `ApplicationData.Current` redirection failure.
+
+**Visual Studio debugging is supported.** After a source change, use Visual Studio **Clean → Rebuild → Deploy** and then F5/debug the deployed app. The loose `AppX` registration has a development-only fallback at `<loose deployment>\\.local-data\\Edam.Studio`, so this path is expected to start and is the convenient source-debugging workflow. A Clean operation may remove that development data and it will be recreated. This workflow proves the debug build only; use `deploy-app` for signed-MSIX/package-runtime validation.
+
+The agent must:
+
+1. Identify the exact app package from `Package.appxmanifest` and inspect any installed package with that identity. Do not remove unrelated packages.
+2. Read the installed package's `LocalState` before replacing a development registration. If it contains user files, preserve them or stop for user direction before removal. A package removal is allowed only for this exact app identity and only as part of the requested deployment. **Record what it held — file count and any user files — so the preservation decision is evidenced, not assumed.**
+3. Ensure the manifest version is greater than the installed version. Increment only the fourth version component when a replacement package would otherwise have the same version; preserve the three-component structure and record the change. **A bump is only required for an in-place replacement: when the development registration is removed first, record that no bump was needed rather than leaving the question open.**
+4. Build with Visual Studio MSBuild and publish to a **dedicated** output folder. The recipe with runtime evidence in this repository is **Release** to `src/Edam.Studio/Edam.Studio/bin/x64/Release/pack-verification-2/`; use that, or a new dedicated folder, and never publish over the folder already validated. Do not use the ordinary Visual Studio Deploy target as the deployment result.
+
+   ```powershell
+   $msbuild = (Get-Command msbuild.exe).Source
+   & $msbuild src/Edam.Studio/Edam.Studio/Edam.Studio.csproj `
+      /t:Publish /p:Configuration=Release /p:Platform=x64 /m
+   ```
+
+   If the default output is stale or contains prior package content, publish with explicit `PublishDir` and `AppxPackageDir` values under the dedicated folder. (A `Debug` publish is possible but has no packaged-runtime evidence behind it in this repository — say so in the report if you use it.)
+
+5. Validate the generated MSIX before installing it: confirm the deployed `ApplicationData/Edam.Studio/Edam.App.Data/Edam.Settings.json` exists, confirm `Projects` and development metadata are absent, and run `signtool verify /pa /all`.
+6. If the exact app identity is installed in development mode, remove only that registration after step 2. Install the generated `.msix` with `Add-AppxPackage -ForceUpdateFromAnyVersion -ForceApplicationShutdown`.
+7. Verify the result with `Get-AppxPackage`: `Status=Ok`, `IsDevelopmentMode=False`, an install location under `C:\Program Files\WindowsApps`, and package `LocalState` present.
+8. Launch the package by its Start-menu identity (`<PackageFamilyName>!App`), not by launching the executable from `bin` or by re-running Visual Studio Deploy. Verify the app reaches its normal window and inspect `startup-trace.log` if it does not.
+9. Report the package path, version, signature result, install state, launch result, and any remaining blocker. Update `docs/HANDOFF.md` and the relevant backlog item with the evidence.
+
+For source-level debugging after `deploy-app`, keep the installed MSIX in place and use Visual Studio **Debug → Other Debug Targets → Debug Installed App Package**, or attach to the running `Edam.Studio.exe`. Rebuilding and deploying through Visual Studio is a separate loose-layout workflow and must not replace the installed package during packaged-runtime validation.
+
+---
+
 # 6. Handoff Mandate (Mandatory)
 
 The handoff document (`docs/HANDOFF.md`) is the **single source of truth for transferring work between agents and contributors**. Keeping it current is **mandatory** — it is the mechanism that allows work to be handed off to another agent without losing context.

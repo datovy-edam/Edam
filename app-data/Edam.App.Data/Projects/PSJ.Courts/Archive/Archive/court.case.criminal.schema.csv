@@ -1,0 +1,1438 @@
+﻿dbms,TABLE_CATALOG,TABLE_SCHEMA,TABLE_NAME,COLUMN_NAME,ORDINAL_POSITION,DATA_TYPE,CHARACTER_MAXIMUM_LENGTH,CONSTRAINT_TYPE,CONSTRAINT_TABLE_SCHEMA,CONSTRAINT_TABLE_NAME,CONSTRAINT_COLUMN_NAME,IS_IDENTITY
+sqlserver,PSJ_Courts,Warrant,WarrantStatus,WarrantID,1,varchar,20,FOREIGN KEY,Warrant,WarrantDetail,WarrantID,0
+sqlserver,PSJ_Courts,Warrant,WarrantStatus,WarrantStatusID,2,varchar,20,PRIMARY KEY,,,,0
+sqlserver,PSJ_Courts,Warrant,WarrantStatus,CodeID,3,varchar,20,FOREIGN KEY,Warrant,WarrantStatusCode,CodeID,0
+sqlserver,PSJ_Courts,Warrant,WarrantStatus,StatusDate,4,date,0,,,,,0
+sqlserver,PSJ_Courts,Warrant,WarrantStatus,Comment,5,varchar,20,,,,,0
+sqlserver,PSJ_Courts,Warrant,WarrantStatus,WarrantLocation,6,varchar,20,,,,,0
+sqlserver,PSJ_Courts,Warrant,WarrantStatus,SessionID,7,varchar,40,,,,,0
+sqlserver,PSJ_Courts,Warrant,WarrantStatus,TenantID,8,varchar,20,,,,,0
+sqlserver,PSJ_Courts,Warrant,WarrantStatus,DataOwnerID,9,varchar,20,,,,,0
+sqlserver,PSJ_Courts,Warrant,WarrantStatus,DataSourceID,10,varchar,20,,,,,0
+sqlserver,PSJ_Courts,Warrant,WarrantStatus,CreatedDateTime,11,datetimeoffset,0,,,,,0
+sqlserver,PSJ_Courts,Warrant,WarrantStatus,UpdatedDateTime,12,datetimeoffset,0,,,,,0
+sqlserver,PSJ_Courts,Warrant,WarrantStatus,RecordStatusCodeID,13,char,1,,,,,0
+sqlserver,PSJ_Courts,Warrant,WarrantStatus,RecordStatusDateTime,14,datetimeoffset,0,,,,,0
+sqlserver,PSJ_Courts,Sentence,ConfinementComponent,SentenceEventID,1,varchar,20,,,,,0
+sqlserver,PSJ_Courts,Sentence,ConfinementComponent,ChargeID,2,varchar,20,FOREIGN KEY,Charge,ChargeDetail,ChargeID,0
+sqlserver,PSJ_Courts,Sentence,ConfinementComponent,SentenceID,3,varchar,20,FOREIGN KEY,Sentence,SentenceDetail,SentenceID,0
+sqlserver,PSJ_Courts,Sentence,ConfinementComponent,ComponentID,4,varchar,20,PRIMARY KEY,,,,0
+sqlserver,PSJ_Courts,Sentence,ConfinementComponent,TypeID,5,varchar,20,FOREIGN KEY,Sentence,ConfinementType,TypeID,0
+sqlserver,PSJ_Courts,Sentence,ConfinementComponent,FacilityID,6,varchar,20,FOREIGN KEY,Code,Organization,OrganizationID,0
+sqlserver,PSJ_Courts,Sentence,ConfinementComponent,StartDate,7,date,0,,,,,0
+sqlserver,PSJ_Courts,Sentence,ConfinementComponent,ImpositionOfSentenceSuspended,8,varchar,20,,,,,0
+sqlserver,PSJ_Courts,Sentence,ConfinementComponent,SentencingStayed,9,varchar,20,,,,,0
+sqlserver,PSJ_Courts,Sentence,ConfinementComponent,SuspendedYears,10,varchar,20,,,,,0
+sqlserver,PSJ_Courts,Sentence,ConfinementComponent,SuspendedMonts,11,varchar,20,,,,,0
+sqlserver,PSJ_Courts,Sentence,ConfinementComponent,SuspendedDays,12,varchar,20,,,,,0
+sqlserver,PSJ_Courts,Sentence,ConfinementComponent,SuspendedWeeks,13,varchar,20,,,,,0
+sqlserver,PSJ_Courts,Sentence,ConfinementComponent,SuspendedReasonCodeID,14,varchar,20,FOREIGN KEY,Sentence,SuspendedReasonCode,CodeID,0
+sqlserver,PSJ_Courts,Sentence,ConfinementComponent,Term,15,varchar,20,,,,,0
+sqlserver,PSJ_Courts,Sentence,ConfinementComponent,TermTypeCodeID,16,varchar,20,,,,,0
+sqlserver,PSJ_Courts,Sentence,ConfinementComponent,YearsToLife,17,varchar,20,,,,,0
+sqlserver,PSJ_Courts,Sentence,ConfinementComponent,Life,18,varchar,20,,,,,0
+sqlserver,PSJ_Courts,Sentence,ConfinementComponent,Death,19,varchar,20,,,,,0
+sqlserver,PSJ_Courts,Sentence,ConfinementComponent,UntilAge18,20,varchar,20,,,,,0
+sqlserver,PSJ_Courts,Sentence,ConfinementComponent,UntilAge21,21,varchar,20,,,,,0
+sqlserver,PSJ_Courts,Sentence,ConfinementComponent,UntilAge25,22,varchar,20,,,,,0
+sqlserver,PSJ_Courts,Sentence,ConfinementComponent,CreditForTimeServedYears,23,varchar,20,,,,,0
+sqlserver,PSJ_Courts,Sentence,ConfinementComponent,CreditForTimeServedMonths,24,varchar,20,,,,,0
+sqlserver,PSJ_Courts,Sentence,ConfinementComponent,CreditForTimeServedDays,25,varchar,20,,,,,0
+sqlserver,PSJ_Courts,Sentence,ConfinementComponent,CreditForTimeServedWeeks,26,varchar,20,,,,,0
+sqlserver,PSJ_Courts,Sentence,ConfinementComponent,ConductCreditTypeCode,27,varchar,20,,,,,0
+sqlserver,PSJ_Courts,Sentence,ConfinementComponent,ConductCreditYears,28,varchar,20,,,,,0
+sqlserver,PSJ_Courts,Sentence,ConfinementComponent,ConductCreditMonths,29,varchar,20,,,,,0
+sqlserver,PSJ_Courts,Sentence,ConfinementComponent,ConductCreditDays,30,varchar,20,,,,,0
+sqlserver,PSJ_Courts,Sentence,ConfinementComponent,ConductCreditWeeks,31,varchar,20,,,,,0
+sqlserver,PSJ_Courts,Sentence,ConfinementComponent,TreatmentCreditYears,32,varchar,20,,,,,0
+sqlserver,PSJ_Courts,Sentence,ConfinementComponent,TreatmentCreditMonths,33,varchar,20,,,,,0
+sqlserver,PSJ_Courts,Sentence,ConfinementComponent,TreatmentCreditDays,34,varchar,20,,,,,0
+sqlserver,PSJ_Courts,Sentence,ConfinementComponent,TreatmentCreditWeeks,35,varchar,20,,,,,0
+sqlserver,PSJ_Courts,Sentence,ConfinementComponent,AdditionalCreditTypeDescription,36,varchar,20,,,,,0
+sqlserver,PSJ_Courts,Sentence,ConfinementComponent,AdditionalCreditYears,37,varchar,20,,,,,0
+sqlserver,PSJ_Courts,Sentence,ConfinementComponent,AdditionalCreditMonths,38,varchar,20,,,,,0
+sqlserver,PSJ_Courts,Sentence,ConfinementComponent,AdditionalCreditDays,39,varchar,20,,,,,0
+sqlserver,PSJ_Courts,Sentence,ConfinementComponent,AdditionalCreditWeeks,40,varchar,20,,,,,0
+sqlserver,PSJ_Courts,Sentence,ConfinementComponent,PostSentenceCreditYears,41,varchar,20,,,,,0
+sqlserver,PSJ_Courts,Sentence,ConfinementComponent,PostSentenceCreditMonths,42,varchar,20,,,,,0
+sqlserver,PSJ_Courts,Sentence,ConfinementComponent,PostSentenceCreditDays,43,varchar,20,,,,,0
+sqlserver,PSJ_Courts,Sentence,ConfinementComponent,PostSentenceCreditWeeks,44,varchar,20,,,,,0
+sqlserver,PSJ_Courts,Sentence,ConfinementComponent,MandatorySupervisedReleaseCreditYears,45,varchar,20,,,,,0
+sqlserver,PSJ_Courts,Sentence,ConfinementComponent,MandatorySupervisedReleaseCreditMonths,46,varchar,20,,,,,0
+sqlserver,PSJ_Courts,Sentence,ConfinementComponent,MandatorySupervisedReleaseCreditDays,47,varchar,20,,,,,0
+sqlserver,PSJ_Courts,Sentence,ConfinementComponent,MandatorySupervisedReleaseCreditWeeks,48,varchar,20,,,,,0
+sqlserver,PSJ_Courts,Sentence,ConfinementComponent,PayFineInLieuOfJailTime,49,varchar,20,,,,,0
+sqlserver,PSJ_Courts,Sentence,ConfinementComponent,FineAmount,50,money,0,,,,,0
+sqlserver,PSJ_Courts,Sentence,ConfinementComponent,FineSuspendedAmount,51,money,0,,,,,0
+sqlserver,PSJ_Courts,Sentence,ConfinementComponent,PayFine,52,varchar,20,,,,,0
+sqlserver,PSJ_Courts,Sentence,ConfinementComponent,PaySuspendedFine,53,varchar,20,,,,,0
+sqlserver,PSJ_Courts,Sentence,ConfinementComponent,StayedReason,54,varchar,20,,,,,0
+sqlserver,PSJ_Courts,Sentence,ConfinementComponent,LifeParoleEligible,55,varchar,20,,,,,0
+sqlserver,PSJ_Courts,Sentence,ConfinementComponent,YearsToLifeParoleEligible,56,varchar,20,,,,,0
+sqlserver,PSJ_Courts,Sentence,ConfinementComponent,FineLengthInLieuOfYears,57,varchar,20,,,,,0
+sqlserver,PSJ_Courts,Sentence,ConfinementComponent,FineLengthInLieuOfMonths,58,varchar,20,,,,,0
+sqlserver,PSJ_Courts,Sentence,ConfinementComponent,FineLengthInLieuOfDays,59,varchar,20,,,,,0
+sqlserver,PSJ_Courts,Sentence,ConfinementComponent,FineLengthInLieuOfWeeks,60,varchar,20,,,,,0
+sqlserver,PSJ_Courts,Sentence,ConfinementComponent,FineSuspendedYears,61,varchar,20,,,,,0
+sqlserver,PSJ_Courts,Sentence,ConfinementComponent,FineSuspendedMonths,62,varchar,20,,,,,0
+sqlserver,PSJ_Courts,Sentence,ConfinementComponent,FineSuspendedDays,63,varchar,20,,,,,0
+sqlserver,PSJ_Courts,Sentence,ConfinementComponent,FineSuspendedWeeks,64,varchar,20,,,,,0
+sqlserver,PSJ_Courts,Sentence,ConfinementComponent,TotalCreditSuspendedYears,65,varchar,20,,,,,0
+sqlserver,PSJ_Courts,Sentence,ConfinementComponent,TotalCreditSuspendedMonths,66,varchar,20,,,,,0
+sqlserver,PSJ_Courts,Sentence,ConfinementComponent,TotalCreditSuspendedDays,67,varchar,20,,,,,0
+sqlserver,PSJ_Courts,Sentence,ConfinementComponent,TotalCreditSuspendedWeeks,68,varchar,20,,,,,0
+sqlserver,PSJ_Courts,Sentence,ConfinementComponent,TermYearsToLife,69,varchar,20,,,,,0
+sqlserver,PSJ_Courts,Sentence,ConfinementComponent,AdultConfinementComments,70,varchar,20,,,,,0
+sqlserver,PSJ_Courts,Sentence,ConfinementComponent,InLieuOfComments,71,varchar,256,,,,,0
+sqlserver,PSJ_Courts,Sentence,ConfinementComponent,FineSuspendedAmountInLieuOf,72,varchar,20,,,,,0
+sqlserver,PSJ_Courts,Sentence,ConfinementComponent,SessionID,73,varchar,40,,,,,0
+sqlserver,PSJ_Courts,Sentence,ConfinementComponent,TenantID,74,varchar,20,,,,,0
+sqlserver,PSJ_Courts,Sentence,ConfinementComponent,DataOwnerID,75,varchar,20,,,,,0
+sqlserver,PSJ_Courts,Sentence,ConfinementComponent,DataSourceID,76,varchar,20,,,,,0
+sqlserver,PSJ_Courts,Sentence,ConfinementComponent,CreatedDateTime,77,datetimeoffset,0,,,,,0
+sqlserver,PSJ_Courts,Sentence,ConfinementComponent,UpdatedDateTime,78,datetimeoffset,0,,,,,0
+sqlserver,PSJ_Courts,Sentence,ConfinementComponent,RecordStatusCodeID,79,char,1,,,,,0
+sqlserver,PSJ_Courts,Sentence,ConfinementComponent,RecordStatusDateTime,80,datetimeoffset,0,,,,,0
+sqlserver,PSJ_Courts,NODS,ServiceType,TypeID,1,varchar,20,PRIMARY KEY,,,,0
+sqlserver,PSJ_Courts,NODS,ServiceType,Description,2,varchar,128,,,,,0
+sqlserver,PSJ_Courts,NODS,ServiceType,SessionID,3,varchar,40,,,,,0
+sqlserver,PSJ_Courts,NODS,ServiceType,TenantID,4,varchar,20,,,,,0
+sqlserver,PSJ_Courts,NODS,ServiceType,DataOwnerID,5,varchar,20,,,,,0
+sqlserver,PSJ_Courts,NODS,ServiceType,DataSourceID,6,varchar,20,,,,,0
+sqlserver,PSJ_Courts,NODS,ServiceType,CreatedDateTime,7,datetimeoffset,0,,,,,0
+sqlserver,PSJ_Courts,NODS,ServiceType,UpdatedDateTime,8,datetimeoffset,0,,,,,0
+sqlserver,PSJ_Courts,NODS,ServiceType,RecordStatusCodeID,9,char,1,,,,,0
+sqlserver,PSJ_Courts,NODS,ServiceType,RecordStatusDateTime,10,datetimeoffset,0,,,,,0
+sqlserver,PSJ_Courts,Case,CaseFiling,CaseID,1,varchar,20,FOREIGN KEY,Case,CaseDetail,CaseID,0
+sqlserver,PSJ_Courts,Case,CaseFiling,AuthorityID,2,varchar,20,FOREIGN KEY,Code,Organization,OrganizationID,0
+sqlserver,PSJ_Courts,Case,CaseFiling,CaseFilingID,3,varchar,20,PRIMARY KEY,,,,0
+sqlserver,PSJ_Courts,Case,CaseFiling,CourtEventID,4,varchar,20,,,,,0
+sqlserver,PSJ_Courts,Case,CaseFiling,DateFiled,5,date,0,,,,,0
+sqlserver,PSJ_Courts,Case,CaseFiling,DateSubmitted,6,date,0,,,,,0
+sqlserver,PSJ_Courts,Case,CaseFiling,StatusCode,7,varchar,20,,,,,0
+sqlserver,PSJ_Courts,Case,CaseFiling,StatusDate,8,datetimeoffset,0,,,,,0
+sqlserver,PSJ_Courts,Case,CaseFiling,SessionID,9,varchar,40,,,,,0
+sqlserver,PSJ_Courts,Case,CaseFiling,TenantID,10,varchar,20,,,,,0
+sqlserver,PSJ_Courts,Case,CaseFiling,DataOwnerID,11,varchar,20,,,,,0
+sqlserver,PSJ_Courts,Case,CaseFiling,DataSourceID,12,varchar,20,,,,,0
+sqlserver,PSJ_Courts,Case,CaseFiling,CreatedDateTime,13,datetimeoffset,0,,,,,0
+sqlserver,PSJ_Courts,Case,CaseFiling,UpdatedDateTime,14,datetimeoffset,0,,,,,0
+sqlserver,PSJ_Courts,Case,CaseFiling,RecordStatusCodeID,15,char,1,,,,,0
+sqlserver,PSJ_Courts,Case,CaseFiling,RecordStatusDateTime,16,datetimeoffset,0,,,,,0
+sqlserver,PSJ_Courts,Party,GenderCode,CodeID,1,varchar,20,PRIMARY KEY,,,,0
+sqlserver,PSJ_Courts,Party,GenderCode,Description,2,varchar,20,,,,,0
+sqlserver,PSJ_Courts,Party,GenderCode,SessionID,3,varchar,40,,,,,0
+sqlserver,PSJ_Courts,Party,GenderCode,TenantID,4,varchar,20,,,,,0
+sqlserver,PSJ_Courts,Party,GenderCode,DataOwnerID,5,varchar,20,,,,,0
+sqlserver,PSJ_Courts,Party,GenderCode,DataSourceID,6,varchar,20,,,,,0
+sqlserver,PSJ_Courts,Party,GenderCode,CreatedDateTime,7,datetimeoffset,0,,,,,0
+sqlserver,PSJ_Courts,Party,GenderCode,UpdatedDateTime,8,datetimeoffset,0,,,,,0
+sqlserver,PSJ_Courts,Party,GenderCode,RecordStatusCodeID,9,char,1,,,,,0
+sqlserver,PSJ_Courts,Party,GenderCode,RecordStatusDateTime,10,datetimeoffset,0,,,,,0
+sqlserver,PSJ_Courts,Charge,ChargeBookingAgency,ChargeBookingAgencyID,1,varchar,20,PRIMARY KEY,,,,0
+sqlserver,PSJ_Courts,Charge,ChargeBookingAgency,CaseID,2,varchar,20,FOREIGN KEY,Case,CaseDetail,CaseID,0
+sqlserver,PSJ_Courts,Charge,ChargeBookingAgency,ChargeID,3,varchar,20,FOREIGN KEY,Charge,ChargeDetail,ChargeID,0
+sqlserver,PSJ_Courts,Charge,ChargeBookingAgency,AgencyID,4,varchar,20,FOREIGN KEY,Code,Organization,OrganizationID,0
+sqlserver,PSJ_Courts,Charge,ChargeBookingAgency,ArrestTime,5,varchar,20,,,,,0
+sqlserver,PSJ_Courts,Charge,ChargeBookingAgency,OfficerID,6,varchar,20,FOREIGN KEY,Code,Officer,OfficerID,0
+sqlserver,PSJ_Courts,Charge,ChargeBookingAgency,SessionID,7,varchar,40,,,,,0
+sqlserver,PSJ_Courts,Charge,ChargeBookingAgency,TenantID,8,varchar,20,,,,,0
+sqlserver,PSJ_Courts,Charge,ChargeBookingAgency,DataOwnerID,9,varchar,20,,,,,0
+sqlserver,PSJ_Courts,Charge,ChargeBookingAgency,DataSourceID,10,varchar,20,,,,,0
+sqlserver,PSJ_Courts,Charge,ChargeBookingAgency,CreatedDateTime,11,datetimeoffset,0,,,,,0
+sqlserver,PSJ_Courts,Charge,ChargeBookingAgency,UpdatedDateTime,12,datetimeoffset,0,,,,,0
+sqlserver,PSJ_Courts,Charge,ChargeBookingAgency,RecordStatusCodeID,13,char,1,,,,,0
+sqlserver,PSJ_Courts,Charge,ChargeBookingAgency,RecordStatusDateTime,14,datetimeoffset,0,,,,,0
+sqlserver,PSJ_Courts,Activity,FinancialEvent,CaseID,1,varchar,20,FOREIGN KEY,Case,CaseDetail,CaseID,0
+sqlserver,PSJ_Courts,Activity,FinancialEvent,EventID,2,varchar,20,PRIMARY KEY,,,,0
+sqlserver,PSJ_Courts,Activity,FinancialEvent,TypeID,3,varchar,20,FOREIGN KEY,Activity,FinancialEventType,TypeID,0
+sqlserver,PSJ_Courts,Activity,FinancialEvent,ChargeID,4,varchar,20,,,,,0
+sqlserver,PSJ_Courts,Activity,FinancialEvent,DateAssessed,5,date,0,,,,,0
+sqlserver,PSJ_Courts,Activity,FinancialEvent,FeeCodeID,6,varchar,20,,,,,0
+sqlserver,PSJ_Courts,Activity,FinancialEvent,PriorityCodeID,7,varchar,20,,,,,0
+sqlserver,PSJ_Courts,Activity,FinancialEvent,WasReferredToCollections,8,bit,0,,,,,0
+sqlserver,PSJ_Courts,Activity,FinancialEvent,Amount,9,money,0,,,,,0
+sqlserver,PSJ_Courts,Activity,FinancialEvent,BalanceDue,10,money,0,,,,,0
+sqlserver,PSJ_Courts,Activity,FinancialEvent,SessionID,11,varchar,40,,,,,0
+sqlserver,PSJ_Courts,Activity,FinancialEvent,TenantID,12,varchar,20,,,,,0
+sqlserver,PSJ_Courts,Activity,FinancialEvent,DataOwnerID,13,varchar,20,,,,,0
+sqlserver,PSJ_Courts,Activity,FinancialEvent,DataSourceID,14,varchar,20,,,,,0
+sqlserver,PSJ_Courts,Activity,FinancialEvent,CreatedDateTime,15,datetimeoffset,0,,,,,0
+sqlserver,PSJ_Courts,Activity,FinancialEvent,UpdatedDateTime,16,datetimeoffset,0,,,,,0
+sqlserver,PSJ_Courts,Activity,FinancialEvent,RecordStatusCodeID,17,char,1,,,,,0
+sqlserver,PSJ_Courts,Activity,FinancialEvent,RecordStatusDateTime,18,datetimeoffset,0,,,,,0
+sqlserver,PSJ_Courts,Warrant,WarrantConditionCode,CodeID,1,varchar,20,PRIMARY KEY,,,,0
+sqlserver,PSJ_Courts,Warrant,WarrantConditionCode,Description,2,varchar,128,,,,,0
+sqlserver,PSJ_Courts,Warrant,WarrantConditionCode,SessionID,3,varchar,40,,,,,0
+sqlserver,PSJ_Courts,Warrant,WarrantConditionCode,TenantID,4,varchar,20,,,,,0
+sqlserver,PSJ_Courts,Warrant,WarrantConditionCode,DataOwnerID,5,varchar,20,,,,,0
+sqlserver,PSJ_Courts,Warrant,WarrantConditionCode,DataSourceID,6,varchar,20,,,,,0
+sqlserver,PSJ_Courts,Warrant,WarrantConditionCode,CreatedDateTime,7,datetimeoffset,0,,,,,0
+sqlserver,PSJ_Courts,Warrant,WarrantConditionCode,UpdatedDateTime,8,datetimeoffset,0,,,,,0
+sqlserver,PSJ_Courts,Warrant,WarrantConditionCode,RecordStatusCodeID,9,char,1,,,,,0
+sqlserver,PSJ_Courts,Warrant,WarrantConditionCode,RecordStatusDateTime,10,datetimeoffset,0,,,,,0
+sqlserver,PSJ_Courts,Party,RaceCode,CodeID,1,varchar,20,PRIMARY KEY,,,,0
+sqlserver,PSJ_Courts,Party,RaceCode,Description,2,varchar,20,,,,,0
+sqlserver,PSJ_Courts,Party,RaceCode,SessionID,3,varchar,40,,,,,0
+sqlserver,PSJ_Courts,Party,RaceCode,TenantID,4,varchar,20,,,,,0
+sqlserver,PSJ_Courts,Party,RaceCode,DataOwnerID,5,varchar,20,,,,,0
+sqlserver,PSJ_Courts,Party,RaceCode,DataSourceID,6,varchar,20,,,,,0
+sqlserver,PSJ_Courts,Party,RaceCode,CreatedDateTime,7,datetimeoffset,0,,,,,0
+sqlserver,PSJ_Courts,Party,RaceCode,UpdatedDateTime,8,datetimeoffset,0,,,,,0
+sqlserver,PSJ_Courts,Party,RaceCode,RecordStatusCodeID,9,char,1,,,,,0
+sqlserver,PSJ_Courts,Party,RaceCode,RecordStatusDateTime,10,datetimeoffset,0,,,,,0
+sqlserver,PSJ_Courts,Sentence,ProbationConditionType,TypeID,1,varchar,20,PRIMARY KEY,,,,0
+sqlserver,PSJ_Courts,Sentence,ProbationConditionType,Description,2,varchar,128,,,,,0
+sqlserver,PSJ_Courts,Sentence,ProbationConditionType,SessionID,3,varchar,40,,,,,0
+sqlserver,PSJ_Courts,Sentence,ProbationConditionType,TenantID,4,varchar,20,,,,,0
+sqlserver,PSJ_Courts,Sentence,ProbationConditionType,DataOwnerID,5,varchar,20,,,,,0
+sqlserver,PSJ_Courts,Sentence,ProbationConditionType,DataSourceID,6,varchar,20,,,,,0
+sqlserver,PSJ_Courts,Sentence,ProbationConditionType,CreatedDateTime,7,datetimeoffset,0,,,,,0
+sqlserver,PSJ_Courts,Sentence,ProbationConditionType,UpdatedDateTime,8,datetimeoffset,0,,,,,0
+sqlserver,PSJ_Courts,Sentence,ProbationConditionType,RecordStatusCodeID,9,char,1,,,,,0
+sqlserver,PSJ_Courts,Sentence,ProbationConditionType,RecordStatusDateTime,10,datetimeoffset,0,,,,,0
+sqlserver,PSJ_Courts,Case,CrossReferenceType,TypeID,1,varchar,20,PRIMARY KEY,,,,0
+sqlserver,PSJ_Courts,Case,CrossReferenceType,Description,2,varchar,20,,,,,0
+sqlserver,PSJ_Courts,Case,CrossReferenceType,SessionID,3,varchar,40,,,,,0
+sqlserver,PSJ_Courts,Case,CrossReferenceType,TenantID,4,varchar,20,,,,,0
+sqlserver,PSJ_Courts,Case,CrossReferenceType,DataOwnerID,5,varchar,20,,,,,0
+sqlserver,PSJ_Courts,Case,CrossReferenceType,DataSourceID,6,varchar,20,,,,,0
+sqlserver,PSJ_Courts,Case,CrossReferenceType,CreatedDateTime,7,datetimeoffset,0,,,,,0
+sqlserver,PSJ_Courts,Case,CrossReferenceType,UpdatedDateTime,8,datetimeoffset,0,,,,,0
+sqlserver,PSJ_Courts,Case,CrossReferenceType,RecordStatusCodeID,9,char,1,,,,,0
+sqlserver,PSJ_Courts,Case,CrossReferenceType,RecordStatusDateTime,10,datetimeoffset,0,,,,,0
+sqlserver,PSJ_Courts,NODS,TypeOfService,CaseID,1,varchar,20,FOREIGN KEY,Case,CaseDetail,CaseID,0
+sqlserver,PSJ_Courts,NODS,TypeOfService,PersonID,2,varchar,20,FOREIGN KEY,Party,PartyDetail,PartyID,0
+sqlserver,PSJ_Courts,NODS,TypeOfService,ServiceID,3,varchar,20,PRIMARY KEY,,,,0
+sqlserver,PSJ_Courts,NODS,TypeOfService,ServiceTypeID,4,varchar,20,FOREIGN KEY,NODS,ServiceType,TypeID,0
+sqlserver,PSJ_Courts,NODS,TypeOfService,ParticipantCourtCaseID,5,varchar,20,FOREIGN KEY,Case,CaseDetail,CaseID,0
+sqlserver,PSJ_Courts,NODS,TypeOfService,ParticipantID,6,varchar,20,,,,,0
+sqlserver,PSJ_Courts,Warrant,WarrantCondition,WarrantID,1,varchar,20,FOREIGN KEY,Warrant,WarrantDetail,WarrantID,0
+sqlserver,PSJ_Courts,Warrant,WarrantCondition,CodeID,2,varchar,20,FOREIGN KEY,Warrant,WarrantConditionCode,CodeID,0
+sqlserver,PSJ_Courts,Warrant,WarrantCondition,Comment,3,varchar,256,,,,,0
+sqlserver,PSJ_Courts,Warrant,WarrantCondition,SessionID,4,varchar,40,,,,,0
+sqlserver,PSJ_Courts,Warrant,WarrantCondition,TenantID,5,varchar,20,,,,,0
+sqlserver,PSJ_Courts,Warrant,WarrantCondition,DataOwnerID,6,varchar,20,,,,,0
+sqlserver,PSJ_Courts,Warrant,WarrantCondition,DataSourceID,7,varchar,20,,,,,0
+sqlserver,PSJ_Courts,Warrant,WarrantCondition,CreatedDateTime,8,datetimeoffset,0,,,,,0
+sqlserver,PSJ_Courts,Warrant,WarrantCondition,UpdatedDateTime,9,datetimeoffset,0,,,,,0
+sqlserver,PSJ_Courts,Warrant,WarrantCondition,RecordStatusCodeID,10,char,1,,,,,0
+sqlserver,PSJ_Courts,Warrant,WarrantCondition,RecordStatusDateTime,11,datetimeoffset,0,,,,,0
+sqlserver,PSJ_Courts,Charge,ChargeReportingAgency,ChargeReportingAgencyID,1,varchar,20,PRIMARY KEY,,,,0
+sqlserver,PSJ_Courts,Charge,ChargeReportingAgency,CaseID,2,varchar,20,FOREIGN KEY,Case,CaseDetail,CaseID,0
+sqlserver,PSJ_Courts,Charge,ChargeReportingAgency,ChargeID,3,varchar,20,FOREIGN KEY,Charge,ChargeDetail,ChargeID,0
+sqlserver,PSJ_Courts,Charge,ChargeReportingAgency,AgencyID,4,varchar,20,FOREIGN KEY,Code,Organization,OrganizationID,0
+sqlserver,PSJ_Courts,Charge,ChargeReportingAgency,ControlNumber,5,varchar,20,,,,,0
+sqlserver,PSJ_Courts,Charge,ChargeReportingAgency,OfficerID,6,varchar,20,FOREIGN KEY,Code,Officer,OfficerID,0
+sqlserver,PSJ_Courts,Charge,ChargeReportingAgency,SessionID,7,varchar,40,,,,,0
+sqlserver,PSJ_Courts,Charge,ChargeReportingAgency,TenantID,8,varchar,20,,,,,0
+sqlserver,PSJ_Courts,Charge,ChargeReportingAgency,DataOwnerID,9,varchar,20,,,,,0
+sqlserver,PSJ_Courts,Charge,ChargeReportingAgency,DataSourceID,10,varchar,20,,,,,0
+sqlserver,PSJ_Courts,Charge,ChargeReportingAgency,CreatedDateTime,11,datetimeoffset,0,,,,,0
+sqlserver,PSJ_Courts,Charge,ChargeReportingAgency,UpdatedDateTime,12,datetimeoffset,0,,,,,0
+sqlserver,PSJ_Courts,Charge,ChargeReportingAgency,RecordStatusCodeID,13,char,1,,,,,0
+sqlserver,PSJ_Courts,Charge,ChargeReportingAgency,RecordStatusDateTime,14,datetimeoffset,0,,,,,0
+sqlserver,PSJ_Courts,Activity,AppealType,TypeID,1,varchar,20,PRIMARY KEY,,,,0
+sqlserver,PSJ_Courts,Activity,AppealType,Description,2,varchar,20,,,,,0
+sqlserver,PSJ_Courts,Activity,AppealType,SessionID,3,varchar,40,,,,,0
+sqlserver,PSJ_Courts,Activity,AppealType,TenantID,4,varchar,20,,,,,0
+sqlserver,PSJ_Courts,Activity,AppealType,DataOwnerID,5,varchar,20,,,,,0
+sqlserver,PSJ_Courts,Activity,AppealType,DataSourceID,6,varchar,20,,,,,0
+sqlserver,PSJ_Courts,Activity,AppealType,CreatedDateTime,7,datetimeoffset,0,,,,,0
+sqlserver,PSJ_Courts,Activity,AppealType,UpdatedDateTime,8,datetimeoffset,0,,,,,0
+sqlserver,PSJ_Courts,Activity,AppealType,RecordStatusCodeID,9,char,1,,,,,0
+sqlserver,PSJ_Courts,Activity,AppealType,RecordStatusDateTime,10,datetimeoffset,0,,,,,0
+sqlserver,PSJ_Courts,Party,PhoneType,TypeID,1,varchar,20,PRIMARY KEY,,,,0
+sqlserver,PSJ_Courts,Party,PhoneType,Description,2,varchar,20,,,,,0
+sqlserver,PSJ_Courts,Party,PhoneType,SessionID,3,varchar,40,,,,,0
+sqlserver,PSJ_Courts,Party,PhoneType,TenantID,4,varchar,20,,,,,0
+sqlserver,PSJ_Courts,Party,PhoneType,DataOwnerID,5,varchar,20,,,,,0
+sqlserver,PSJ_Courts,Party,PhoneType,DataSourceID,6,varchar,20,,,,,0
+sqlserver,PSJ_Courts,Party,PhoneType,CreatedDateTime,7,datetimeoffset,0,,,,,0
+sqlserver,PSJ_Courts,Party,PhoneType,UpdatedDateTime,8,datetimeoffset,0,,,,,0
+sqlserver,PSJ_Courts,Party,PhoneType,RecordStatusCodeID,9,char,1,,,,,0
+sqlserver,PSJ_Courts,Party,PhoneType,RecordStatusDateTime,10,datetimeoffset,0,,,,,0
+sqlserver,PSJ_Courts,Sentence,ProbationComponent,ChargeID,1,varchar,20,FOREIGN KEY,Charge,ChargeDetail,ChargeID,0
+sqlserver,PSJ_Courts,Sentence,ProbationComponent,SentenceID,2,varchar,20,FOREIGN KEY,Sentence,SentenceDetail,SentenceID,0
+sqlserver,PSJ_Courts,Sentence,ProbationComponent,ComponentID,3,varchar,20,PRIMARY KEY,,,,0
+sqlserver,PSJ_Courts,Sentence,ProbationComponent,TypeID,4,varchar,20,,,,,0
+sqlserver,PSJ_Courts,Sentence,ProbationComponent,StartDate,5,date,0,,,,,0
+sqlserver,PSJ_Courts,Sentence,ProbationComponent,EndDate,6,date,0,,,,,0
+sqlserver,PSJ_Courts,Sentence,ProbationComponent,TermYears,7,varchar,20,,,,,0
+sqlserver,PSJ_Courts,Sentence,ProbationComponent,TermMonths,8,varchar,20,,,,,0
+sqlserver,PSJ_Courts,Sentence,ProbationComponent,TermDays,9,varchar,20,,,,,0
+sqlserver,PSJ_Courts,Sentence,ProbationComponent,TermWeeks,10,varchar,20,,,,,0
+sqlserver,PSJ_Courts,Sentence,ProbationComponent,Manual,11,varchar,20,,,,,0
+sqlserver,PSJ_Courts,Sentence,ProbationComponent,ImpositionOfSentenceSuspended,12,bit,0,,,,,0
+sqlserver,PSJ_Courts,Sentence,ProbationComponent,Comment,13,varchar,256,,,,,0
+sqlserver,PSJ_Courts,Sentence,ProbationComponent,SessionID,14,varchar,40,,,,,0
+sqlserver,PSJ_Courts,Sentence,ProbationComponent,TenantID,15,varchar,20,,,,,0
+sqlserver,PSJ_Courts,Sentence,ProbationComponent,DataOwnerID,16,varchar,20,,,,,0
+sqlserver,PSJ_Courts,Sentence,ProbationComponent,DataSourceID,17,varchar,20,,,,,0
+sqlserver,PSJ_Courts,Sentence,ProbationComponent,CreatedDateTime,18,datetimeoffset,0,,,,,0
+sqlserver,PSJ_Courts,Sentence,ProbationComponent,UpdatedDateTime,19,datetimeoffset,0,,,,,0
+sqlserver,PSJ_Courts,Sentence,ProbationComponent,RecordStatusCodeID,20,char,1,,,,,0
+sqlserver,PSJ_Courts,Sentence,ProbationComponent,RecordStatusDateTime,21,datetimeoffset,0,,,,,0
+sqlserver,PSJ_Courts,Case,CaseCrossReference,CaseID,1,varchar,20,FOREIGN KEY,Case,CaseDetail,CaseID,0
+sqlserver,PSJ_Courts,Case,CaseCrossReference,CrossReferenceID,2,varchar,20,PRIMARY KEY,,,,0
+sqlserver,PSJ_Courts,Case,CaseCrossReference,TypeID,3,varchar,20,FOREIGN KEY,Case,CrossReferenceType,TypeID,0
+sqlserver,PSJ_Courts,Case,CaseCrossReference,Description,4,varchar,256,,,,,0
+sqlserver,PSJ_Courts,Case,CaseCrossReference,CaseNumber,5,varchar,20,,,,,0
+sqlserver,PSJ_Courts,Case,CaseCrossReference,SessionID,6,varchar,40,,,,,0
+sqlserver,PSJ_Courts,Case,CaseCrossReference,TenantID,7,varchar,20,,,,,0
+sqlserver,PSJ_Courts,Case,CaseCrossReference,DataOwnerID,8,varchar,20,,,,,0
+sqlserver,PSJ_Courts,Case,CaseCrossReference,DataSourceID,9,varchar,20,,,,,0
+sqlserver,PSJ_Courts,Case,CaseCrossReference,CreatedDateTime,10,datetimeoffset,0,,,,,0
+sqlserver,PSJ_Courts,Case,CaseCrossReference,UpdatedDateTime,11,datetimeoffset,0,,,,,0
+sqlserver,PSJ_Courts,Case,CaseCrossReference,RecordStatusCodeID,12,char,1,,,,,0
+sqlserver,PSJ_Courts,Case,CaseCrossReference,RecordStatusDateTime,13,datetimeoffset,0,,,,,0
+sqlserver,PSJ_Courts,NODS,RiskAssessment,CaseID,1,varchar,20,FOREIGN KEY,Case,CaseDetail,CaseID,0
+sqlserver,PSJ_Courts,NODS,RiskAssessment,RiskAssessmentID,2,varchar,20,PRIMARY KEY,,,,0
+sqlserver,PSJ_Courts,NODS,RiskAssessment,NameInstrument,3,varchar,128,,,,,0
+sqlserver,PSJ_Courts,NODS,RiskAssessment,Score,4,decimal,0,,,,,0
+sqlserver,PSJ_Courts,NODS,RiskAssessment,SessionID,5,varchar,40,,,,,0
+sqlserver,PSJ_Courts,NODS,RiskAssessment,TenantID,6,varchar,20,,,,,0
+sqlserver,PSJ_Courts,NODS,RiskAssessment,DataOwnerID,7,varchar,20,,,,,0
+sqlserver,PSJ_Courts,NODS,RiskAssessment,DataSourceID,8,varchar,20,,,,,0
+sqlserver,PSJ_Courts,NODS,RiskAssessment,CreatedDateTime,9,datetimeoffset,0,,,,,0
+sqlserver,PSJ_Courts,NODS,RiskAssessment,UpdatedDateTime,10,datetimeoffset,0,,,,,0
+sqlserver,PSJ_Courts,NODS,RiskAssessment,RecordStatusCodeID,11,char,1,,,,,0
+sqlserver,PSJ_Courts,NODS,RiskAssessment,RecordStatusDateTime,12,datetimeoffset,0,,,,,0
+sqlserver,PSJ_Courts,NODS,EventParticipant,EventParticipantID,1,varchar,20,PRIMARY KEY,,,,0
+sqlserver,PSJ_Courts,NODS,EventParticipant,EventID,2,varchar,20,FOREIGN KEY,Activity,CaseEvent,EventID,0
+sqlserver,PSJ_Courts,NODS,EventParticipant,ParticipantType,3,varchar,256,,,,,0
+sqlserver,PSJ_Courts,NODS,EventParticipant,InterpreterLanguage,4,varchar,20,,,,,0
+sqlserver,PSJ_Courts,NODS,EventParticipant,PartyID,5,varchar,20,FOREIGN KEY,Party,PartyDetail,PartyID,0
+sqlserver,PSJ_Courts,NODS,EventParticipant,SessionID,6,varchar,40,,,,,0
+sqlserver,PSJ_Courts,NODS,EventParticipant,TenantID,7,varchar,20,,,,,0
+sqlserver,PSJ_Courts,NODS,EventParticipant,DataOwnerID,8,varchar,20,,,,,0
+sqlserver,PSJ_Courts,NODS,EventParticipant,DataSourceID,9,varchar,20,,,,,0
+sqlserver,PSJ_Courts,NODS,EventParticipant,CreatedDateTime,10,datetimeoffset,0,,,,,0
+sqlserver,PSJ_Courts,NODS,EventParticipant,UpdatedDateTime,11,datetimeoffset,0,,,,,0
+sqlserver,PSJ_Courts,NODS,EventParticipant,RecordStatusCodeID,12,char,1,,,,,0
+sqlserver,PSJ_Courts,NODS,EventParticipant,RecordStatusDateTime,13,datetimeoffset,0,,,,,0
+sqlserver,PSJ_Courts,Activity,AppealDispositionType,TypeID,1,varchar,20,PRIMARY KEY,,,,0
+sqlserver,PSJ_Courts,Activity,AppealDispositionType,Description,2,varchar,20,,,,,0
+sqlserver,PSJ_Courts,Activity,AppealDispositionType,SessionID,3,varchar,40,,,,,0
+sqlserver,PSJ_Courts,Activity,AppealDispositionType,TenantID,4,varchar,20,,,,,0
+sqlserver,PSJ_Courts,Activity,AppealDispositionType,DataOwnerID,5,varchar,20,,,,,0
+sqlserver,PSJ_Courts,Activity,AppealDispositionType,DataSourceID,6,varchar,20,,,,,0
+sqlserver,PSJ_Courts,Activity,AppealDispositionType,CreatedDateTime,7,datetimeoffset,0,,,,,0
+sqlserver,PSJ_Courts,Activity,AppealDispositionType,UpdatedDateTime,8,datetimeoffset,0,,,,,0
+sqlserver,PSJ_Courts,Activity,AppealDispositionType,RecordStatusCodeID,9,char,1,,,,,0
+sqlserver,PSJ_Courts,Activity,AppealDispositionType,RecordStatusDateTime,10,datetimeoffset,0,,,,,0
+sqlserver,PSJ_Courts,Charge,ChargeAmendedReasonCode,CodeID,1,varchar,20,PRIMARY KEY,,,,0
+sqlserver,PSJ_Courts,Charge,ChargeAmendedReasonCode,Description,2,varchar,128,,,,,0
+sqlserver,PSJ_Courts,Charge,ChargeAmendedReasonCode,SessionID,3,varchar,40,,,,,0
+sqlserver,PSJ_Courts,Charge,ChargeAmendedReasonCode,TenantID,4,varchar,20,,,,,0
+sqlserver,PSJ_Courts,Charge,ChargeAmendedReasonCode,DataOwnerID,5,varchar,20,,,,,0
+sqlserver,PSJ_Courts,Charge,ChargeAmendedReasonCode,DataSourceID,6,varchar,20,,,,,0
+sqlserver,PSJ_Courts,Charge,ChargeAmendedReasonCode,CreatedDateTime,7,datetimeoffset,0,,,,,0
+sqlserver,PSJ_Courts,Charge,ChargeAmendedReasonCode,UpdatedDateTime,8,datetimeoffset,0,,,,,0
+sqlserver,PSJ_Courts,Charge,ChargeAmendedReasonCode,RecordStatusCodeID,9,char,1,,,,,0
+sqlserver,PSJ_Courts,Charge,ChargeAmendedReasonCode,RecordStatusDateTime,10,datetimeoffset,0,,,,,0
+sqlserver,PSJ_Courts,Case,RelatedFillingType,TypeID,1,varchar,20,PRIMARY KEY,,,,0
+sqlserver,PSJ_Courts,Case,RelatedFillingType,Description,2,varchar,20,,,,,0
+sqlserver,PSJ_Courts,Case,RelatedFillingType,SessionID,3,varchar,40,,,,,0
+sqlserver,PSJ_Courts,Case,RelatedFillingType,TenantID,4,varchar,20,,,,,0
+sqlserver,PSJ_Courts,Case,RelatedFillingType,DataOwnerID,5,varchar,20,,,,,0
+sqlserver,PSJ_Courts,Case,RelatedFillingType,DataSourceID,6,varchar,20,,,,,0
+sqlserver,PSJ_Courts,Case,RelatedFillingType,CreatedDateTime,7,datetimeoffset,0,,,,,0
+sqlserver,PSJ_Courts,Case,RelatedFillingType,UpdatedDateTime,8,datetimeoffset,0,,,,,0
+sqlserver,PSJ_Courts,Case,RelatedFillingType,RecordStatusCodeID,9,char,1,,,,,0
+sqlserver,PSJ_Courts,Case,RelatedFillingType,RecordStatusDateTime,10,datetimeoffset,0,,,,,0
+sqlserver,PSJ_Courts,Sentence,ProbationCondition,ChargeID,1,varchar,20,FOREIGN KEY,Charge,ChargeDetail,ChargeID,0
+sqlserver,PSJ_Courts,Sentence,ProbationCondition,SentenceID,2,varchar,20,FOREIGN KEY,Sentence,SentenceDetail,SentenceID,0
+sqlserver,PSJ_Courts,Sentence,ProbationCondition,ConditionID,3,varchar,20,PRIMARY KEY,,,,0
+sqlserver,PSJ_Courts,Sentence,ProbationCondition,ComponentID,4,varchar,20,FOREIGN KEY,Sentence,ProbationComponent,ComponentID,0
+sqlserver,PSJ_Courts,Sentence,ProbationCondition,TypeID,5,varchar,20,FOREIGN KEY,Sentence,ProbationConditionType,TypeID,0
+sqlserver,PSJ_Courts,Sentence,ProbationCondition,EffectiveDate,6,date,0,,,,,0
+sqlserver,PSJ_Courts,Sentence,ProbationCondition,StatusCodeID,7,varchar,20,,,,,0
+sqlserver,PSJ_Courts,Sentence,ProbationCondition,StatusDate,8,date,0,,,,,0
+sqlserver,PSJ_Courts,Sentence,ProbationCondition,SessionID,9,varchar,40,,,,,0
+sqlserver,PSJ_Courts,Sentence,ProbationCondition,TenantID,10,varchar,20,,,,,0
+sqlserver,PSJ_Courts,Sentence,ProbationCondition,DataOwnerID,11,varchar,20,,,,,0
+sqlserver,PSJ_Courts,Sentence,ProbationCondition,DataSourceID,12,varchar,20,,,,,0
+sqlserver,PSJ_Courts,Sentence,ProbationCondition,CreatedDateTime,13,datetimeoffset,0,,,,,0
+sqlserver,PSJ_Courts,Sentence,ProbationCondition,UpdatedDateTime,14,datetimeoffset,0,,,,,0
+sqlserver,PSJ_Courts,Sentence,ProbationCondition,RecordStatusCodeID,15,char,1,,,,,0
+sqlserver,PSJ_Courts,Sentence,ProbationCondition,RecordStatusDateTime,16,datetimeoffset,0,,,,,0
+sqlserver,PSJ_Courts,NODS,ViolationType,TypeID,1,varchar,20,PRIMARY KEY,,,,0
+sqlserver,PSJ_Courts,NODS,ViolationType,Description,2,varchar,128,,,,,0
+sqlserver,PSJ_Courts,NODS,ViolationType,SessionID,3,varchar,40,,,,,0
+sqlserver,PSJ_Courts,NODS,ViolationType,TenantID,4,varchar,20,,,,,0
+sqlserver,PSJ_Courts,NODS,ViolationType,DataOwnerID,5,varchar,20,,,,,0
+sqlserver,PSJ_Courts,NODS,ViolationType,DataSourceID,6,varchar,20,,,,,0
+sqlserver,PSJ_Courts,NODS,ViolationType,CreatedDateTime,7,datetimeoffset,0,,,,,0
+sqlserver,PSJ_Courts,NODS,ViolationType,UpdatedDateTime,8,datetimeoffset,0,,,,,0
+sqlserver,PSJ_Courts,NODS,ViolationType,RecordStatusCodeID,9,char,1,,,,,0
+sqlserver,PSJ_Courts,NODS,ViolationType,RecordStatusDateTime,10,datetimeoffset,0,,,,,0
+sqlserver,PSJ_Courts,Activity,AppealStatus,CodeID,1,varchar,20,PRIMARY KEY,,,,0
+sqlserver,PSJ_Courts,Activity,AppealStatus,Description,2,varchar,20,,,,,0
+sqlserver,PSJ_Courts,Activity,AppealStatus,Date,3,date,0,,,,,0
+sqlserver,PSJ_Courts,Activity,AppealStatus,SessionID,4,varchar,40,,,,,0
+sqlserver,PSJ_Courts,Activity,AppealStatus,TenantID,5,varchar,20,,,,,0
+sqlserver,PSJ_Courts,Activity,AppealStatus,DataOwnerID,6,varchar,20,,,,,0
+sqlserver,PSJ_Courts,Activity,AppealStatus,DataSourceID,7,varchar,20,,,,,0
+sqlserver,PSJ_Courts,Activity,AppealStatus,CreatedDateTime,8,datetimeoffset,0,,,,,0
+sqlserver,PSJ_Courts,Activity,AppealStatus,UpdatedDateTime,9,datetimeoffset,0,,,,,0
+sqlserver,PSJ_Courts,Activity,AppealStatus,RecordStatusCodeID,10,char,1,,,,,0
+sqlserver,PSJ_Courts,Activity,AppealStatus,RecordStatusDateTime,11,datetimeoffset,0,,,,,0
+sqlserver,PSJ_Courts,NODS,MannerOfDispositionType,TypeID,1,varchar,20,PRIMARY KEY,,,,0
+sqlserver,PSJ_Courts,NODS,MannerOfDispositionType,Description,2,varchar,20,,,,,0
+sqlserver,PSJ_Courts,NODS,MannerOfDispositionType,SessionID,3,varchar,40,,,,,0
+sqlserver,PSJ_Courts,NODS,MannerOfDispositionType,TenantID,4,varchar,20,,,,,0
+sqlserver,PSJ_Courts,NODS,MannerOfDispositionType,DataOwnerID,5,varchar,20,,,,,0
+sqlserver,PSJ_Courts,NODS,MannerOfDispositionType,DataSourceID,6,varchar,20,,,,,0
+sqlserver,PSJ_Courts,NODS,MannerOfDispositionType,CreatedDateTime,7,datetimeoffset,0,,,,,0
+sqlserver,PSJ_Courts,NODS,MannerOfDispositionType,UpdatedDateTime,8,datetimeoffset,0,,,,,0
+sqlserver,PSJ_Courts,NODS,MannerOfDispositionType,RecordStatusCodeID,9,char,1,,,,,0
+sqlserver,PSJ_Courts,NODS,MannerOfDispositionType,RecordStatusDateTime,10,datetimeoffset,0,,,,,0
+sqlserver,PSJ_Courts,Charge,ChargeModifierCode,CodeID,1,varchar,20,PRIMARY KEY,,,,0
+sqlserver,PSJ_Courts,Charge,ChargeModifierCode,Description,2,varchar,128,,,,,0
+sqlserver,PSJ_Courts,Charge,ChargeModifierCode,SessionID,3,varchar,40,,,,,0
+sqlserver,PSJ_Courts,Charge,ChargeModifierCode,TenantID,4,varchar,20,,,,,0
+sqlserver,PSJ_Courts,Charge,ChargeModifierCode,DataOwnerID,5,varchar,20,,,,,0
+sqlserver,PSJ_Courts,Charge,ChargeModifierCode,DataSourceID,6,varchar,20,,,,,0
+sqlserver,PSJ_Courts,Charge,ChargeModifierCode,CreatedDateTime,7,datetimeoffset,0,,,,,0
+sqlserver,PSJ_Courts,Charge,ChargeModifierCode,UpdatedDateTime,8,datetimeoffset,0,,,,,0
+sqlserver,PSJ_Courts,Charge,ChargeModifierCode,RecordStatusCodeID,9,char,1,,,,,0
+sqlserver,PSJ_Courts,Charge,ChargeModifierCode,RecordStatusDateTime,10,datetimeoffset,0,,,,,0
+sqlserver,PSJ_Courts,Case,RelatedFilling,CaseID,1,varchar,20,FOREIGN KEY,Case,CaseDetail,CaseID,0
+sqlserver,PSJ_Courts,Case,RelatedFilling,RelatedCaseFilingID,2,varchar,20,PRIMARY KEY,,,,0
+sqlserver,PSJ_Courts,Case,RelatedFilling,RelatedFillingID,3,varchar,20,,,,,0
+sqlserver,PSJ_Courts,Case,RelatedFilling,TypeID,4,varchar,20,FOREIGN KEY,Case,RelatedFillingType,TypeID,0
+sqlserver,PSJ_Courts,Case,RelatedFilling,Reason,5,varchar,256,,,,,0
+sqlserver,PSJ_Courts,Case,RelatedFilling,SessionID,6,varchar,40,,,,,0
+sqlserver,PSJ_Courts,Case,RelatedFilling,TenantID,7,varchar,20,,,,,0
+sqlserver,PSJ_Courts,Case,RelatedFilling,DataOwnerID,8,varchar,20,,,,,0
+sqlserver,PSJ_Courts,Case,RelatedFilling,DataSourceID,9,varchar,20,,,,,0
+sqlserver,PSJ_Courts,Case,RelatedFilling,CreatedDateTime,10,datetimeoffset,0,,,,,0
+sqlserver,PSJ_Courts,Case,RelatedFilling,UpdatedDateTime,11,datetimeoffset,0,,,,,0
+sqlserver,PSJ_Courts,Case,RelatedFilling,RecordStatusCodeID,12,char,1,,,,,0
+sqlserver,PSJ_Courts,Case,RelatedFilling,RecordStatusDateTime,13,datetimeoffset,0,,,,,0
+sqlserver,PSJ_Courts,NODS,SentenceViolation,SentenceID,1,varchar,20,FOREIGN KEY,Sentence,SentenceDetail,SentenceID,0
+sqlserver,PSJ_Courts,NODS,SentenceViolation,SentenceViolationID,2,varchar,20,PRIMARY KEY,,,,0
+sqlserver,PSJ_Courts,NODS,SentenceViolation,ViolationTypeID,3,varchar,20,FOREIGN KEY,NODS,ViolationType,TypeID,0
+sqlserver,PSJ_Courts,NODS,SentenceViolation,ViolationOutcome,4,varchar,128,,,,,0
+sqlserver,PSJ_Courts,NODS,SentenceViolation,SessionID,5,varchar,40,,,,,0
+sqlserver,PSJ_Courts,NODS,SentenceViolation,TenantID,6,varchar,20,,,,,0
+sqlserver,PSJ_Courts,NODS,SentenceViolation,DataOwnerID,7,varchar,20,,,,,0
+sqlserver,PSJ_Courts,NODS,SentenceViolation,DataSourceID,8,varchar,20,,,,,0
+sqlserver,PSJ_Courts,NODS,SentenceViolation,CreatedDateTime,9,datetimeoffset,0,,,,,0
+sqlserver,PSJ_Courts,NODS,SentenceViolation,UpdatedDateTime,10,datetimeoffset,0,,,,,0
+sqlserver,PSJ_Courts,NODS,SentenceViolation,RecordStatusCodeID,11,char,1,,,,,0
+sqlserver,PSJ_Courts,NODS,SentenceViolation,RecordStatusDateTime,12,datetimeoffset,0,,,,,0
+sqlserver,PSJ_Courts,NODS,DispositionCategoryCode,CodeID,1,varchar,20,PRIMARY KEY,,,,0
+sqlserver,PSJ_Courts,NODS,DispositionCategoryCode,Description,2,varchar,20,,,,,0
+sqlserver,PSJ_Courts,NODS,DispositionCategoryCode,SessionID,3,varchar,40,,,,,0
+sqlserver,PSJ_Courts,NODS,DispositionCategoryCode,TenantID,4,varchar,20,,,,,0
+sqlserver,PSJ_Courts,NODS,DispositionCategoryCode,DataOwnerID,5,varchar,20,,,,,0
+sqlserver,PSJ_Courts,NODS,DispositionCategoryCode,DataSourceID,6,varchar,20,,,,,0
+sqlserver,PSJ_Courts,NODS,DispositionCategoryCode,CreatedDateTime,7,datetimeoffset,0,,,,,0
+sqlserver,PSJ_Courts,NODS,DispositionCategoryCode,UpdatedDateTime,8,datetimeoffset,0,,,,,0
+sqlserver,PSJ_Courts,NODS,DispositionCategoryCode,RecordStatusCodeID,9,char,1,,,,,0
+sqlserver,PSJ_Courts,NODS,DispositionCategoryCode,RecordStatusDateTime,10,datetimeoffset,0,,,,,0
+sqlserver,PSJ_Courts,Sentence,ProbationStatus,ProbationStatusID,1,varchar,20,PRIMARY KEY,,,,0
+sqlserver,PSJ_Courts,Sentence,ProbationStatus,ChargeID,2,varchar,20,FOREIGN KEY,Charge,ChargeDetail,ChargeID,0
+sqlserver,PSJ_Courts,Sentence,ProbationStatus,SentenceID,3,varchar,20,FOREIGN KEY,Sentence,SentenceDetail,SentenceID,0
+sqlserver,PSJ_Courts,Sentence,ProbationStatus,ConditionID,4,varchar,20,FOREIGN KEY,Sentence,ProbationCondition,ConditionID,0
+sqlserver,PSJ_Courts,Sentence,ProbationStatus,ComponentID,5,varchar,20,FOREIGN KEY,Sentence,ProbationComponent,ComponentID,0
+sqlserver,PSJ_Courts,Sentence,ProbationStatus,StatusCodeID,6,varchar,20,,,,,0
+sqlserver,PSJ_Courts,Sentence,ProbationStatus,StatusDate,7,varchar,20,,,,,0
+sqlserver,PSJ_Courts,Sentence,ProbationStatus,SessionID,8,varchar,40,,,,,0
+sqlserver,PSJ_Courts,Sentence,ProbationStatus,TenantID,9,varchar,20,,,,,0
+sqlserver,PSJ_Courts,Sentence,ProbationStatus,DataOwnerID,10,varchar,20,,,,,0
+sqlserver,PSJ_Courts,Sentence,ProbationStatus,DataSourceID,11,varchar,20,,,,,0
+sqlserver,PSJ_Courts,Sentence,ProbationStatus,CreatedDateTime,12,datetimeoffset,0,,,,,0
+sqlserver,PSJ_Courts,Sentence,ProbationStatus,UpdatedDateTime,13,datetimeoffset,0,,,,,0
+sqlserver,PSJ_Courts,Sentence,ProbationStatus,RecordStatusCodeID,14,char,1,,,,,0
+sqlserver,PSJ_Courts,Sentence,ProbationStatus,RecordStatusDateTime,15,datetimeoffset,0,,,,,0
+sqlserver,PSJ_Courts,Charge,ChargeModifier,ChargeModifierID,1,varchar,20,PRIMARY KEY,,,,0
+sqlserver,PSJ_Courts,Charge,ChargeModifier,CaseID,2,varchar,20,FOREIGN KEY,Case,CaseDetail,CaseID,0
+sqlserver,PSJ_Courts,Charge,ChargeModifier,ChargeID,3,varchar,20,FOREIGN KEY,Charge,ChargeDetail,ChargeID,0
+sqlserver,PSJ_Courts,Charge,ChargeModifier,ModifierID,4,varchar,20,FOREIGN KEY,Charge,ChargeModifierCode,CodeID,0
+sqlserver,PSJ_Courts,Charge,ChargeModifier,SessionID,5,varchar,40,,,,,0
+sqlserver,PSJ_Courts,Charge,ChargeModifier,TenantID,6,varchar,20,,,,,0
+sqlserver,PSJ_Courts,Charge,ChargeModifier,DataOwnerID,7,varchar,20,,,,,0
+sqlserver,PSJ_Courts,Charge,ChargeModifier,DataSourceID,8,varchar,20,,,,,0
+sqlserver,PSJ_Courts,Charge,ChargeModifier,CreatedDateTime,9,datetimeoffset,0,,,,,0
+sqlserver,PSJ_Courts,Charge,ChargeModifier,UpdatedDateTime,10,datetimeoffset,0,,,,,0
+sqlserver,PSJ_Courts,Charge,ChargeModifier,RecordStatusCodeID,11,char,1,,,,,0
+sqlserver,PSJ_Courts,Charge,ChargeModifier,RecordStatusDateTime,12,datetimeoffset,0,,,,,0
+sqlserver,PSJ_Courts,Activity,EventType,TypeID,1,varchar,20,PRIMARY KEY,,,,0
+sqlserver,PSJ_Courts,Activity,EventType,Description,2,varchar,20,,,,,0
+sqlserver,PSJ_Courts,Activity,EventType,SessionID,3,varchar,40,,,,,0
+sqlserver,PSJ_Courts,Activity,EventType,TenantID,4,varchar,20,,,,,0
+sqlserver,PSJ_Courts,Activity,EventType,DataOwnerID,5,varchar,20,,,,,0
+sqlserver,PSJ_Courts,Activity,EventType,DataSourceID,6,varchar,20,,,,,0
+sqlserver,PSJ_Courts,Activity,EventType,CreatedDateTime,7,datetimeoffset,0,,,,,0
+sqlserver,PSJ_Courts,Activity,EventType,UpdatedDateTime,8,datetimeoffset,0,,,,,0
+sqlserver,PSJ_Courts,Activity,EventType,RecordStatusCodeID,9,char,1,,,,,0
+sqlserver,PSJ_Courts,Activity,EventType,RecordStatusDateTime,10,datetimeoffset,0,,,,,0
+sqlserver,PSJ_Courts,NODS,SuspensionTransmission,CaseID,1,varchar,20,FOREIGN KEY,Case,CaseDetail,CaseID,0
+sqlserver,PSJ_Courts,NODS,SuspensionTransmission,SuspensionTransmissionID,2,varchar,20,PRIMARY KEY,,,,0
+sqlserver,PSJ_Courts,NODS,SuspensionTransmission,SuspensionTransmittedDate,3,date,0,,,,,0
+sqlserver,PSJ_Courts,NODS,SuspensionTransmission,TransmissionAgencyID,4,varchar,20,FOREIGN KEY,Code,Organization,OrganizationID,0
+sqlserver,PSJ_Courts,NODS,SuspensionTransmission,TransmissionDate,5,date,0,,,,,0
+sqlserver,PSJ_Courts,NODS,SuspensionTransmission,LengthOfSuspension,6,int,0,,,,,0
+sqlserver,PSJ_Courts,NODS,SuspensionTransmission,SessionID,7,varchar,40,,,,,0
+sqlserver,PSJ_Courts,NODS,SuspensionTransmission,TenantID,8,varchar,20,,,,,0
+sqlserver,PSJ_Courts,NODS,SuspensionTransmission,DataOwnerID,9,varchar,20,,,,,0
+sqlserver,PSJ_Courts,NODS,SuspensionTransmission,DataSourceID,10,varchar,20,,,,,0
+sqlserver,PSJ_Courts,NODS,SuspensionTransmission,CreatedDateTime,11,datetimeoffset,0,,,,,0
+sqlserver,PSJ_Courts,NODS,SuspensionTransmission,UpdatedDateTime,12,datetimeoffset,0,,,,,0
+sqlserver,PSJ_Courts,NODS,SuspensionTransmission,RecordStatusCodeID,13,char,1,,,,,0
+sqlserver,PSJ_Courts,NODS,SuspensionTransmission,RecordStatusDateTime,14,datetimeoffset,0,,,,,0
+sqlserver,PSJ_Courts,NODS,JudgementType,TypeID,1,varchar,20,PRIMARY KEY,,,,0
+sqlserver,PSJ_Courts,NODS,JudgementType,Description,2,varchar,20,,,,,0
+sqlserver,PSJ_Courts,NODS,JudgementType,SessionID,3,varchar,40,,,,,0
+sqlserver,PSJ_Courts,NODS,JudgementType,TenantID,4,varchar,20,,,,,0
+sqlserver,PSJ_Courts,NODS,JudgementType,DataOwnerID,5,varchar,20,,,,,0
+sqlserver,PSJ_Courts,NODS,JudgementType,DataSourceID,6,varchar,20,,,,,0
+sqlserver,PSJ_Courts,NODS,JudgementType,CreatedDateTime,7,datetimeoffset,0,,,,,0
+sqlserver,PSJ_Courts,NODS,JudgementType,UpdatedDateTime,8,datetimeoffset,0,,,,,0
+sqlserver,PSJ_Courts,NODS,JudgementType,RecordStatusCodeID,9,char,1,,,,,0
+sqlserver,PSJ_Courts,NODS,JudgementType,RecordStatusDateTime,10,datetimeoffset,0,,,,,0
+sqlserver,PSJ_Courts,Party,NameType,TypeID,1,varchar,20,PRIMARY KEY,,,,0
+sqlserver,PSJ_Courts,Party,NameType,Description,2,varchar,256,,,,,0
+sqlserver,PSJ_Courts,Party,NameType,SessionID,3,varchar,40,,,,,0
+sqlserver,PSJ_Courts,Party,NameType,TenantID,4,varchar,20,,,,,0
+sqlserver,PSJ_Courts,Party,NameType,DataOwnerID,5,varchar,20,,,,,0
+sqlserver,PSJ_Courts,Party,NameType,DataSourceID,6,varchar,20,,,,,0
+sqlserver,PSJ_Courts,Party,NameType,CreatedDateTime,7,datetimeoffset,0,,,,,0
+sqlserver,PSJ_Courts,Party,NameType,UpdatedDateTime,8,datetimeoffset,0,,,,,0
+sqlserver,PSJ_Courts,Party,NameType,RecordStatusCodeID,9,char,1,,,,,0
+sqlserver,PSJ_Courts,Party,NameType,RecordStatusDateTime,10,datetimeoffset,0,,,,,0
+sqlserver,PSJ_Courts,Activity,PleaType,TypeID,1,varchar,20,PRIMARY KEY,,,,0
+sqlserver,PSJ_Courts,Activity,PleaType,Description,2,varchar,20,,,,,0
+sqlserver,PSJ_Courts,Activity,PleaType,SessionID,3,varchar,40,,,,,0
+sqlserver,PSJ_Courts,Activity,PleaType,TenantID,4,varchar,20,,,,,0
+sqlserver,PSJ_Courts,Activity,PleaType,DataOwnerID,5,varchar,20,,,,,0
+sqlserver,PSJ_Courts,Activity,PleaType,DataSourceID,6,varchar,20,,,,,0
+sqlserver,PSJ_Courts,Activity,PleaType,CreatedDateTime,7,datetimeoffset,0,,,,,0
+sqlserver,PSJ_Courts,Activity,PleaType,UpdatedDateTime,8,datetimeoffset,0,,,,,0
+sqlserver,PSJ_Courts,Activity,PleaType,RecordStatusCodeID,9,char,1,,,,,0
+sqlserver,PSJ_Courts,Activity,PleaType,RecordStatusDateTime,10,datetimeoffset,0,,,,,0
+sqlserver,PSJ_Courts,Sentence,DriverLicenseConditionType,TypeID,1,varchar,20,PRIMARY KEY,,,,0
+sqlserver,PSJ_Courts,Sentence,DriverLicenseConditionType,Description,2,varchar,128,,,,,0
+sqlserver,PSJ_Courts,Sentence,DriverLicenseConditionType,SessionID,3,varchar,40,,,,,0
+sqlserver,PSJ_Courts,Sentence,DriverLicenseConditionType,TenantID,4,varchar,20,,,,,0
+sqlserver,PSJ_Courts,Sentence,DriverLicenseConditionType,DataOwnerID,5,varchar,20,,,,,0
+sqlserver,PSJ_Courts,Sentence,DriverLicenseConditionType,DataSourceID,6,varchar,20,,,,,0
+sqlserver,PSJ_Courts,Sentence,DriverLicenseConditionType,CreatedDateTime,7,datetimeoffset,0,,,,,0
+sqlserver,PSJ_Courts,Sentence,DriverLicenseConditionType,UpdatedDateTime,8,datetimeoffset,0,,,,,0
+sqlserver,PSJ_Courts,Sentence,DriverLicenseConditionType,RecordStatusCodeID,9,char,1,,,,,0
+sqlserver,PSJ_Courts,Sentence,DriverLicenseConditionType,RecordStatusDateTime,10,datetimeoffset,0,,,,,0
+sqlserver,PSJ_Courts,Charge,PleaType,TypeID,1,varchar,20,PRIMARY KEY,,,,0
+sqlserver,PSJ_Courts,Charge,PleaType,Description,2,varchar,128,,,,,0
+sqlserver,PSJ_Courts,Charge,PleaType,SessionID,3,varchar,40,,,,,0
+sqlserver,PSJ_Courts,Charge,PleaType,TenantID,4,varchar,20,,,,,0
+sqlserver,PSJ_Courts,Charge,PleaType,DataOwnerID,5,varchar,20,,,,,0
+sqlserver,PSJ_Courts,Charge,PleaType,DataSourceID,6,varchar,20,,,,,0
+sqlserver,PSJ_Courts,Charge,PleaType,CreatedDateTime,7,datetimeoffset,0,,,,,0
+sqlserver,PSJ_Courts,Charge,PleaType,UpdatedDateTime,8,datetimeoffset,0,,,,,0
+sqlserver,PSJ_Courts,Charge,PleaType,RecordStatusCodeID,9,char,1,,,,,0
+sqlserver,PSJ_Courts,Charge,PleaType,RecordStatusDateTime,10,datetimeoffset,0,,,,,0
+sqlserver,PSJ_Courts,NODS,CaseDispositionEvent,CaseID,1,varchar,20,FOREIGN KEY,Case,CaseDetail,CaseID,0
+sqlserver,PSJ_Courts,NODS,CaseDispositionEvent,CaseDispositionEventID,2,varchar,20,PRIMARY KEY,,,,0
+sqlserver,PSJ_Courts,NODS,CaseDispositionEvent,EventDate,3,date,0,,,,,0
+sqlserver,PSJ_Courts,NODS,CaseDispositionEvent,EventTime,4,varchar,20,,,,,0
+sqlserver,PSJ_Courts,NODS,CaseDispositionEvent,AuthorityID,5,varchar,20,FOREIGN KEY,Code,Organization,OrganizationID,0
+sqlserver,PSJ_Courts,NODS,CaseDispositionEvent,OverallOutcome,6,varchar,20,,,,,0
+sqlserver,PSJ_Courts,NODS,CaseDispositionEvent,MannerOfDispositionTypeID,7,varchar,20,FOREIGN KEY,NODS,MannerOfDispositionType,TypeID,0
+sqlserver,PSJ_Courts,NODS,CaseDispositionEvent,IsPreAdjudicationDiversion,8,bit,0,,,,,0
+sqlserver,PSJ_Courts,NODS,CaseDispositionEvent,PreAdjudicationDiversionProgramID,9,varchar,20,,,,,0
+sqlserver,PSJ_Courts,NODS,CaseDispositionEvent,PostAdjudicationDiversionProgramID,10,varchar,20,,,,,0
+sqlserver,PSJ_Courts,NODS,CaseDispositionEvent,DispositionTypeID,11,varchar,20,,,,,0
+sqlserver,PSJ_Courts,NODS,CaseDispositionEvent,PleaTypeID,12,varchar,20,FOREIGN KEY,Charge,PleaType,TypeID,0
+sqlserver,PSJ_Courts,NODS,CaseDispositionEvent,IsDirectedVerdic,13,bit,0,,,,,0
+sqlserver,PSJ_Courts,NODS,CaseDispositionEvent,CaseClosedDate,14,date,0,,,,,0
+sqlserver,PSJ_Courts,NODS,CaseDispositionEvent,PrevailingPartyID,15,varchar,20,FOREIGN KEY,Party,PartyDetail,PartyID,0
+sqlserver,PSJ_Courts,NODS,CaseDispositionEvent,DispositionCategoryCodeID,16,varchar,20,,,,,0
+sqlserver,PSJ_Courts,NODS,CaseDispositionEvent,JudgementTypeID,17,varchar,20,FOREIGN KEY,NODS,JudgementType,TypeID,0
+sqlserver,PSJ_Courts,NODS,CaseDispositionEvent,TotalMonetaryDamages,18,money,0,,,,,0
+sqlserver,PSJ_Courts,NODS,CaseDispositionEvent,TotalCosts,19,money,0,,,,,0
+sqlserver,PSJ_Courts,NODS,CaseDispositionEvent,HasNonMonetaryRelief,20,bit,0,,,,,0
+sqlserver,PSJ_Courts,NODS,CaseDispositionEvent,DispositionDetail,21,varchar,256,,,,,0
+sqlserver,PSJ_Courts,NODS,CaseDispositionEvent,SessionID,22,varchar,40,,,,,0
+sqlserver,PSJ_Courts,NODS,CaseDispositionEvent,TenantID,23,varchar,20,,,,,0
+sqlserver,PSJ_Courts,NODS,CaseDispositionEvent,DataOwnerID,24,varchar,20,,,,,0
+sqlserver,PSJ_Courts,NODS,CaseDispositionEvent,DataSourceID,25,varchar,20,,,,,0
+sqlserver,PSJ_Courts,NODS,CaseDispositionEvent,CreatedDateTime,26,datetimeoffset,0,,,,,0
+sqlserver,PSJ_Courts,NODS,CaseDispositionEvent,UpdatedDateTime,27,datetimeoffset,0,,,,,0
+sqlserver,PSJ_Courts,NODS,CaseDispositionEvent,RecordStatusCodeID,28,char,1,,,,,0
+sqlserver,PSJ_Courts,NODS,CaseDispositionEvent,RecordStatusDateTime,29,datetimeoffset,0,,,,,0
+sqlserver,PSJ_Courts,Sentence,DriverLicenseCondition,ChargeID,1,varchar,20,FOREIGN KEY,Charge,ChargeDetail,ChargeID,0
+sqlserver,PSJ_Courts,Sentence,DriverLicenseCondition,SentenceID,2,varchar,20,FOREIGN KEY,Sentence,SentenceDetail,SentenceID,0
+sqlserver,PSJ_Courts,Sentence,DriverLicenseCondition,ConditionID,3,varchar,20,PRIMARY KEY,,,,0
+sqlserver,PSJ_Courts,Sentence,DriverLicenseCondition,TypeID,4,varchar,20,FOREIGN KEY,Sentence,DriverLicenseConditionType,TypeID,0
+sqlserver,PSJ_Courts,Sentence,DriverLicenseCondition,SuspensionTerm,5,varchar,20,,,,,0
+sqlserver,PSJ_Courts,Sentence,DriverLicenseCondition,RevocationTerm,6,varchar,20,,,,,0
+sqlserver,PSJ_Courts,Sentence,DriverLicenseCondition,Delay,7,varchar,20,,,,,0
+sqlserver,PSJ_Courts,Sentence,DriverLicenseCondition,TermYears,8,varchar,20,,,,,0
+sqlserver,PSJ_Courts,Sentence,DriverLicenseCondition,TermMonths,9,varchar,20,,,,,0
+sqlserver,PSJ_Courts,Sentence,DriverLicenseCondition,TermDays,10,varchar,20,,,,,0
+sqlserver,PSJ_Courts,Sentence,DriverLicenseCondition,TermWeeks,11,varchar,20,,,,,0
+sqlserver,PSJ_Courts,Sentence,DriverLicenseCondition,PursuantToVehicleCodeID,12,varchar,20,,,,,0
+sqlserver,PSJ_Courts,Sentence,DriverLicenseCondition,HabitualOffender,13,bit,0,,,,,0
+sqlserver,PSJ_Courts,Sentence,DriverLicenseCondition,BACDrugs,14,varchar,20,,,,,0
+sqlserver,PSJ_Courts,Sentence,DriverLicenseCondition,BACLevel,15,varchar,20,,,,,0
+sqlserver,PSJ_Courts,Sentence,DriverLicenseCondition,SessionID,16,varchar,40,,,,,0
+sqlserver,PSJ_Courts,Sentence,DriverLicenseCondition,TenantID,17,varchar,20,,,,,0
+sqlserver,PSJ_Courts,Sentence,DriverLicenseCondition,DataOwnerID,18,varchar,20,,,,,0
+sqlserver,PSJ_Courts,Sentence,DriverLicenseCondition,DataSourceID,19,varchar,20,,,,,0
+sqlserver,PSJ_Courts,Sentence,DriverLicenseCondition,CreatedDateTime,20,datetimeoffset,0,,,,,0
+sqlserver,PSJ_Courts,Sentence,DriverLicenseCondition,UpdatedDateTime,21,datetimeoffset,0,,,,,0
+sqlserver,PSJ_Courts,Sentence,DriverLicenseCondition,RecordStatusCodeID,22,char,1,,,,,0
+sqlserver,PSJ_Courts,Sentence,DriverLicenseCondition,RecordStatusDateTime,23,datetimeoffset,0,,,,,0
+sqlserver,PSJ_Courts,Charge,PleaEvent,PleaEventID,1,varchar,20,PRIMARY KEY,,,,0
+sqlserver,PSJ_Courts,Charge,PleaEvent,CaseID,2,varchar,20,FOREIGN KEY,Case,CaseDetail,CaseID,0
+sqlserver,PSJ_Courts,Charge,PleaEvent,PleaID,3,varchar,20,,,,,0
+sqlserver,PSJ_Courts,Charge,PleaEvent,EventDate,4,date,0,,,,,0
+sqlserver,PSJ_Courts,Charge,PleaEvent,ChargeID,5,varchar,20,,,,,0
+sqlserver,PSJ_Courts,Charge,PleaEvent,PleaType,6,varchar,256,,,,,0
+sqlserver,PSJ_Courts,Charge,PleaEvent,AmendReasonCodeID,7,varchar,20,,,,,0
+sqlserver,PSJ_Courts,Charge,PleaEvent,SessionID,8,varchar,40,,,,,0
+sqlserver,PSJ_Courts,Charge,PleaEvent,TenantID,9,varchar,20,,,,,0
+sqlserver,PSJ_Courts,Charge,PleaEvent,DataOwnerID,10,varchar,20,,,,,0
+sqlserver,PSJ_Courts,Charge,PleaEvent,DataSourceID,11,varchar,20,,,,,0
+sqlserver,PSJ_Courts,Charge,PleaEvent,CreatedDateTime,12,datetimeoffset,0,,,,,0
+sqlserver,PSJ_Courts,Charge,PleaEvent,UpdatedDateTime,13,datetimeoffset,0,,,,,0
+sqlserver,PSJ_Courts,Charge,PleaEvent,RecordStatusCodeID,14,char,1,,,,,0
+sqlserver,PSJ_Courts,Charge,PleaEvent,RecordStatusDateTime,15,datetimeoffset,0,,,,,0
+sqlserver,PSJ_Courts,Activity,AppealEvent,CaseID,1,varchar,20,FOREIGN KEY,Case,CaseDetail,CaseID,0
+sqlserver,PSJ_Courts,Activity,AppealEvent,EventID,2,varchar,20,PRIMARY KEY,,,,0
+sqlserver,PSJ_Courts,Activity,AppealEvent,EventType,3,varchar,20,,,,,0
+sqlserver,PSJ_Courts,Activity,AppealEvent,AppealTypeID,4,varchar,20,FOREIGN KEY,Activity,AppealType,TypeID,0
+sqlserver,PSJ_Courts,Activity,AppealEvent,FiledDate,5,varchar,20,,,,,0
+sqlserver,PSJ_Courts,Activity,AppealEvent,FileddBy,6,varchar,20,,,,,0
+sqlserver,PSJ_Courts,Activity,AppealEvent,DispositionTypeID,7,varchar,20,FOREIGN KEY,Activity,AppealDispositionType,TypeID,0
+sqlserver,PSJ_Courts,Activity,AppealEvent,AppealStatus,8,varchar,20,FOREIGN KEY,Activity,AppealStatus,CodeID,0
+sqlserver,PSJ_Courts,Activity,AppealEvent,SessionID,9,varchar,40,,,,,0
+sqlserver,PSJ_Courts,Activity,AppealEvent,TenantID,10,varchar,20,,,,,0
+sqlserver,PSJ_Courts,Activity,AppealEvent,DataOwnerID,11,varchar,20,,,,,0
+sqlserver,PSJ_Courts,Activity,AppealEvent,DataSourceID,12,varchar,20,,,,,0
+sqlserver,PSJ_Courts,Activity,AppealEvent,CreatedDateTime,13,datetimeoffset,0,,,,,0
+sqlserver,PSJ_Courts,Activity,AppealEvent,UpdatedDateTime,14,datetimeoffset,0,,,,,0
+sqlserver,PSJ_Courts,Activity,AppealEvent,RecordStatusCodeID,15,char,1,,,,,0
+sqlserver,PSJ_Courts,Activity,AppealEvent,RecordStatusDateTime,16,datetimeoffset,0,,,,,0
+sqlserver,PSJ_Courts,Code,Organization,OrganizationID,1,varchar,20,PRIMARY KEY,,,,0
+sqlserver,PSJ_Courts,Code,Organization,TypeID,2,varchar,20,,,,,0
+sqlserver,PSJ_Courts,Code,Organization,ORI,3,varchar,10,,,,,0
+sqlserver,PSJ_Courts,Code,Organization,OrganizationName,4,varchar,20,,,,,0
+sqlserver,PSJ_Courts,Code,Organization,SessionID,5,varchar,40,,,,,0
+sqlserver,PSJ_Courts,Code,Organization,TenantID,6,varchar,20,,,,,0
+sqlserver,PSJ_Courts,Code,Organization,DataOwnerID,7,varchar,20,,,,,0
+sqlserver,PSJ_Courts,Code,Organization,DataSourceID,8,varchar,20,,,,,0
+sqlserver,PSJ_Courts,Code,Organization,CreatedDateTime,9,datetimeoffset,0,,,,,0
+sqlserver,PSJ_Courts,Code,Organization,UpdatedDateTime,10,datetimeoffset,0,,,,,0
+sqlserver,PSJ_Courts,Code,Organization,RecordStatusCodeID,11,char,1,,,,,0
+sqlserver,PSJ_Courts,Code,Organization,RecordStatusDateTime,12,datetimeoffset,0,,,,,0
+sqlserver,PSJ_Courts,Party,PartyDetail,PartyID,1,varchar,20,PRIMARY KEY,,,,0
+sqlserver,PSJ_Courts,Party,PartyDetail,GenderCodeID,2,varchar,20,FOREIGN KEY,Party,GenderCode,CodeID,0
+sqlserver,PSJ_Courts,Party,PartyDetail,RaceCodeID,3,varchar,20,FOREIGN KEY,Party,RaceCode,CodeID,0
+sqlserver,PSJ_Courts,Party,PartyDetail,Height,4,varchar,20,,,,,0
+sqlserver,PSJ_Courts,Party,PartyDetail,Weight,5,varchar,20,,,,,0
+sqlserver,PSJ_Courts,Party,PartyDetail,DateOfBirth,6,date,0,,,,,0
+sqlserver,PSJ_Courts,Party,PartyDetail,DateOfDeath,7,date,0,,,,,0
+sqlserver,PSJ_Courts,Party,PartyDetail,StateID,8,varchar,20,,,,,0
+sqlserver,PSJ_Courts,Party,PartyDetail,FBINumber,9,varchar,20,,,,,0
+sqlserver,PSJ_Courts,Party,PartyDetail,SessionID,10,varchar,40,,,,,0
+sqlserver,PSJ_Courts,Party,PartyDetail,TenantID,11,varchar,20,,,,,0
+sqlserver,PSJ_Courts,Party,PartyDetail,DataOwnerID,12,varchar,20,,,,,0
+sqlserver,PSJ_Courts,Party,PartyDetail,DataSourceID,13,varchar,20,,,,,0
+sqlserver,PSJ_Courts,Party,PartyDetail,CreatedDateTime,14,datetimeoffset,0,,,,,0
+sqlserver,PSJ_Courts,Party,PartyDetail,UpdatedDateTime,15,datetimeoffset,0,,,,,0
+sqlserver,PSJ_Courts,Party,PartyDetail,RecordStatusCodeID,16,char,1,,,,,0
+sqlserver,PSJ_Courts,Party,PartyDetail,RecordStatusDateTime,17,datetimeoffset,0,,,,,0
+sqlserver,PSJ_Courts,NODS,OutcomeType,TypeID,1,varchar,20,PRIMARY KEY,,,,0
+sqlserver,PSJ_Courts,NODS,OutcomeType,Description,2,varchar,128,,,,,0
+sqlserver,PSJ_Courts,NODS,OutcomeType,SessionID,3,varchar,40,,,,,0
+sqlserver,PSJ_Courts,NODS,OutcomeType,TenantID,4,varchar,20,,,,,0
+sqlserver,PSJ_Courts,NODS,OutcomeType,DataOwnerID,5,varchar,20,,,,,0
+sqlserver,PSJ_Courts,NODS,OutcomeType,DataSourceID,6,varchar,20,,,,,0
+sqlserver,PSJ_Courts,NODS,OutcomeType,CreatedDateTime,7,datetimeoffset,0,,,,,0
+sqlserver,PSJ_Courts,NODS,OutcomeType,UpdatedDateTime,8,datetimeoffset,0,,,,,0
+sqlserver,PSJ_Courts,NODS,OutcomeType,RecordStatusCodeID,9,char,1,,,,,0
+sqlserver,PSJ_Courts,NODS,OutcomeType,RecordStatusDateTime,10,datetimeoffset,0,,,,,0
+sqlserver,PSJ_Courts,Charge,DispositionType,TypeID,1,varchar,20,PRIMARY KEY,,,,0
+sqlserver,PSJ_Courts,Charge,DispositionType,Description,2,varchar,128,,,,,0
+sqlserver,PSJ_Courts,Charge,DispositionType,SessionID,3,varchar,40,,,,,0
+sqlserver,PSJ_Courts,Charge,DispositionType,TenantID,4,varchar,20,,,,,0
+sqlserver,PSJ_Courts,Charge,DispositionType,DataOwnerID,5,varchar,20,,,,,0
+sqlserver,PSJ_Courts,Charge,DispositionType,DataSourceID,6,varchar,20,,,,,0
+sqlserver,PSJ_Courts,Charge,DispositionType,CreatedDateTime,7,datetimeoffset,0,,,,,0
+sqlserver,PSJ_Courts,Charge,DispositionType,UpdatedDateTime,8,datetimeoffset,0,,,,,0
+sqlserver,PSJ_Courts,Charge,DispositionType,RecordStatusCodeID,9,char,1,,,,,0
+sqlserver,PSJ_Courts,Charge,DispositionType,RecordStatusDateTime,10,datetimeoffset,0,,,,,0
+sqlserver,PSJ_Courts,Activity,CaseEvent,CaseID,1,varchar,20,FOREIGN KEY,Case,CaseDetail,CaseID,0
+sqlserver,PSJ_Courts,Activity,CaseEvent,EventID,2,varchar,20,PRIMARY KEY,,,,0
+sqlserver,PSJ_Courts,Activity,CaseEvent,EventDate,3,date,0,,,,,0
+sqlserver,PSJ_Courts,Activity,CaseEvent,EventTime,4,varchar,20,,,,,0
+sqlserver,PSJ_Courts,Activity,CaseEvent,TypeID,5,varchar,20,FOREIGN KEY,Activity,EventType,TypeID,0
+sqlserver,PSJ_Courts,Activity,CaseEvent,Location,6,varchar,20,,,,,0
+sqlserver,PSJ_Courts,Activity,CaseEvent,Number,7,varchar,20,,,,,0
+sqlserver,PSJ_Courts,Activity,CaseEvent,ReviewDateTime,8,varchar,20,,,,,0
+sqlserver,PSJ_Courts,Activity,CaseEvent,ReviewCompletedDateTime,9,datetimeoffset,0,,,,,0
+sqlserver,PSJ_Courts,Activity,CaseEvent,InstrumentNumber,10,varchar,20,,,,,0
+sqlserver,PSJ_Courts,Activity,CaseEvent,PleaID,11,varchar,20,,,,,0
+sqlserver,PSJ_Courts,Activity,CaseEvent,Amount,12,money,0,,,,,0
+sqlserver,PSJ_Courts,Activity,CaseEvent,Comment,13,varchar,1024,,,,,0
+sqlserver,PSJ_Courts,Activity,CaseEvent,ChargeID,14,varchar,20,,,,,0
+sqlserver,PSJ_Courts,Activity,CaseEvent,SessionID,15,varchar,40,,,,,0
+sqlserver,PSJ_Courts,Activity,CaseEvent,TenantID,16,varchar,20,,,,,0
+sqlserver,PSJ_Courts,Activity,CaseEvent,DataOwnerID,17,varchar,20,,,,,0
+sqlserver,PSJ_Courts,Activity,CaseEvent,DataSourceID,18,varchar,20,,,,,0
+sqlserver,PSJ_Courts,Activity,CaseEvent,CreatedDateTime,19,datetimeoffset,0,,,,,0
+sqlserver,PSJ_Courts,Activity,CaseEvent,UpdatedDateTime,20,datetimeoffset,0,,,,,0
+sqlserver,PSJ_Courts,Activity,CaseEvent,RecordStatusCodeID,21,char,1,,,,,0
+sqlserver,PSJ_Courts,Activity,CaseEvent,RecordStatusDateTime,22,datetimeoffset,0,,,,,0
+sqlserver,PSJ_Courts,Sentence,DriverLicenseRestrictionType,TypeID,1,varchar,20,PRIMARY KEY,,,,0
+sqlserver,PSJ_Courts,Sentence,DriverLicenseRestrictionType,Description,2,varchar,128,,,,,0
+sqlserver,PSJ_Courts,Sentence,DriverLicenseRestrictionType,SessionID,3,varchar,40,,,,,0
+sqlserver,PSJ_Courts,Sentence,DriverLicenseRestrictionType,TenantID,4,varchar,20,,,,,0
+sqlserver,PSJ_Courts,Sentence,DriverLicenseRestrictionType,DataOwnerID,5,varchar,20,,,,,0
+sqlserver,PSJ_Courts,Sentence,DriverLicenseRestrictionType,DataSourceID,6,varchar,20,,,,,0
+sqlserver,PSJ_Courts,Sentence,DriverLicenseRestrictionType,CreatedDateTime,7,datetimeoffset,0,,,,,0
+sqlserver,PSJ_Courts,Sentence,DriverLicenseRestrictionType,UpdatedDateTime,8,datetimeoffset,0,,,,,0
+sqlserver,PSJ_Courts,Sentence,DriverLicenseRestrictionType,RecordStatusCodeID,9,char,1,,,,,0
+sqlserver,PSJ_Courts,Sentence,DriverLicenseRestrictionType,RecordStatusDateTime,10,datetimeoffset,0,,,,,0
+sqlserver,PSJ_Courts,Code,Officer,OfficerID,1,varchar,20,PRIMARY KEY,,,,0
+sqlserver,PSJ_Courts,Code,Officer,TypeID,2,varchar,20,,,,,0
+sqlserver,PSJ_Courts,Code,Officer,RegistrationID,3,varchar,40,,,,,0
+sqlserver,PSJ_Courts,Code,Officer,Name,4,varchar,128,,,,,0
+sqlserver,PSJ_Courts,Code,Officer,SessionID,5,varchar,40,,,,,0
+sqlserver,PSJ_Courts,Code,Officer,TenantID,6,varchar,20,,,,,0
+sqlserver,PSJ_Courts,Code,Officer,DataOwnerID,7,varchar,20,,,,,0
+sqlserver,PSJ_Courts,Code,Officer,DataSourceID,8,varchar,20,,,,,0
+sqlserver,PSJ_Courts,Code,Officer,CreatedDateTime,9,datetimeoffset,0,,,,,0
+sqlserver,PSJ_Courts,Code,Officer,UpdatedDateTime,10,datetimeoffset,0,,,,,0
+sqlserver,PSJ_Courts,Code,Officer,RecordStatusCodeID,11,char,1,,,,,0
+sqlserver,PSJ_Courts,Code,Officer,RecordStatusDateTime,12,datetimeoffset,0,,,,,0
+sqlserver,PSJ_Courts,Activity,HearingType,TypeID,1,varchar,20,PRIMARY KEY,,,,0
+sqlserver,PSJ_Courts,Activity,HearingType,Description,2,varchar,256,,,,,0
+sqlserver,PSJ_Courts,Activity,HearingType,SessionID,3,varchar,40,,,,,0
+sqlserver,PSJ_Courts,Activity,HearingType,TenantID,4,varchar,20,,,,,0
+sqlserver,PSJ_Courts,Activity,HearingType,DataOwnerID,5,varchar,20,,,,,0
+sqlserver,PSJ_Courts,Activity,HearingType,DataSourceID,6,varchar,20,,,,,0
+sqlserver,PSJ_Courts,Activity,HearingType,CreatedDateTime,7,datetimeoffset,0,,,,,0
+sqlserver,PSJ_Courts,Activity,HearingType,UpdatedDateTime,8,datetimeoffset,0,,,,,0
+sqlserver,PSJ_Courts,Activity,HearingType,RecordStatusCodeID,9,char,1,,,,,0
+sqlserver,PSJ_Courts,Activity,HearingType,RecordStatusDateTime,10,datetimeoffset,0,,,,,0
+sqlserver,PSJ_Courts,NODS,CaseEventOutcome,CaseEventOutcomeID,1,varchar,20,PRIMARY KEY,,,,0
+sqlserver,PSJ_Courts,NODS,CaseEventOutcome,CaseID,2,varchar,20,FOREIGN KEY,Case,CaseDetail,CaseID,0
+sqlserver,PSJ_Courts,NODS,CaseEventOutcome,EventID,3,varchar,20,FOREIGN KEY,Activity,CaseEvent,EventID,0
+sqlserver,PSJ_Courts,NODS,CaseEventOutcome,TypeID,4,varchar,20,FOREIGN KEY,NODS,OutcomeType,TypeID,0
+sqlserver,PSJ_Courts,NODS,CaseEventOutcome,Reason,5,varchar,128,,,,,0
+sqlserver,PSJ_Courts,NODS,CaseEventOutcome,SessionID,6,varchar,40,,,,,0
+sqlserver,PSJ_Courts,NODS,CaseEventOutcome,TenantID,7,varchar,20,,,,,0
+sqlserver,PSJ_Courts,NODS,CaseEventOutcome,DataOwnerID,8,varchar,20,,,,,0
+sqlserver,PSJ_Courts,NODS,CaseEventOutcome,DataSourceID,9,varchar,20,,,,,0
+sqlserver,PSJ_Courts,NODS,CaseEventOutcome,CreatedDateTime,10,datetimeoffset,0,,,,,0
+sqlserver,PSJ_Courts,NODS,CaseEventOutcome,UpdatedDateTime,11,datetimeoffset,0,,,,,0
+sqlserver,PSJ_Courts,NODS,CaseEventOutcome,RecordStatusCodeID,12,char,1,,,,,0
+sqlserver,PSJ_Courts,NODS,CaseEventOutcome,RecordStatusDateTime,13,datetimeoffset,0,,,,,0
+sqlserver,PSJ_Courts,Charge,AmendReasonCode,CodeID,1,varchar,20,PRIMARY KEY,,,,0
+sqlserver,PSJ_Courts,Charge,AmendReasonCode,Description,2,varchar,128,,,,,0
+sqlserver,PSJ_Courts,Charge,AmendReasonCode,SessionID,3,varchar,40,,,,,0
+sqlserver,PSJ_Courts,Charge,AmendReasonCode,TenantID,4,varchar,20,,,,,0
+sqlserver,PSJ_Courts,Charge,AmendReasonCode,DataOwnerID,5,varchar,20,,,,,0
+sqlserver,PSJ_Courts,Charge,AmendReasonCode,DataSourceID,6,varchar,20,,,,,0
+sqlserver,PSJ_Courts,Charge,AmendReasonCode,CreatedDateTime,7,datetimeoffset,0,,,,,0
+sqlserver,PSJ_Courts,Charge,AmendReasonCode,UpdatedDateTime,8,datetimeoffset,0,,,,,0
+sqlserver,PSJ_Courts,Charge,AmendReasonCode,RecordStatusCodeID,9,char,1,,,,,0
+sqlserver,PSJ_Courts,Charge,AmendReasonCode,RecordStatusDateTime,10,datetimeoffset,0,,,,,0
+sqlserver,PSJ_Courts,Sentence,DriverLicenseRestriction,ChargeID,1,varchar,20,FOREIGN KEY,Charge,ChargeDetail,ChargeID,0
+sqlserver,PSJ_Courts,Sentence,DriverLicenseRestriction,SentenceID,2,varchar,20,FOREIGN KEY,Sentence,SentenceDetail,SentenceID,0
+sqlserver,PSJ_Courts,Sentence,DriverLicenseRestriction,ConditionID,3,varchar,20,FOREIGN KEY,Sentence,DriverLicenseCondition,ConditionID,0
+sqlserver,PSJ_Courts,Sentence,DriverLicenseRestriction,RestrictionID,4,varchar,20,PRIMARY KEY,,,,0
+sqlserver,PSJ_Courts,Sentence,DriverLicenseRestriction,TypeID,5,varchar,20,FOREIGN KEY,Sentence,DriverLicenseRestrictionType,TypeID,0
+sqlserver,PSJ_Courts,Sentence,DriverLicenseRestriction,StartDate,6,date,0,,,,,0
+sqlserver,PSJ_Courts,Sentence,DriverLicenseRestriction,TermYears,7,varchar,20,,,,,0
+sqlserver,PSJ_Courts,Sentence,DriverLicenseRestriction,TermMonths,8,varchar,20,,,,,0
+sqlserver,PSJ_Courts,Sentence,DriverLicenseRestriction,TermDays,9,varchar,20,,,,,0
+sqlserver,PSJ_Courts,Sentence,DriverLicenseRestriction,TermWeeks,10,varchar,20,,,,,0
+sqlserver,PSJ_Courts,Sentence,DriverLicenseRestriction,Comment,11,varchar,256,,,,,0
+sqlserver,PSJ_Courts,Sentence,DriverLicenseRestriction,SessionID,12,varchar,40,,,,,0
+sqlserver,PSJ_Courts,Sentence,DriverLicenseRestriction,TenantID,13,varchar,20,,,,,0
+sqlserver,PSJ_Courts,Sentence,DriverLicenseRestriction,DataOwnerID,14,varchar,20,,,,,0
+sqlserver,PSJ_Courts,Sentence,DriverLicenseRestriction,DataSourceID,15,varchar,20,,,,,0
+sqlserver,PSJ_Courts,Sentence,DriverLicenseRestriction,CreatedDateTime,16,datetimeoffset,0,,,,,0
+sqlserver,PSJ_Courts,Sentence,DriverLicenseRestriction,UpdatedDateTime,17,datetimeoffset,0,,,,,0
+sqlserver,PSJ_Courts,Sentence,DriverLicenseRestriction,RecordStatusCodeID,18,char,1,,,,,0
+sqlserver,PSJ_Courts,Sentence,DriverLicenseRestriction,RecordStatusDateTime,19,datetimeoffset,0,,,,,0
+sqlserver,PSJ_Courts,Code,Address,AddressID,1,varchar,20,,,,,0
+sqlserver,PSJ_Courts,Code,Address,TypeID,2,varchar,20,,,,,0
+sqlserver,PSJ_Courts,Code,Address,AddressLine1,3,varchar,128,,,,,0
+sqlserver,PSJ_Courts,Code,Address,AddressLine2,4,varchar,128,,,,,0
+sqlserver,PSJ_Courts,Code,Address,CityName,5,varchar,40,,,,,0
+sqlserver,PSJ_Courts,Code,Address,StateCode,6,varchar,20,,,,,0
+sqlserver,PSJ_Courts,Code,Address,PostalCode,7,varchar,20,,,,,0
+sqlserver,PSJ_Courts,Code,Address,SessionID,8,varchar,40,,,,,0
+sqlserver,PSJ_Courts,Code,Address,TenantID,9,varchar,20,,,,,0
+sqlserver,PSJ_Courts,Code,Address,DataOwnerID,10,varchar,20,,,,,0
+sqlserver,PSJ_Courts,Code,Address,DataSourceID,11,varchar,20,,,,,0
+sqlserver,PSJ_Courts,Code,Address,CreatedDateTime,12,datetimeoffset,0,,,,,0
+sqlserver,PSJ_Courts,Code,Address,UpdatedDateTime,13,datetimeoffset,0,,,,,0
+sqlserver,PSJ_Courts,Code,Address,RecordStatusCodeID,14,char,1,,,,,0
+sqlserver,PSJ_Courts,Code,Address,RecordStatusDateTime,15,datetimeoffset,0,,,,,0
+sqlserver,PSJ_Courts,Party,PartyName,PartyID,1,varchar,20,FOREIGN KEY,Party,PartyDetail,PartyID,0
+sqlserver,PSJ_Courts,Party,PartyName,PartyNameID,2,varchar,20,PRIMARY KEY,,,,0
+sqlserver,PSJ_Courts,Party,PartyName,TypeID,3,varchar,20,FOREIGN KEY,Party,NameType,TypeID,0
+sqlserver,PSJ_Courts,Party,PartyName,GivenName,4,varchar,30,,,,,0
+sqlserver,PSJ_Courts,Party,PartyName,MiddleName,5,varchar,30,,,,,0
+sqlserver,PSJ_Courts,Party,PartyName,Surname,6,varchar,30,,,,,0
+sqlserver,PSJ_Courts,Party,PartyName,NameSuffix,7,varchar,30,,,,,0
+sqlserver,PSJ_Courts,Party,PartyName,IsPrimary,8,bit,0,,,,,0
+sqlserver,PSJ_Courts,Party,PartyName,SessionID,9,varchar,40,,,,,0
+sqlserver,PSJ_Courts,Party,PartyName,TenantID,10,varchar,20,,,,,0
+sqlserver,PSJ_Courts,Party,PartyName,DataOwnerID,11,varchar,20,,,,,0
+sqlserver,PSJ_Courts,Party,PartyName,DataSourceID,12,varchar,20,,,,,0
+sqlserver,PSJ_Courts,Party,PartyName,CreatedDateTime,13,datetimeoffset,0,,,,,0
+sqlserver,PSJ_Courts,Party,PartyName,UpdatedDateTime,14,datetimeoffset,0,,,,,0
+sqlserver,PSJ_Courts,Party,PartyName,RecordStatusCodeID,15,char,1,,,,,0
+sqlserver,PSJ_Courts,Party,PartyName,RecordStatusDateTime,16,datetimeoffset,0,,,,,0
+sqlserver,PSJ_Courts,Activity,ReleaseType,TypeID,1,varchar,20,PRIMARY KEY,,,,0
+sqlserver,PSJ_Courts,Activity,ReleaseType,Description,2,varchar,20,,,,,0
+sqlserver,PSJ_Courts,Activity,ReleaseType,SessionID,3,varchar,40,,,,,0
+sqlserver,PSJ_Courts,Activity,ReleaseType,TenantID,4,varchar,20,,,,,0
+sqlserver,PSJ_Courts,Activity,ReleaseType,DataOwnerID,5,varchar,20,,,,,0
+sqlserver,PSJ_Courts,Activity,ReleaseType,DataSourceID,6,varchar,20,,,,,0
+sqlserver,PSJ_Courts,Activity,ReleaseType,CreatedDateTime,7,datetimeoffset,0,,,,,0
+sqlserver,PSJ_Courts,Activity,ReleaseType,UpdatedDateTime,8,datetimeoffset,0,,,,,0
+sqlserver,PSJ_Courts,Activity,ReleaseType,RecordStatusCodeID,9,char,1,,,,,0
+sqlserver,PSJ_Courts,Activity,ReleaseType,RecordStatusDateTime,10,datetimeoffset,0,,,,,0
+sqlserver,PSJ_Courts,Activity,HearingFlag,FlagID,1,varchar,20,PRIMARY KEY,,,,0
+sqlserver,PSJ_Courts,Activity,HearingFlag,Description,2,varchar,256,,,,,0
+sqlserver,PSJ_Courts,Activity,HearingFlag,SessionID,3,varchar,40,,,,,0
+sqlserver,PSJ_Courts,Activity,HearingFlag,TenantID,4,varchar,20,,,,,0
+sqlserver,PSJ_Courts,Activity,HearingFlag,DataOwnerID,5,varchar,20,,,,,0
+sqlserver,PSJ_Courts,Activity,HearingFlag,DataSourceID,6,varchar,20,,,,,0
+sqlserver,PSJ_Courts,Activity,HearingFlag,CreatedDateTime,7,datetimeoffset,0,,,,,0
+sqlserver,PSJ_Courts,Activity,HearingFlag,UpdatedDateTime,8,datetimeoffset,0,,,,,0
+sqlserver,PSJ_Courts,Activity,HearingFlag,RecordStatusCodeID,9,char,1,,,,,0
+sqlserver,PSJ_Courts,Activity,HearingFlag,RecordStatusDateTime,10,datetimeoffset,0,,,,,0
+sqlserver,PSJ_Courts,Charge,DispositionEvent,DispositionEventID,1,varchar,20,PRIMARY KEY,,,,0
+sqlserver,PSJ_Courts,Charge,DispositionEvent,CaseID,2,varchar,20,FOREIGN KEY,Case,CaseDetail,CaseID,0
+sqlserver,PSJ_Courts,Charge,DispositionEvent,DispositionTypeID,3,varchar,20,FOREIGN KEY,Charge,DispositionType,TypeID,0
+sqlserver,PSJ_Courts,Charge,DispositionEvent,EventDate,4,date,0,,,,,0
+sqlserver,PSJ_Courts,Charge,DispositionEvent,AmendReasonCodeID,5,varchar,20,FOREIGN KEY,Charge,AmendReasonCode,CodeID,0
+sqlserver,PSJ_Courts,Charge,DispositionEvent,SessionID,6,varchar,40,,,,,0
+sqlserver,PSJ_Courts,Charge,DispositionEvent,TenantID,7,varchar,20,,,,,0
+sqlserver,PSJ_Courts,Charge,DispositionEvent,DataOwnerID,8,varchar,20,,,,,0
+sqlserver,PSJ_Courts,Charge,DispositionEvent,DataSourceID,9,varchar,20,,,,,0
+sqlserver,PSJ_Courts,Charge,DispositionEvent,CreatedDateTime,10,datetimeoffset,0,,,,,0
+sqlserver,PSJ_Courts,Charge,DispositionEvent,UpdatedDateTime,11,datetimeoffset,0,,,,,0
+sqlserver,PSJ_Courts,Charge,DispositionEvent,RecordStatusCodeID,12,char,1,,,,,0
+sqlserver,PSJ_Courts,Charge,DispositionEvent,RecordStatusDateTime,13,datetimeoffset,0,,,,,0
+sqlserver,PSJ_Courts,Code,JurisdictionCode,CodeID,1,varchar,20,PRIMARY KEY,,,,0
+sqlserver,PSJ_Courts,Code,JurisdictionCode,Description,2,varchar,20,,,,,0
+sqlserver,PSJ_Courts,Code,JurisdictionCode,SessionID,3,varchar,40,,,,,0
+sqlserver,PSJ_Courts,Code,JurisdictionCode,TenantID,4,varchar,20,,,,,0
+sqlserver,PSJ_Courts,Code,JurisdictionCode,DataOwnerID,5,varchar,20,,,,,0
+sqlserver,PSJ_Courts,Code,JurisdictionCode,DataSourceID,6,varchar,20,,,,,0
+sqlserver,PSJ_Courts,Code,JurisdictionCode,CreatedDateTime,7,datetimeoffset,0,,,,,0
+sqlserver,PSJ_Courts,Code,JurisdictionCode,UpdatedDateTime,8,datetimeoffset,0,,,,,0
+sqlserver,PSJ_Courts,Code,JurisdictionCode,RecordStatusCodeID,9,char,1,,,,,0
+sqlserver,PSJ_Courts,Code,JurisdictionCode,RecordStatusDateTime,10,datetimeoffset,0,,,,,0
+sqlserver,PSJ_Courts,Activity,BondType,TypeID,1,varchar,20,PRIMARY KEY,,,,0
+sqlserver,PSJ_Courts,Activity,BondType,Description,2,varchar,20,,,,,0
+sqlserver,PSJ_Courts,Activity,BondType,SessionID,3,varchar,40,,,,,0
+sqlserver,PSJ_Courts,Activity,BondType,TenantID,4,varchar,20,,,,,0
+sqlserver,PSJ_Courts,Activity,BondType,DataOwnerID,5,varchar,20,,,,,0
+sqlserver,PSJ_Courts,Activity,BondType,DataSourceID,6,varchar,20,,,,,0
+sqlserver,PSJ_Courts,Activity,BondType,CreatedDateTime,7,datetimeoffset,0,,,,,0
+sqlserver,PSJ_Courts,Activity,BondType,UpdatedDateTime,8,datetimeoffset,0,,,,,0
+sqlserver,PSJ_Courts,Activity,BondType,RecordStatusCodeID,9,char,1,,,,,0
+sqlserver,PSJ_Courts,Activity,BondType,RecordStatusDateTime,10,datetimeoffset,0,,,,,0
+sqlserver,PSJ_Courts,Sentence,ProgramType,TypeID,1,varchar,20,PRIMARY KEY,,,,0
+sqlserver,PSJ_Courts,Sentence,ProgramType,Description,2,varchar,128,,,,,0
+sqlserver,PSJ_Courts,Sentence,ProgramType,SessionID,3,varchar,40,,,,,0
+sqlserver,PSJ_Courts,Sentence,ProgramType,TenantID,4,varchar,20,,,,,0
+sqlserver,PSJ_Courts,Sentence,ProgramType,DataOwnerID,5,varchar,20,,,,,0
+sqlserver,PSJ_Courts,Sentence,ProgramType,DataSourceID,6,varchar,20,,,,,0
+sqlserver,PSJ_Courts,Sentence,ProgramType,CreatedDateTime,7,datetimeoffset,0,,,,,0
+sqlserver,PSJ_Courts,Sentence,ProgramType,UpdatedDateTime,8,datetimeoffset,0,,,,,0
+sqlserver,PSJ_Courts,Sentence,ProgramType,RecordStatusCodeID,9,char,1,,,,,0
+sqlserver,PSJ_Courts,Sentence,ProgramType,RecordStatusDateTime,10,datetimeoffset,0,,,,,0
+sqlserver,PSJ_Courts,Party,PartyPhone,PartyID,1,varchar,20,FOREIGN KEY,Party,PartyDetail,PartyID,0
+sqlserver,PSJ_Courts,Party,PartyPhone,PartyPhoneID,2,varchar,20,PRIMARY KEY,,,,0
+sqlserver,PSJ_Courts,Party,PartyPhone,TypeID,3,varchar,20,FOREIGN KEY,Party,PhoneType,TypeID,0
+sqlserver,PSJ_Courts,Party,PartyPhone,Number,4,varchar,20,,,,,0
+sqlserver,PSJ_Courts,Party,PartyPhone,IsPrimary,5,bit,0,,,,,0
+sqlserver,PSJ_Courts,Party,PartyPhone,SessionID,6,varchar,40,,,,,0
+sqlserver,PSJ_Courts,Party,PartyPhone,TenantID,7,varchar,20,,,,,0
+sqlserver,PSJ_Courts,Party,PartyPhone,DataOwnerID,8,varchar,20,,,,,0
+sqlserver,PSJ_Courts,Party,PartyPhone,DataSourceID,9,varchar,20,,,,,0
+sqlserver,PSJ_Courts,Party,PartyPhone,CreatedDateTime,10,datetimeoffset,0,,,,,0
+sqlserver,PSJ_Courts,Party,PartyPhone,UpdatedDateTime,11,datetimeoffset,0,,,,,0
+sqlserver,PSJ_Courts,Party,PartyPhone,RecordStatusCodeID,12,char,1,,,,,0
+sqlserver,PSJ_Courts,Party,PartyPhone,RecordStatusDateTime,13,datetimeoffset,0,,,,,0
+sqlserver,PSJ_Courts,Code,OffenseCode,OffenseID,1,varchar,20,PRIMARY KEY,,,,0
+sqlserver,PSJ_Courts,Code,OffenseCode,StatuteNumber,2,varchar,20,,,,,0
+sqlserver,PSJ_Courts,Code,OffenseCode,StatuteCode,3,varchar,20,,,,,0
+sqlserver,PSJ_Courts,Code,OffenseCode,StatuteDescription,4,varchar,128,,,,,0
+sqlserver,PSJ_Courts,Code,OffenseCode,StatuteDegree,5,varchar,20,,,,,0
+sqlserver,PSJ_Courts,Code,OffenseCode,CategoryCodeID,6,varchar,20,,,,,0
+sqlserver,PSJ_Courts,Code,OffenseCode,CjisCodeID,7,varchar,20,,,,,0
+sqlserver,PSJ_Courts,Code,OffenseCode,EnactedDate,8,date,0,,,,,0
+sqlserver,PSJ_Courts,Code,OffenseCode,RepealedDate,9,date,0,,,,,0
+sqlserver,PSJ_Courts,Code,OffenseCode,SessionID,10,varchar,40,,,,,0
+sqlserver,PSJ_Courts,Code,OffenseCode,TenantID,11,varchar,20,,,,,0
+sqlserver,PSJ_Courts,Code,OffenseCode,DataOwnerID,12,varchar,20,,,,,0
+sqlserver,PSJ_Courts,Code,OffenseCode,DataSourceID,13,varchar,20,,,,,0
+sqlserver,PSJ_Courts,Code,OffenseCode,CreatedDateTime,14,datetimeoffset,0,,,,,0
+sqlserver,PSJ_Courts,Code,OffenseCode,UpdatedDateTime,15,datetimeoffset,0,,,,,0
+sqlserver,PSJ_Courts,Code,OffenseCode,RecordStatusCodeID,16,char,1,,,,,0
+sqlserver,PSJ_Courts,Code,OffenseCode,RecordStatusDateTime,17,datetimeoffset,0,,,,,0
+sqlserver,PSJ_Courts,NODS,CaseFillingAppliesToParty,CaseID,1,varchar,20,FOREIGN KEY,Case,CaseDetail,CaseID,0
+sqlserver,PSJ_Courts,NODS,CaseFillingAppliesToParty,PartyID,2,varchar,20,,,,,0
+sqlserver,PSJ_Courts,NODS,CaseFillingAppliesToParty,CaseFillingAppliesToPartyID,3,varchar,20,PRIMARY KEY,,,,0
+sqlserver,PSJ_Courts,NODS,CaseFillingAppliesToParty,CaseFillingPartyID,4,varchar,20,,,,,0
+sqlserver,PSJ_Courts,NODS,CaseFillingAppliesToParty,CaseFilingID,5,varchar,20,,,,,0
+sqlserver,PSJ_Courts,NODS,CaseFillingAppliesToParty,FillingCaseID,6,varchar,20,,,,,0
+sqlserver,PSJ_Courts,NODS,CaseFillingAppliesToParty,PartyCaseID,7,varchar,20,,,,,0
+sqlserver,PSJ_Courts,NODS,CaseFillingAppliesToParty,SessionID,8,varchar,40,,,,,0
+sqlserver,PSJ_Courts,NODS,CaseFillingAppliesToParty,TenantID,9,varchar,20,,,,,0
+sqlserver,PSJ_Courts,NODS,CaseFillingAppliesToParty,DataOwnerID,10,varchar,20,,,,,0
+sqlserver,PSJ_Courts,NODS,CaseFillingAppliesToParty,DataSourceID,11,varchar,20,,,,,0
+sqlserver,PSJ_Courts,NODS,CaseFillingAppliesToParty,CreatedDateTime,12,datetimeoffset,0,,,,,0
+sqlserver,PSJ_Courts,NODS,CaseFillingAppliesToParty,UpdatedDateTime,13,datetimeoffset,0,,,,,0
+sqlserver,PSJ_Courts,NODS,CaseFillingAppliesToParty,RecordStatusCodeID,14,char,1,,,,,0
+sqlserver,PSJ_Courts,NODS,CaseFillingAppliesToParty,RecordStatusDateTime,15,datetimeoffset,0,,,,,0
+sqlserver,PSJ_Courts,Activity,BailBondRevocation,CaseID,1,varchar,20,FOREIGN KEY,Case,CaseDetail,CaseID,0
+sqlserver,PSJ_Courts,Activity,BailBondRevocation,RevocationID,2,varchar,20,PRIMARY KEY,,,,0
+sqlserver,PSJ_Courts,Activity,BailBondRevocation,RevocationDate,3,date,0,,,,,0
+sqlserver,PSJ_Courts,Activity,BailBondRevocation,Reason,4,varchar,128,,,,,0
+sqlserver,PSJ_Courts,Activity,BailBondRevocation,SessionID,5,varchar,40,,,,,0
+sqlserver,PSJ_Courts,Activity,BailBondRevocation,TenantID,6,varchar,20,,,,,0
+sqlserver,PSJ_Courts,Activity,BailBondRevocation,DataOwnerID,7,varchar,20,,,,,0
+sqlserver,PSJ_Courts,Activity,BailBondRevocation,DataSourceID,8,varchar,20,,,,,0
+sqlserver,PSJ_Courts,Activity,BailBondRevocation,CreatedDateTime,9,datetimeoffset,0,,,,,0
+sqlserver,PSJ_Courts,Activity,BailBondRevocation,UpdatedDateTime,10,datetimeoffset,0,,,,,0
+sqlserver,PSJ_Courts,Activity,BailBondRevocation,RecordStatusCodeID,11,char,1,,,,,0
+sqlserver,PSJ_Courts,Activity,BailBondRevocation,RecordStatusDateTime,12,datetimeoffset,0,,,,,0
+sqlserver,PSJ_Courts,Sentence,SentenceType,TypeID,1,varchar,20,PRIMARY KEY,,,,0
+sqlserver,PSJ_Courts,Sentence,SentenceType,Description,2,varchar,128,,,,,0
+sqlserver,PSJ_Courts,Sentence,SentenceType,SessionID,3,varchar,40,,,,,0
+sqlserver,PSJ_Courts,Sentence,SentenceType,TenantID,4,varchar,20,,,,,0
+sqlserver,PSJ_Courts,Sentence,SentenceType,DataOwnerID,5,varchar,20,,,,,0
+sqlserver,PSJ_Courts,Sentence,SentenceType,DataSourceID,6,varchar,20,,,,,0
+sqlserver,PSJ_Courts,Sentence,SentenceType,CreatedDateTime,7,datetimeoffset,0,,,,,0
+sqlserver,PSJ_Courts,Sentence,SentenceType,UpdatedDateTime,8,datetimeoffset,0,,,,,0
+sqlserver,PSJ_Courts,Sentence,SentenceType,RecordStatusCodeID,9,char,1,,,,,0
+sqlserver,PSJ_Courts,Sentence,SentenceType,RecordStatusDateTime,10,datetimeoffset,0,,,,,0
+sqlserver,PSJ_Courts,Sentence,ProgramComponent,ChargeID,1,varchar,20,FOREIGN KEY,Charge,ChargeDetail,ChargeID,0
+sqlserver,PSJ_Courts,Sentence,ProgramComponent,SentenceID,2,varchar,20,FOREIGN KEY,Sentence,SentenceDetail,SentenceID,0
+sqlserver,PSJ_Courts,Sentence,ProgramComponent,ComponentID,3,varchar,20,PRIMARY KEY,,,,0
+sqlserver,PSJ_Courts,Sentence,ProgramComponent,TypeID,4,varchar,20,FOREIGN KEY,Sentence,ProgramType,TypeID,0
+sqlserver,PSJ_Courts,Sentence,ProgramComponent,Ordered,5,bit,0,,,,,0
+sqlserver,PSJ_Courts,Sentence,ProgramComponent,Recommended,6,bit,0,,,,,0
+sqlserver,PSJ_Courts,Sentence,ProgramComponent,OrderDate,7,date,0,,,,,0
+sqlserver,PSJ_Courts,Sentence,ProgramComponent,CompleteBy,8,date,0,,,,,0
+sqlserver,PSJ_Courts,Sentence,ProgramComponent,InLieuOf,9,varchar,20,,,,,0
+sqlserver,PSJ_Courts,Sentence,ProgramComponent,TermYears,10,varchar,20,,,,,0
+sqlserver,PSJ_Courts,Sentence,ProgramComponent,TermMonths,11,varchar,20,,,,,0
+sqlserver,PSJ_Courts,Sentence,ProgramComponent,TermDays,12,varchar,20,,,,,0
+sqlserver,PSJ_Courts,Sentence,ProgramComponent,TermWeeks,13,varchar,20,,,,,0
+sqlserver,PSJ_Courts,Sentence,ProgramComponent,Comment,14,varchar,256,,,,,0
+sqlserver,PSJ_Courts,Sentence,ProgramComponent,SessionID,15,varchar,40,,,,,0
+sqlserver,PSJ_Courts,Sentence,ProgramComponent,TenantID,16,varchar,20,,,,,0
+sqlserver,PSJ_Courts,Sentence,ProgramComponent,DataOwnerID,17,varchar,20,,,,,0
+sqlserver,PSJ_Courts,Sentence,ProgramComponent,DataSourceID,18,varchar,20,,,,,0
+sqlserver,PSJ_Courts,Sentence,ProgramComponent,CreatedDateTime,19,datetimeoffset,0,,,,,0
+sqlserver,PSJ_Courts,Sentence,ProgramComponent,UpdatedDateTime,20,datetimeoffset,0,,,,,0
+sqlserver,PSJ_Courts,Sentence,ProgramComponent,RecordStatusCodeID,21,char,1,,,,,0
+sqlserver,PSJ_Courts,Sentence,ProgramComponent,RecordStatusDateTime,22,datetimeoffset,0,,,,,0
+sqlserver,PSJ_Courts,Code,DrugType,TypeID,1,varchar,20,PRIMARY KEY,,,,0
+sqlserver,PSJ_Courts,Code,DrugType,Description,2,varchar,128,,,,,0
+sqlserver,PSJ_Courts,Code,DrugType,SessionID,3,varchar,40,,,,,0
+sqlserver,PSJ_Courts,Code,DrugType,TenantID,4,varchar,20,,,,,0
+sqlserver,PSJ_Courts,Code,DrugType,DataOwnerID,5,varchar,20,,,,,0
+sqlserver,PSJ_Courts,Code,DrugType,DataSourceID,6,varchar,20,,,,,0
+sqlserver,PSJ_Courts,Code,DrugType,CreatedDateTime,7,datetimeoffset,0,,,,,0
+sqlserver,PSJ_Courts,Code,DrugType,UpdatedDateTime,8,datetimeoffset,0,,,,,0
+sqlserver,PSJ_Courts,Code,DrugType,RecordStatusCodeID,9,char,1,,,,,0
+sqlserver,PSJ_Courts,Code,DrugType,RecordStatusDateTime,10,datetimeoffset,0,,,,,0
+sqlserver,PSJ_Courts,Party,DriverLicenseType,TypeID,1,varchar,20,PRIMARY KEY,,,,0
+sqlserver,PSJ_Courts,Party,DriverLicenseType,Description,2,varchar,256,,,,,0
+sqlserver,PSJ_Courts,Party,DriverLicenseType,SessionID,3,varchar,40,,,,,0
+sqlserver,PSJ_Courts,Party,DriverLicenseType,TenantID,4,varchar,20,,,,,0
+sqlserver,PSJ_Courts,Party,DriverLicenseType,DataOwnerID,5,varchar,20,,,,,0
+sqlserver,PSJ_Courts,Party,DriverLicenseType,DataSourceID,6,varchar,20,,,,,0
+sqlserver,PSJ_Courts,Party,DriverLicenseType,CreatedDateTime,7,datetimeoffset,0,,,,,0
+sqlserver,PSJ_Courts,Party,DriverLicenseType,UpdatedDateTime,8,datetimeoffset,0,,,,,0
+sqlserver,PSJ_Courts,Party,DriverLicenseType,RecordStatusCodeID,9,char,1,,,,,0
+sqlserver,PSJ_Courts,Party,DriverLicenseType,RecordStatusDateTime,10,datetimeoffset,0,,,,,0
+sqlserver,PSJ_Courts,Sentence,SentenceEvent,CaseID,1,varchar,20,FOREIGN KEY,Case,CaseDetail,CaseID,0
+sqlserver,PSJ_Courts,Sentence,SentenceEvent,SentenceEventID,2,varchar,20,PRIMARY KEY,,,,0
+sqlserver,PSJ_Courts,Sentence,SentenceEvent,AuthorityID,3,varchar,20,FOREIGN KEY,Code,Organization,OrganizationID,0
+sqlserver,PSJ_Courts,Sentence,SentenceEvent,SentenceTypeID,4,varchar,20,FOREIGN KEY,Sentence,SentenceType,TypeID,0
+sqlserver,PSJ_Courts,Sentence,SentenceEvent,SentenceDate,5,date,0,,,,,0
+sqlserver,PSJ_Courts,Sentence,SentenceEvent,SessionID,6,varchar,40,,,,,0
+sqlserver,PSJ_Courts,Sentence,SentenceEvent,TenantID,7,varchar,20,,,,,0
+sqlserver,PSJ_Courts,Sentence,SentenceEvent,DataOwnerID,8,varchar,20,,,,,0
+sqlserver,PSJ_Courts,Sentence,SentenceEvent,DataSourceID,9,varchar,20,,,,,0
+sqlserver,PSJ_Courts,Sentence,SentenceEvent,CreatedDateTime,10,datetimeoffset,0,,,,,0
+sqlserver,PSJ_Courts,Sentence,SentenceEvent,UpdatedDateTime,11,datetimeoffset,0,,,,,0
+sqlserver,PSJ_Courts,Sentence,SentenceEvent,RecordStatusCodeID,12,char,1,,,,,0
+sqlserver,PSJ_Courts,Sentence,SentenceEvent,RecordStatusDateTime,13,datetimeoffset,0,,,,,0
+sqlserver,PSJ_Courts,NODS,ReferralType,TypeID,1,varchar,20,PRIMARY KEY,,,,0
+sqlserver,PSJ_Courts,NODS,ReferralType,Description,2,varchar,128,,,,,0
+sqlserver,PSJ_Courts,NODS,ReferralType,SessionID,3,varchar,40,,,,,0
+sqlserver,PSJ_Courts,NODS,ReferralType,TenantID,4,varchar,20,,,,,0
+sqlserver,PSJ_Courts,NODS,ReferralType,DataOwnerID,5,varchar,20,,,,,0
+sqlserver,PSJ_Courts,NODS,ReferralType,DataSourceID,6,varchar,20,,,,,0
+sqlserver,PSJ_Courts,NODS,ReferralType,CreatedDateTime,7,datetimeoffset,0,,,,,0
+sqlserver,PSJ_Courts,NODS,ReferralType,UpdatedDateTime,8,datetimeoffset,0,,,,,0
+sqlserver,PSJ_Courts,NODS,ReferralType,RecordStatusCodeID,9,char,1,,,,,0
+sqlserver,PSJ_Courts,NODS,ReferralType,RecordStatusDateTime,10,datetimeoffset,0,,,,,0
+sqlserver,PSJ_Courts,Activity,BailBondRelease,CaseID,1,varchar,20,FOREIGN KEY,Case,CaseDetail,CaseID,0
+sqlserver,PSJ_Courts,Activity,BailBondRelease,ReleaseID,2,varchar,20,PRIMARY KEY,,,,0
+sqlserver,PSJ_Courts,Activity,BailBondRelease,ReleaseType,3,varchar,20,,,,,0
+sqlserver,PSJ_Courts,Activity,BailBondRelease,BondType,4,varchar,20,,,,,0
+sqlserver,PSJ_Courts,Activity,BailBondRelease,AuthorityID,5,varchar,20,,,,,0
+sqlserver,PSJ_Courts,Activity,BailBondRelease,BondSetDate,6,date,0,,,,,0
+sqlserver,PSJ_Courts,Activity,BailBondRelease,BondPostDate,7,date,0,,,,,0
+sqlserver,PSJ_Courts,Activity,BailBondRelease,AmountOfBond,8,money,0,,,,,0
+sqlserver,PSJ_Courts,Activity,BailBondRelease,PostDate,9,date,0,,,,,0
+sqlserver,PSJ_Courts,Activity,BailBondRelease,RevocationID,10,varchar,20,FOREIGN KEY,Activity,BailBondRevocation,RevocationID,0
+sqlserver,PSJ_Courts,Activity,BailBondRelease,SessionID,11,varchar,40,,,,,0
+sqlserver,PSJ_Courts,Activity,BailBondRelease,TenantID,12,varchar,20,,,,,0
+sqlserver,PSJ_Courts,Activity,BailBondRelease,DataOwnerID,13,varchar,20,,,,,0
+sqlserver,PSJ_Courts,Activity,BailBondRelease,DataSourceID,14,varchar,20,,,,,0
+sqlserver,PSJ_Courts,Activity,BailBondRelease,CreatedDateTime,15,datetimeoffset,0,,,,,0
+sqlserver,PSJ_Courts,Activity,BailBondRelease,UpdatedDateTime,16,datetimeoffset,0,,,,,0
+sqlserver,PSJ_Courts,Activity,BailBondRelease,RecordStatusCodeID,17,char,1,,,,,0
+sqlserver,PSJ_Courts,Activity,BailBondRelease,RecordStatusDateTime,18,datetimeoffset,0,,,,,0
+sqlserver,PSJ_Courts,Case,CaseType,TypeID,1,varchar,20,PRIMARY KEY,,,,0
+sqlserver,PSJ_Courts,Case,CaseType,Description,2,varchar,128,,,,,0
+sqlserver,PSJ_Courts,Case,CaseType,SessionID,3,varchar,40,,,,,0
+sqlserver,PSJ_Courts,Case,CaseType,TenantID,4,varchar,20,,,,,0
+sqlserver,PSJ_Courts,Case,CaseType,DataOwnerID,5,varchar,20,,,,,0
+sqlserver,PSJ_Courts,Case,CaseType,DataSourceID,6,varchar,20,,,,,0
+sqlserver,PSJ_Courts,Case,CaseType,CreatedDateTime,7,datetimeoffset,0,,,,,0
+sqlserver,PSJ_Courts,Case,CaseType,UpdatedDateTime,8,datetimeoffset,0,,,,,0
+sqlserver,PSJ_Courts,Case,CaseType,RecordStatusCodeID,9,char,1,,,,,0
+sqlserver,PSJ_Courts,Case,CaseType,RecordStatusDateTime,10,datetimeoffset,0,,,,,0
+sqlserver,PSJ_Courts,Party,DriverLicenseStatusCode,CodeID,1,varchar,20,PRIMARY KEY,,,,0
+sqlserver,PSJ_Courts,Party,DriverLicenseStatusCode,Description,2,varchar,256,,,,,0
+sqlserver,PSJ_Courts,Party,DriverLicenseStatusCode,SessionID,3,varchar,40,,,,,0
+sqlserver,PSJ_Courts,Party,DriverLicenseStatusCode,TenantID,4,varchar,20,,,,,0
+sqlserver,PSJ_Courts,Party,DriverLicenseStatusCode,DataOwnerID,5,varchar,20,,,,,0
+sqlserver,PSJ_Courts,Party,DriverLicenseStatusCode,DataSourceID,6,varchar,20,,,,,0
+sqlserver,PSJ_Courts,Party,DriverLicenseStatusCode,CreatedDateTime,7,datetimeoffset,0,,,,,0
+sqlserver,PSJ_Courts,Party,DriverLicenseStatusCode,UpdatedDateTime,8,datetimeoffset,0,,,,,0
+sqlserver,PSJ_Courts,Party,DriverLicenseStatusCode,RecordStatusCodeID,9,char,1,,,,,0
+sqlserver,PSJ_Courts,Party,DriverLicenseStatusCode,RecordStatusDateTime,10,datetimeoffset,0,,,,,0
+sqlserver,PSJ_Courts,Sentence,ConditionType,TypeID,1,varchar,20,PRIMARY KEY,,,,0
+sqlserver,PSJ_Courts,Sentence,ConditionType,Description,2,varchar,128,,,,,0
+sqlserver,PSJ_Courts,Sentence,ConditionType,SessionID,3,varchar,40,,,,,0
+sqlserver,PSJ_Courts,Sentence,ConditionType,TenantID,4,varchar,20,,,,,0
+sqlserver,PSJ_Courts,Sentence,ConditionType,DataOwnerID,5,varchar,20,,,,,0
+sqlserver,PSJ_Courts,Sentence,ConditionType,DataSourceID,6,varchar,20,,,,,0
+sqlserver,PSJ_Courts,Sentence,ConditionType,CreatedDateTime,7,datetimeoffset,0,,,,,0
+sqlserver,PSJ_Courts,Sentence,ConditionType,UpdatedDateTime,8,datetimeoffset,0,,,,,0
+sqlserver,PSJ_Courts,Sentence,ConditionType,RecordStatusCodeID,9,char,1,,,,,0
+sqlserver,PSJ_Courts,Sentence,ConditionType,RecordStatusDateTime,10,datetimeoffset,0,,,,,0
+sqlserver,PSJ_Courts,NODS,FacilitationType,TypeID,1,varchar,20,PRIMARY KEY,,,,0
+sqlserver,PSJ_Courts,NODS,FacilitationType,Description,2,varchar,128,,,,,0
+sqlserver,PSJ_Courts,NODS,FacilitationType,SessionID,3,varchar,40,,,,,0
+sqlserver,PSJ_Courts,NODS,FacilitationType,TenantID,4,varchar,20,,,,,0
+sqlserver,PSJ_Courts,NODS,FacilitationType,DataOwnerID,5,varchar,20,,,,,0
+sqlserver,PSJ_Courts,NODS,FacilitationType,DataSourceID,6,varchar,20,,,,,0
+sqlserver,PSJ_Courts,NODS,FacilitationType,CreatedDateTime,7,datetimeoffset,0,,,,,0
+sqlserver,PSJ_Courts,NODS,FacilitationType,UpdatedDateTime,8,datetimeoffset,0,,,,,0
+sqlserver,PSJ_Courts,NODS,FacilitationType,RecordStatusCodeID,9,char,1,,,,,0
+sqlserver,PSJ_Courts,NODS,FacilitationType,RecordStatusDateTime,10,datetimeoffset,0,,,,,0
+sqlserver,PSJ_Courts,Activity,ConditionType,TypeID,1,varchar,20,PRIMARY KEY,,,,0
+sqlserver,PSJ_Courts,Activity,ConditionType,Description,2,varchar,256,,,,,0
+sqlserver,PSJ_Courts,Activity,ConditionType,SessionID,3,varchar,40,,,,,0
+sqlserver,PSJ_Courts,Activity,ConditionType,TenantID,4,varchar,20,,,,,0
+sqlserver,PSJ_Courts,Activity,ConditionType,DataOwnerID,5,varchar,20,,,,,0
+sqlserver,PSJ_Courts,Activity,ConditionType,DataSourceID,6,varchar,20,,,,,0
+sqlserver,PSJ_Courts,Activity,ConditionType,CreatedDateTime,7,datetimeoffset,0,,,,,0
+sqlserver,PSJ_Courts,Activity,ConditionType,UpdatedDateTime,8,datetimeoffset,0,,,,,0
+sqlserver,PSJ_Courts,Activity,ConditionType,RecordStatusCodeID,9,char,1,,,,,0
+sqlserver,PSJ_Courts,Activity,ConditionType,RecordStatusDateTime,10,datetimeoffset,0,,,,,0
+sqlserver,PSJ_Courts,Sentence,SentenceDetail,CaseID,1,varchar,20,FOREIGN KEY,Case,CaseDetail,CaseID,0
+sqlserver,PSJ_Courts,Sentence,SentenceDetail,SentenceEventID,2,varchar,20,,,,,0
+sqlserver,PSJ_Courts,Sentence,SentenceDetail,SentenceID,3,varchar,20,PRIMARY KEY,,,,0
+sqlserver,PSJ_Courts,Sentence,SentenceDetail,ChargeID,4,varchar,20,FOREIGN KEY,Charge,ChargeDetail,ChargeID,0
+sqlserver,PSJ_Courts,Sentence,SentenceDetail,SessionID,5,varchar,40,,,,,0
+sqlserver,PSJ_Courts,Sentence,SentenceDetail,TenantID,6,varchar,20,,,,,0
+sqlserver,PSJ_Courts,Sentence,SentenceDetail,DataOwnerID,7,varchar,20,,,,,0
+sqlserver,PSJ_Courts,Sentence,SentenceDetail,DataSourceID,8,varchar,20,,,,,0
+sqlserver,PSJ_Courts,Sentence,SentenceDetail,CreatedDateTime,9,datetimeoffset,0,,,,,0
+sqlserver,PSJ_Courts,Sentence,SentenceDetail,UpdatedDateTime,10,datetimeoffset,0,,,,,0
+sqlserver,PSJ_Courts,Sentence,SentenceDetail,RecordStatusCodeID,11,char,1,,,,,0
+sqlserver,PSJ_Courts,Sentence,SentenceDetail,RecordStatusDateTime,12,datetimeoffset,0,,,,,0
+sqlserver,PSJ_Courts,Party,PartyDriversLicense,PartyID,1,varchar,20,FOREIGN KEY,Party,PartyDetail,PartyID,0
+sqlserver,PSJ_Courts,Party,PartyDriversLicense,PartyDriversLicenseID,2,varchar,20,PRIMARY KEY,,,,0
+sqlserver,PSJ_Courts,Party,PartyDriversLicense,TypeID,3,varchar,20,FOREIGN KEY,Party,DriverLicenseType,TypeID,0
+sqlserver,PSJ_Courts,Party,PartyDriversLicense,Number,4,varchar,20,,,,,0
+sqlserver,PSJ_Courts,Party,PartyDriversLicense,StateCode,5,varchar,20,,,,,0
+sqlserver,PSJ_Courts,Party,PartyDriversLicense,IssuedDate,6,date,0,,,,,0
+sqlserver,PSJ_Courts,Party,PartyDriversLicense,ExpirationDate,7,date,0,,,,,0
+sqlserver,PSJ_Courts,Party,PartyDriversLicense,StatusCodeID,8,varchar,20,FOREIGN KEY,Party,DriverLicenseStatusCode,CodeID,0
+sqlserver,PSJ_Courts,Party,PartyDriversLicense,IsUSLicense,9,bit,0,,,,,0
+sqlserver,PSJ_Courts,Party,PartyDriversLicense,SessionID,10,varchar,40,,,,,0
+sqlserver,PSJ_Courts,Party,PartyDriversLicense,TenantID,11,varchar,20,,,,,0
+sqlserver,PSJ_Courts,Party,PartyDriversLicense,DataOwnerID,12,varchar,20,,,,,0
+sqlserver,PSJ_Courts,Party,PartyDriversLicense,DataSourceID,13,varchar,20,,,,,0
+sqlserver,PSJ_Courts,Party,PartyDriversLicense,CreatedDateTime,14,datetimeoffset,0,,,,,0
+sqlserver,PSJ_Courts,Party,PartyDriversLicense,UpdatedDateTime,15,datetimeoffset,0,,,,,0
+sqlserver,PSJ_Courts,Party,PartyDriversLicense,RecordStatusCodeID,16,char,1,,,,,0
+sqlserver,PSJ_Courts,Party,PartyDriversLicense,RecordStatusDateTime,17,datetimeoffset,0,,,,,0
+sqlserver,PSJ_Courts,Sentence,Condition,SentenceEventID,1,varchar,20,,,,,0
+sqlserver,PSJ_Courts,Sentence,Condition,ChargeID,2,varchar,20,FOREIGN KEY,Charge,ChargeDetail,ChargeID,0
+sqlserver,PSJ_Courts,Sentence,Condition,SentenceID,3,varchar,20,FOREIGN KEY,Sentence,SentenceDetail,SentenceID,0
+sqlserver,PSJ_Courts,Sentence,Condition,DispComponentConditionId,4,varchar,20,,,,,0
+sqlserver,PSJ_Courts,Sentence,Condition,TypeID,5,varchar,20,FOREIGN KEY,Sentence,ProgramType,TypeID,0
+sqlserver,PSJ_Courts,Sentence,Condition,Description,6,varchar,20,,,,,0
+sqlserver,PSJ_Courts,Sentence,Condition,EffectiveDate,7,date,0,,,,,0
+sqlserver,PSJ_Courts,Sentence,Condition,Amount,8,varchar,20,,,,,0
+sqlserver,PSJ_Courts,Sentence,Condition,SessionID,9,varchar,40,,,,,0
+sqlserver,PSJ_Courts,Sentence,Condition,TenantID,10,varchar,20,,,,,0
+sqlserver,PSJ_Courts,Sentence,Condition,DataOwnerID,11,varchar,20,,,,,0
+sqlserver,PSJ_Courts,Sentence,Condition,DataSourceID,12,varchar,20,,,,,0
+sqlserver,PSJ_Courts,Sentence,Condition,CreatedDateTime,13,datetimeoffset,0,,,,,0
+sqlserver,PSJ_Courts,Sentence,Condition,UpdatedDateTime,14,datetimeoffset,0,,,,,0
+sqlserver,PSJ_Courts,Sentence,Condition,RecordStatusCodeID,15,char,1,,,,,0
+sqlserver,PSJ_Courts,Sentence,Condition,RecordStatusDateTime,16,datetimeoffset,0,,,,,0
+sqlserver,PSJ_Courts,NODS,ResolutionType,TypeID,1,varchar,20,PRIMARY KEY,,,,0
+sqlserver,PSJ_Courts,NODS,ResolutionType,Description,2,varchar,128,,,,,0
+sqlserver,PSJ_Courts,NODS,ResolutionType,SessionID,3,varchar,40,,,,,0
+sqlserver,PSJ_Courts,NODS,ResolutionType,TenantID,4,varchar,20,,,,,0
+sqlserver,PSJ_Courts,NODS,ResolutionType,DataOwnerID,5,varchar,20,,,,,0
+sqlserver,PSJ_Courts,NODS,ResolutionType,DataSourceID,6,varchar,20,,,,,0
+sqlserver,PSJ_Courts,NODS,ResolutionType,CreatedDateTime,7,datetimeoffset,0,,,,,0
+sqlserver,PSJ_Courts,NODS,ResolutionType,UpdatedDateTime,8,datetimeoffset,0,,,,,0
+sqlserver,PSJ_Courts,NODS,ResolutionType,RecordStatusCodeID,9,char,1,,,,,0
+sqlserver,PSJ_Courts,NODS,ResolutionType,RecordStatusDateTime,10,datetimeoffset,0,,,,,0
+sqlserver,PSJ_Courts,Activity,ReleaseCondition,CaseID,1,varchar,20,FOREIGN KEY,Case,CaseDetail,CaseID,0
+sqlserver,PSJ_Courts,Activity,ReleaseCondition,ReleaseConditionID,2,varchar,20,,,,,0
+sqlserver,PSJ_Courts,Activity,ReleaseCondition,BailBondReleaseID,3,varchar,20,,,,,0
+sqlserver,PSJ_Courts,Activity,ReleaseCondition,ISNoContactOrder,4,bit,0,,,,,0
+sqlserver,PSJ_Courts,Activity,ReleaseCondition,ConditionTypeID,5,varchar,20,FOREIGN KEY,Activity,ConditionType,TypeID,0
+sqlserver,PSJ_Courts,Activity,ReleaseCondition,SessionID,6,varchar,40,,,,,0
+sqlserver,PSJ_Courts,Activity,ReleaseCondition,TenantID,7,varchar,20,,,,,0
+sqlserver,PSJ_Courts,Activity,ReleaseCondition,DataOwnerID,8,varchar,20,,,,,0
+sqlserver,PSJ_Courts,Activity,ReleaseCondition,DataSourceID,9,varchar,20,,,,,0
+sqlserver,PSJ_Courts,Activity,ReleaseCondition,CreatedDateTime,10,datetimeoffset,0,,,,,0
+sqlserver,PSJ_Courts,Activity,ReleaseCondition,UpdatedDateTime,11,datetimeoffset,0,,,,,0
+sqlserver,PSJ_Courts,Activity,ReleaseCondition,RecordStatusCodeID,12,char,1,,,,,0
+sqlserver,PSJ_Courts,Activity,ReleaseCondition,RecordStatusDateTime,13,datetimeoffset,0,,,,,0
+sqlserver,PSJ_Courts,Sentence,ConfinementType,TypeID,1,varchar,20,PRIMARY KEY,,,,0
+sqlserver,PSJ_Courts,Sentence,ConfinementType,Description,2,varchar,128,,,,,0
+sqlserver,PSJ_Courts,Sentence,ConfinementType,SessionID,3,varchar,40,,,,,0
+sqlserver,PSJ_Courts,Sentence,ConfinementType,TenantID,4,varchar,20,,,,,0
+sqlserver,PSJ_Courts,Sentence,ConfinementType,DataOwnerID,5,varchar,20,,,,,0
+sqlserver,PSJ_Courts,Sentence,ConfinementType,DataSourceID,6,varchar,20,,,,,0
+sqlserver,PSJ_Courts,Sentence,ConfinementType,CreatedDateTime,7,datetimeoffset,0,,,,,0
+sqlserver,PSJ_Courts,Sentence,ConfinementType,UpdatedDateTime,8,datetimeoffset,0,,,,,0
+sqlserver,PSJ_Courts,Sentence,ConfinementType,RecordStatusCodeID,9,char,1,,,,,0
+sqlserver,PSJ_Courts,Sentence,ConfinementType,RecordStatusDateTime,10,datetimeoffset,0,,,,,0
+sqlserver,PSJ_Courts,Activity,HearingResultCode,CodeID,1,varchar,20,PRIMARY KEY,,,,0
+sqlserver,PSJ_Courts,Activity,HearingResultCode,Description,2,varchar,256,,,,,0
+sqlserver,PSJ_Courts,Activity,HearingResultCode,SessionID,3,varchar,40,,,,,0
+sqlserver,PSJ_Courts,Activity,HearingResultCode,TenantID,4,varchar,20,,,,,0
+sqlserver,PSJ_Courts,Activity,HearingResultCode,DataOwnerID,5,varchar,20,,,,,0
+sqlserver,PSJ_Courts,Activity,HearingResultCode,DataSourceID,6,varchar,20,,,,,0
+sqlserver,PSJ_Courts,Activity,HearingResultCode,CreatedDateTime,7,datetimeoffset,0,,,,,0
+sqlserver,PSJ_Courts,Activity,HearingResultCode,UpdatedDateTime,8,datetimeoffset,0,,,,,0
+sqlserver,PSJ_Courts,Activity,HearingResultCode,RecordStatusCodeID,9,char,1,,,,,0
+sqlserver,PSJ_Courts,Activity,HearingResultCode,RecordStatusDateTime,10,datetimeoffset,0,,,,,0
+sqlserver,PSJ_Courts,NODS,DisputeResolution,CaseID,1,varchar,20,FOREIGN KEY,Case,CaseDetail,CaseID,0
+sqlserver,PSJ_Courts,NODS,DisputeResolution,DisputeResolutionID,2,varchar,20,,,,,0
+sqlserver,PSJ_Courts,NODS,DisputeResolution,ReferralDate,3,date,0,,,,,0
+sqlserver,PSJ_Courts,NODS,DisputeResolution,ReferralTypeID,4,varchar,20,FOREIGN KEY,NODS,ReferralType,TypeID,0
+sqlserver,PSJ_Courts,NODS,DisputeResolution,IsCourtOrdereed,5,bit,0,,,,,0
+sqlserver,PSJ_Courts,NODS,DisputeResolution,IsNeutralInvolved,6,bit,0,,,,,0
+sqlserver,PSJ_Courts,NODS,DisputeResolution,ReportDate,7,date,0,,,,,0
+sqlserver,PSJ_Courts,NODS,DisputeResolution,ReferralToTrial,8,bit,0,,,,,0
+sqlserver,PSJ_Courts,NODS,DisputeResolution,FacilitationTypeID,9,varchar,20,FOREIGN KEY,NODS,FacilitationType,TypeID,0
+sqlserver,PSJ_Courts,NODS,DisputeResolution,ResolutionTypeID,10,varchar,20,FOREIGN KEY,NODS,ResolutionType,TypeID,0
+sqlserver,PSJ_Courts,NODS,DisputeResolution,SessionID,11,varchar,40,,,,,0
+sqlserver,PSJ_Courts,NODS,DisputeResolution,TenantID,12,varchar,20,,,,,0
+sqlserver,PSJ_Courts,NODS,DisputeResolution,DataOwnerID,13,varchar,20,,,,,0
+sqlserver,PSJ_Courts,NODS,DisputeResolution,DataSourceID,14,varchar,20,,,,,0
+sqlserver,PSJ_Courts,NODS,DisputeResolution,CreatedDateTime,15,datetimeoffset,0,,,,,0
+sqlserver,PSJ_Courts,NODS,DisputeResolution,UpdatedDateTime,16,datetimeoffset,0,,,,,0
+sqlserver,PSJ_Courts,NODS,DisputeResolution,RecordStatusCodeID,17,char,1,,,,,0
+sqlserver,PSJ_Courts,NODS,DisputeResolution,RecordStatusDateTime,18,datetimeoffset,0,,,,,0
+sqlserver,PSJ_Courts,Sentence,ConcurrentConsecutive,ChargeID,1,varchar,20,FOREIGN KEY,Charge,ChargeDetail,ChargeID,0
+sqlserver,PSJ_Courts,Sentence,ConcurrentConsecutive,SentenceID,2,varchar,20,FOREIGN KEY,Sentence,SentenceDetail,SentenceID,0
+sqlserver,PSJ_Courts,Sentence,ConcurrentConsecutive,RelatedSentenceID,3,varchar,20,FOREIGN KEY,Sentence,SentenceDetail,SentenceID,0
+sqlserver,PSJ_Courts,Sentence,ConcurrentConsecutive,ConcurrentOrConsecutive,4,varchar,20,,,,,0
+sqlserver,PSJ_Courts,Sentence,ConcurrentConsecutive,ToWhatOtherSentenceID,5,varchar,20,,,,,0
+sqlserver,PSJ_Courts,Sentence,ConcurrentConsecutive,Description,6,varchar,20,,,,,0
+sqlserver,PSJ_Courts,Sentence,ConcurrentConsecutive,SessionID,7,varchar,40,,,,,0
+sqlserver,PSJ_Courts,Sentence,ConcurrentConsecutive,TenantID,8,varchar,20,,,,,0
+sqlserver,PSJ_Courts,Sentence,ConcurrentConsecutive,DataOwnerID,9,varchar,20,,,,,0
+sqlserver,PSJ_Courts,Sentence,ConcurrentConsecutive,DataSourceID,10,varchar,20,,,,,0
+sqlserver,PSJ_Courts,Sentence,ConcurrentConsecutive,CreatedDateTime,11,datetimeoffset,0,,,,,0
+sqlserver,PSJ_Courts,Sentence,ConcurrentConsecutive,UpdatedDateTime,12,datetimeoffset,0,,,,,0
+sqlserver,PSJ_Courts,Sentence,ConcurrentConsecutive,RecordStatusCodeID,13,char,1,,,,,0
+sqlserver,PSJ_Courts,Sentence,ConcurrentConsecutive,RecordStatusDateTime,14,datetimeoffset,0,,,,,0
+sqlserver,PSJ_Courts,Party,PartyRoleCode,CodeID,1,varchar,20,PRIMARY KEY,,,,0
+sqlserver,PSJ_Courts,Party,PartyRoleCode,Description,2,varchar,256,,,,,0
+sqlserver,PSJ_Courts,Party,PartyRoleCode,SessionID,3,varchar,40,,,,,0
+sqlserver,PSJ_Courts,Party,PartyRoleCode,TenantID,4,varchar,20,,,,,0
+sqlserver,PSJ_Courts,Party,PartyRoleCode,DataOwnerID,5,varchar,20,,,,,0
+sqlserver,PSJ_Courts,Party,PartyRoleCode,DataSourceID,6,varchar,20,,,,,0
+sqlserver,PSJ_Courts,Party,PartyRoleCode,CreatedDateTime,7,datetimeoffset,0,,,,,0
+sqlserver,PSJ_Courts,Party,PartyRoleCode,UpdatedDateTime,8,datetimeoffset,0,,,,,0
+sqlserver,PSJ_Courts,Party,PartyRoleCode,RecordStatusCodeID,9,char,1,,,,,0
+sqlserver,PSJ_Courts,Party,PartyRoleCode,RecordStatusDateTime,10,datetimeoffset,0,,,,,0
+sqlserver,PSJ_Courts,Activity,FinancialEventType,TypeID,1,varchar,20,PRIMARY KEY,,,,0
+sqlserver,PSJ_Courts,Activity,FinancialEventType,Description,2,varchar,256,,,,,0
+sqlserver,PSJ_Courts,Activity,FinancialEventType,SessionID,3,varchar,40,,,,,0
+sqlserver,PSJ_Courts,Activity,FinancialEventType,TenantID,4,varchar,20,,,,,0
+sqlserver,PSJ_Courts,Activity,FinancialEventType,DataOwnerID,5,varchar,20,,,,,0
+sqlserver,PSJ_Courts,Activity,FinancialEventType,DataSourceID,6,varchar,20,,,,,0
+sqlserver,PSJ_Courts,Activity,FinancialEventType,CreatedDateTime,7,datetimeoffset,0,,,,,0
+sqlserver,PSJ_Courts,Activity,FinancialEventType,UpdatedDateTime,8,datetimeoffset,0,,,,,0
+sqlserver,PSJ_Courts,Activity,FinancialEventType,RecordStatusCodeID,9,char,1,,,,,0
+sqlserver,PSJ_Courts,Activity,FinancialEventType,RecordStatusDateTime,10,datetimeoffset,0,,,,,0
+sqlserver,PSJ_Courts,Sentence,SuspendedReasonCode,CodeID,1,varchar,20,PRIMARY KEY,,,,0
+sqlserver,PSJ_Courts,Sentence,SuspendedReasonCode,Description,2,varchar,20,,,,,0
+sqlserver,PSJ_Courts,Sentence,SuspendedReasonCode,SessionID,3,varchar,40,,,,,0
+sqlserver,PSJ_Courts,Sentence,SuspendedReasonCode,TenantID,4,varchar,20,,,,,0
+sqlserver,PSJ_Courts,Sentence,SuspendedReasonCode,DataOwnerID,5,varchar,20,,,,,0
+sqlserver,PSJ_Courts,Sentence,SuspendedReasonCode,DataSourceID,6,varchar,20,,,,,0
+sqlserver,PSJ_Courts,Sentence,SuspendedReasonCode,CreatedDateTime,7,datetimeoffset,0,,,,,0
+sqlserver,PSJ_Courts,Sentence,SuspendedReasonCode,UpdatedDateTime,8,datetimeoffset,0,,,,,0
+sqlserver,PSJ_Courts,Sentence,SuspendedReasonCode,RecordStatusCodeID,9,char,1,,,,,0
+sqlserver,PSJ_Courts,Sentence,SuspendedReasonCode,RecordStatusDateTime,10,datetimeoffset,0,,,,,0
+sqlserver,PSJ_Courts,Activity,Hearing,CaseID,1,varchar,20,FOREIGN KEY,Case,CaseDetail,CaseID,0
+sqlserver,PSJ_Courts,Activity,Hearing,HearingID,2,varchar,20,PRIMARY KEY,,,,0
+sqlserver,PSJ_Courts,Activity,Hearing,CaseNumber,3,varchar,20,,,,,0
+sqlserver,PSJ_Courts,Activity,Hearing,CaseTypeID,4,varchar,20,FOREIGN KEY,Case,CaseType,TypeID,0
+sqlserver,PSJ_Courts,Activity,Hearing,CaseTitle,5,varchar,20,,,,,0
+sqlserver,PSJ_Courts,Activity,Hearing,CourtName,6,varchar,128,,,,,0
+sqlserver,PSJ_Courts,Activity,Hearing,Defendant,7,varchar,128,,,,,0
+sqlserver,PSJ_Courts,Activity,Hearing,AttorneyName,8,varchar,128,,,,,0
+sqlserver,PSJ_Courts,Activity,Hearing,TypeID,9,varchar,20,FOREIGN KEY,Activity,HearingType,TypeID,0
+sqlserver,PSJ_Courts,Activity,Hearing,HearingFlagID,10,varchar,20,FOREIGN KEY,Activity,HearingFlag,FlagID,0
+sqlserver,PSJ_Courts,Activity,Hearing,HearingDate,11,date,0,,,,,0
+sqlserver,PSJ_Courts,Activity,Hearing,HearingSequence,12,varchar,20,,,,,0
+sqlserver,PSJ_Courts,Activity,Hearing,SesssionDescription,13,varchar,20,,,,,0
+sqlserver,PSJ_Courts,Activity,Hearing,StartTime,14,varchar,20,,,,,0
+sqlserver,PSJ_Courts,Activity,Hearing,SessionEndTime,15,varchar,20,,,,,0
+sqlserver,PSJ_Courts,Activity,Hearing,JudgeID,16,varchar,20,FOREIGN KEY,Code,Officer,OfficerID,0
+sqlserver,PSJ_Courts,Activity,Hearing,DepartmentID,17,varchar,20,FOREIGN KEY,Code,Organization,OrganizationID,0
+sqlserver,PSJ_Courts,Activity,Hearing,ResultCodeID,18,varchar,20,FOREIGN KEY,Activity,HearingResultCode,CodeID,0
+sqlserver,PSJ_Courts,Activity,Hearing,CancelledReasonCode,19,varchar,20,,,,,0
+sqlserver,PSJ_Courts,Activity,Hearing,RescheduleReasonCode,20,varchar,20,,,,,0
+sqlserver,PSJ_Courts,Activity,Hearing,CancelledDateTime,21,datetimeoffset,0,,,,,0
+sqlserver,PSJ_Courts,Activity,Hearing,SessionID,22,varchar,40,,,,,0
+sqlserver,PSJ_Courts,Activity,Hearing,TenantID,23,varchar,20,,,,,0
+sqlserver,PSJ_Courts,Activity,Hearing,DataOwnerID,24,varchar,20,,,,,0
+sqlserver,PSJ_Courts,Activity,Hearing,DataSourceID,25,varchar,20,,,,,0
+sqlserver,PSJ_Courts,Activity,Hearing,CreatedDateTime,26,datetimeoffset,0,,,,,0
+sqlserver,PSJ_Courts,Activity,Hearing,UpdatedDateTime,27,datetimeoffset,0,,,,,0
+sqlserver,PSJ_Courts,Activity,Hearing,RecordStatusCodeID,28,char,1,,,,,0
+sqlserver,PSJ_Courts,Activity,Hearing,RecordStatusDateTime,29,datetimeoffset,0,,,,,0
+sqlserver,PSJ_Courts,Case,CaseAttorney,CaseAttorneyID,1,varchar,20,PRIMARY KEY,,,,0
+sqlserver,PSJ_Courts,Case,CaseAttorney,RoleCodeID,2,varchar,20,FOREIGN KEY,Party,PartyRoleCode,CodeID,0
+sqlserver,PSJ_Courts,Case,CaseAttorney,OfficerID,3,varchar,20,FOREIGN KEY,Code,Officer,OfficerID,0
+sqlserver,PSJ_Courts,Case,CaseAttorney,Name,4,varchar,128,,,,,0
+sqlserver,PSJ_Courts,Case,CaseAttorney,IsLead,5,bit,0,,,,,0
+sqlserver,PSJ_Courts,Case,CaseAttorney,IsPublicDefender,6,bit,0,,,,,0
+sqlserver,PSJ_Courts,Case,CaseAttorney,IsAppinted,7,bit,0,,,,,0
+sqlserver,PSJ_Courts,Case,CaseAttorney,DateAdded,8,date,0,,,,,0
+sqlserver,PSJ_Courts,Case,CaseAttorney,DateRemoved,9,date,0,,,,,0
+sqlserver,PSJ_Courts,Case,CaseAttorney,RemoveReasonCodeID,10,varchar,20,,,,,0
+sqlserver,PSJ_Courts,Case,CaseAttorney,Comment,11,varchar,1024,,,,,0
+sqlserver,PSJ_Courts,Case,CaseAttorney,SessionID,12,varchar,40,,,,,0
+sqlserver,PSJ_Courts,Case,CaseAttorney,TenantID,13,varchar,20,,,,,0
+sqlserver,PSJ_Courts,Case,CaseAttorney,DataOwnerID,14,varchar,20,,,,,0
+sqlserver,PSJ_Courts,Case,CaseAttorney,DataSourceID,15,varchar,20,,,,,0
+sqlserver,PSJ_Courts,Case,CaseAttorney,CreatedDateTime,16,datetimeoffset,0,,,,,0
+sqlserver,PSJ_Courts,Case,CaseAttorney,UpdatedDateTime,17,datetimeoffset,0,,,,,0
+sqlserver,PSJ_Courts,Case,CaseAttorney,RecordStatusCodeID,18,char,1,,,,,0
+sqlserver,PSJ_Courts,Case,CaseAttorney,RecordStatusDateTime,19,datetimeoffset,0,,,,,0
+sqlserver,PSJ_Courts,NODS,ReferalSourceType,TypeID,1,varchar,20,PRIMARY KEY,,,,0
+sqlserver,PSJ_Courts,NODS,ReferalSourceType,Description,2,varchar,128,,,,,0
+sqlserver,PSJ_Courts,NODS,ReferalSourceType,SessionID,3,varchar,40,,,,,0
+sqlserver,PSJ_Courts,NODS,ReferalSourceType,TenantID,4,varchar,20,,,,,0
+sqlserver,PSJ_Courts,NODS,ReferalSourceType,DataOwnerID,5,varchar,20,,,,,0
+sqlserver,PSJ_Courts,NODS,ReferalSourceType,DataSourceID,6,varchar,20,,,,,0
+sqlserver,PSJ_Courts,NODS,ReferalSourceType,CreatedDateTime,7,datetimeoffset,0,,,,,0
+sqlserver,PSJ_Courts,NODS,ReferalSourceType,UpdatedDateTime,8,datetimeoffset,0,,,,,0
+sqlserver,PSJ_Courts,NODS,ReferalSourceType,RecordStatusCodeID,9,char,1,,,,,0
+sqlserver,PSJ_Courts,NODS,ReferalSourceType,RecordStatusDateTime,10,datetimeoffset,0,,,,,0
+sqlserver,PSJ_Courts,Activity,FeeType,TypeID,1,varchar,20,PRIMARY KEY,,,,0
+sqlserver,PSJ_Courts,Activity,FeeType,Description,2,varchar,256,,,,,0
+sqlserver,PSJ_Courts,Activity,FeeType,SessionID,3,varchar,40,,,,,0
+sqlserver,PSJ_Courts,Activity,FeeType,TenantID,4,varchar,20,,,,,0
+sqlserver,PSJ_Courts,Activity,FeeType,DataOwnerID,5,varchar,20,,,,,0
+sqlserver,PSJ_Courts,Activity,FeeType,DataSourceID,6,varchar,20,,,,,0
+sqlserver,PSJ_Courts,Activity,FeeType,CreatedDateTime,7,datetimeoffset,0,,,,,0
+sqlserver,PSJ_Courts,Activity,FeeType,UpdatedDateTime,8,datetimeoffset,0,,,,,0
+sqlserver,PSJ_Courts,Activity,FeeType,RecordStatusCodeID,9,char,1,,,,,0
+sqlserver,PSJ_Courts,Activity,FeeType,RecordStatusDateTime,10,datetimeoffset,0,,,,,0
+sqlserver,PSJ_Courts,Warrant,WarrantDetail,WarrantID,1,varchar,20,PRIMARY KEY,,,,0
+sqlserver,PSJ_Courts,Warrant,WarrantDetail,WarrantNumber,2,varchar,20,,,,,0
+sqlserver,PSJ_Courts,Warrant,WarrantDetail,CaseID,3,varchar,20,FOREIGN KEY,Case,CaseDetail,CaseID,0
+sqlserver,PSJ_Courts,Warrant,WarrantDetail,CaseNumber,4,varchar,20,,,,,0
+sqlserver,PSJ_Courts,Warrant,WarrantDetail,BookingNumber,5,varchar,20,,,,,0
+sqlserver,PSJ_Courts,Warrant,WarrantDetail,BailSettingType,6,varchar,20,,,,,0
+sqlserver,PSJ_Courts,Warrant,WarrantDetail,BailAmount,7,money,0,,,,,0
+sqlserver,PSJ_Courts,Warrant,WarrantDetail,ExpirationDate,8,date,0,,,,,0
+sqlserver,PSJ_Courts,Warrant,WarrantDetail,PartyID,9,varchar,20,FOREIGN KEY,Party,PartyDetail,PartyID,0
+sqlserver,PSJ_Courts,Warrant,WarrantDetail,SessionID,10,varchar,40,,,,,0
+sqlserver,PSJ_Courts,Warrant,WarrantDetail,TenantID,11,varchar,20,,,,,0
+sqlserver,PSJ_Courts,Warrant,WarrantDetail,DataOwnerID,12,varchar,20,,,,,0
+sqlserver,PSJ_Courts,Warrant,WarrantDetail,DataSourceID,13,varchar,20,,,,,0
+sqlserver,PSJ_Courts,Warrant,WarrantDetail,CreatedDateTime,14,datetimeoffset,0,,,,,0
+sqlserver,PSJ_Courts,Warrant,WarrantDetail,UpdatedDateTime,15,datetimeoffset,0,,,,,0
+sqlserver,PSJ_Courts,Warrant,WarrantDetail,RecordStatusCodeID,16,char,1,,,,,0
+sqlserver,PSJ_Courts,Warrant,WarrantDetail,RecordStatusDateTime,17,datetimeoffset,0,,,,,0
+sqlserver,PSJ_Courts,Case,CaseDetail,CaseID,1,varchar,20,PRIMARY KEY,,,,0
+sqlserver,PSJ_Courts,Case,CaseDetail,CaseNumber,2,varchar,20,,,,,0
+sqlserver,PSJ_Courts,Case,CaseDetail,TypeID,3,varchar,20,FOREIGN KEY,Case,CaseType,TypeID,0
+sqlserver,PSJ_Courts,Case,CaseDetail,CaseTitle,4,varchar,20,,,,,0
+sqlserver,PSJ_Courts,Case,CaseDetail,FiledDate,5,date,0,,,,,0
+sqlserver,PSJ_Courts,Case,CaseDetail,CourtName,6,varchar,20,,,,,0
+sqlserver,PSJ_Courts,Case,CaseDetail,SessionID,7,varchar,40,,,,,0
+sqlserver,PSJ_Courts,Case,CaseDetail,TenantID,8,varchar,20,,,,,0
+sqlserver,PSJ_Courts,Case,CaseDetail,DataOwnerID,9,varchar,20,,,,,0
+sqlserver,PSJ_Courts,Case,CaseDetail,DataSourceID,10,varchar,20,,,,,0
+sqlserver,PSJ_Courts,Case,CaseDetail,CreatedDateTime,11,datetimeoffset,0,,,,,0
+sqlserver,PSJ_Courts,Case,CaseDetail,UpdatedDateTime,12,datetimeoffset,0,,,,,0
+sqlserver,PSJ_Courts,Case,CaseDetail,RecordStatusCodeID,13,char,1,,,,,0
+sqlserver,PSJ_Courts,Case,CaseDetail,RecordStatusDateTime,14,datetimeoffset,0,,,,,0
+sqlserver,PSJ_Courts,NODS,IntakeDecisionType,TypeID,1,varchar,20,PRIMARY KEY,,,,0
+sqlserver,PSJ_Courts,NODS,IntakeDecisionType,Description,2,varchar,128,,,,,0
+sqlserver,PSJ_Courts,NODS,IntakeDecisionType,SessionID,3,varchar,40,,,,,0
+sqlserver,PSJ_Courts,NODS,IntakeDecisionType,TenantID,4,varchar,20,,,,,0
+sqlserver,PSJ_Courts,NODS,IntakeDecisionType,DataOwnerID,5,varchar,20,,,,,0
+sqlserver,PSJ_Courts,NODS,IntakeDecisionType,DataSourceID,6,varchar,20,,,,,0
+sqlserver,PSJ_Courts,NODS,IntakeDecisionType,CreatedDateTime,7,datetimeoffset,0,,,,,0
+sqlserver,PSJ_Courts,NODS,IntakeDecisionType,UpdatedDateTime,8,datetimeoffset,0,,,,,0
+sqlserver,PSJ_Courts,NODS,IntakeDecisionType,RecordStatusCodeID,9,char,1,,,,,0
+sqlserver,PSJ_Courts,NODS,IntakeDecisionType,RecordStatusDateTime,10,datetimeoffset,0,,,,,0
+sqlserver,PSJ_Courts,Activity,PriorityCode,CodeID,1,varchar,20,PRIMARY KEY,,,,0
+sqlserver,PSJ_Courts,Activity,PriorityCode,Description,2,varchar,256,,,,,0
+sqlserver,PSJ_Courts,Activity,PriorityCode,SessionID,3,varchar,40,,,,,0
+sqlserver,PSJ_Courts,Activity,PriorityCode,TenantID,4,varchar,20,,,,,0
+sqlserver,PSJ_Courts,Activity,PriorityCode,DataOwnerID,5,varchar,20,,,,,0
+sqlserver,PSJ_Courts,Activity,PriorityCode,DataSourceID,6,varchar,20,,,,,0
+sqlserver,PSJ_Courts,Activity,PriorityCode,CreatedDateTime,7,datetimeoffset,0,,,,,0
+sqlserver,PSJ_Courts,Activity,PriorityCode,UpdatedDateTime,8,datetimeoffset,0,,,,,0
+sqlserver,PSJ_Courts,Activity,PriorityCode,RecordStatusCodeID,9,char,1,,,,,0
+sqlserver,PSJ_Courts,Activity,PriorityCode,RecordStatusDateTime,10,datetimeoffset,0,,,,,0
+sqlserver,PSJ_Courts,Case,CaseParty,CasePartyID,1,varchar,20,PRIMARY KEY,,,,0
+sqlserver,PSJ_Courts,Case,CaseParty,CaseID,2,varchar,20,FOREIGN KEY,Case,CaseDetail,CaseID,0
+sqlserver,PSJ_Courts,Case,CaseParty,PartyID,3,varchar,20,FOREIGN KEY,Party,PartyDetail,PartyID,0
+sqlserver,PSJ_Courts,Case,CaseParty,RoleCodeID,4,varchar,20,FOREIGN KEY,Party,PartyRoleCode,CodeID,0
+sqlserver,PSJ_Courts,Case,CaseParty,AttorneyID,5,varchar,20,FOREIGN KEY,Case,CaseAttorney,CaseAttorneyID,0
+sqlserver,PSJ_Courts,Case,CaseParty,SessionID,6,varchar,40,,,,,0
+sqlserver,PSJ_Courts,Case,CaseParty,TenantID,7,varchar,20,,,,,0
+sqlserver,PSJ_Courts,Case,CaseParty,DataOwnerID,8,varchar,20,,,,,0
+sqlserver,PSJ_Courts,Case,CaseParty,DataSourceID,9,varchar,20,,,,,0
+sqlserver,PSJ_Courts,Case,CaseParty,CreatedDateTime,10,datetimeoffset,0,,,,,0
+sqlserver,PSJ_Courts,Case,CaseParty,UpdatedDateTime,11,datetimeoffset,0,,,,,0
+sqlserver,PSJ_Courts,Case,CaseParty,RecordStatusCodeID,12,char,1,,,,,0
+sqlserver,PSJ_Courts,Case,CaseParty,RecordStatusDateTime,13,datetimeoffset,0,,,,,0
+sqlserver,PSJ_Courts,Case,CaseFlag,CaseID,1,varchar,20,FOREIGN KEY,Case,CaseDetail,CaseID,0
+sqlserver,PSJ_Courts,Case,CaseFlag,FlageID,2,varchar,20,PRIMARY KEY,,,,0
+sqlserver,PSJ_Courts,Case,CaseFlag,FlagCode,3,varchar,20,,,,,0
+sqlserver,PSJ_Courts,Case,CaseFlag,FlagDescription,4,varchar,20,,,,,0
+sqlserver,PSJ_Courts,Case,CaseFlag,SessionID,5,varchar,40,,,,,0
+sqlserver,PSJ_Courts,Case,CaseFlag,TenantID,6,varchar,20,,,,,0
+sqlserver,PSJ_Courts,Case,CaseFlag,DataOwnerID,7,varchar,20,,,,,0
+sqlserver,PSJ_Courts,Case,CaseFlag,DataSourceID,8,varchar,20,,,,,0
+sqlserver,PSJ_Courts,Case,CaseFlag,CreatedDateTime,9,datetimeoffset,0,,,,,0
+sqlserver,PSJ_Courts,Case,CaseFlag,UpdatedDateTime,10,datetimeoffset,0,,,,,0
+sqlserver,PSJ_Courts,Case,CaseFlag,RecordStatusCodeID,11,char,1,,,,,0
+sqlserver,PSJ_Courts,Case,CaseFlag,RecordStatusDateTime,12,datetimeoffset,0,,,,,0
+sqlserver,PSJ_Courts,NODS,Intake,CaseID,1,varchar,20,FOREIGN KEY,Case,CaseDetail,CaseID,0
+sqlserver,PSJ_Courts,NODS,Intake,IntakeID,2,varchar,20,PRIMARY KEY,,,,0
+sqlserver,PSJ_Courts,NODS,Intake,ReferalDate,3,date,0,,,,,0
+sqlserver,PSJ_Courts,NODS,Intake,ReferalSourceTypeID,4,varchar,20,FOREIGN KEY,Code,Organization,OrganizationID,0
+sqlserver,PSJ_Courts,NODS,Intake,ReferalSourceTypeID,4,varchar,20,FOREIGN KEY,NODS,ReferalSourceType,TypeID,0
+sqlserver,PSJ_Courts,NODS,Intake,ReferralPersonAgencyID,5,varchar,20,,,,,0
+sqlserver,PSJ_Courts,NODS,Intake,IntakeDecisionDate,6,date,0,,,,,0
+sqlserver,PSJ_Courts,NODS,Intake,IntakeDecisionTypeID,7,varchar,20,FOREIGN KEY,NODS,IntakeDecisionType,TypeID,0
+sqlserver,PSJ_Courts,NODS,Intake,LivingArragementAtIntake,8,bit,0,,,,,0
+sqlserver,PSJ_Courts,NODS,Intake,PostalCodeIntake,9,varchar,20,,,,,0
+sqlserver,PSJ_Courts,NODS,Intake,WasDetained,10,bit,0,,,,,0
+sqlserver,PSJ_Courts,NODS,Intake,IsDiversionEligible,11,bit,0,,,,,0
+sqlserver,PSJ_Courts,NODS,Intake,WasAssessedAtIntake,12,bit,0,,,,,0
+sqlserver,PSJ_Courts,NODS,Intake,SessionID,13,varchar,40,,,,,0
+sqlserver,PSJ_Courts,NODS,Intake,TenantID,14,varchar,20,,,,,0
+sqlserver,PSJ_Courts,NODS,Intake,DataOwnerID,15,varchar,20,,,,,0
+sqlserver,PSJ_Courts,NODS,Intake,DataSourceID,16,varchar,20,,,,,0
+sqlserver,PSJ_Courts,NODS,Intake,CreatedDateTime,17,datetimeoffset,0,,,,,0
+sqlserver,PSJ_Courts,NODS,Intake,UpdatedDateTime,18,datetimeoffset,0,,,,,0
+sqlserver,PSJ_Courts,NODS,Intake,RecordStatusCodeID,19,char,1,,,,,0
+sqlserver,PSJ_Courts,NODS,Intake,RecordStatusDateTime,20,datetimeoffset,0,,,,,0
+sqlserver,PSJ_Courts,Warrant,WarrantStatusCode,CodeID,1,varchar,20,PRIMARY KEY,,,,0
+sqlserver,PSJ_Courts,Warrant,WarrantStatusCode,Description,2,varchar,128,,,,,0
+sqlserver,PSJ_Courts,Warrant,WarrantStatusCode,SessionID,3,varchar,40,,,,,0
+sqlserver,PSJ_Courts,Warrant,WarrantStatusCode,TenantID,4,varchar,20,,,,,0
+sqlserver,PSJ_Courts,Warrant,WarrantStatusCode,DataOwnerID,5,varchar,20,,,,,0
+sqlserver,PSJ_Courts,Warrant,WarrantStatusCode,DataSourceID,6,varchar,20,,,,,0
+sqlserver,PSJ_Courts,Warrant,WarrantStatusCode,CreatedDateTime,7,datetimeoffset,0,,,,,0
+sqlserver,PSJ_Courts,Warrant,WarrantStatusCode,UpdatedDateTime,8,datetimeoffset,0,,,,,0
+sqlserver,PSJ_Courts,Warrant,WarrantStatusCode,RecordStatusCodeID,9,char,1,,,,,0
+sqlserver,PSJ_Courts,Warrant,WarrantStatusCode,RecordStatusDateTime,10,datetimeoffset,0,,,,,0
+sqlserver,PSJ_Courts,Charge,ChargeDetail,CaseID,1,varchar,20,FOREIGN KEY,Case,CaseDetail,CaseID,0
+sqlserver,PSJ_Courts,Charge,ChargeDetail,ChargeID,2,varchar,20,PRIMARY KEY,,,,0
+sqlserver,PSJ_Courts,Charge,ChargeDetail,FillingDate,3,date,0,,,,,0
+sqlserver,PSJ_Courts,Charge,ChargeDetail,ArrestDate,4,date,0,,,,,0
+sqlserver,PSJ_Courts,Charge,ChargeDetail,ArrestTrackID,5,varchar,20,,,,,0
+sqlserver,PSJ_Courts,Charge,ChargeDetail,DispositionDate,6,date,0,,,,,0
+sqlserver,PSJ_Courts,Charge,ChargeDetail,OfficerID,7,varchar,20,,,,,0
+sqlserver,PSJ_Courts,Charge,ChargeDetail,OffenseDate,8,date,0,,,,,0
+sqlserver,PSJ_Courts,Charge,ChargeDetail,OffenseLocationID,9,varchar,20,,,,,0
+sqlserver,PSJ_Courts,Charge,ChargeDetail,ChargeNumber,10,varchar,20,,,,,0
+sqlserver,PSJ_Courts,Charge,ChargeDetail,ChargeDescription,11,varchar,256,,,,,0
+sqlserver,PSJ_Courts,Charge,ChargeDetail,DrugTypeID,12,varchar,256,,,,,0
+sqlserver,PSJ_Courts,Charge,ChargeDetail,IncidentZoneTypeID,13,varchar,20,,,,,0
+sqlserver,PSJ_Courts,Charge,ChargeDetail,JurisdictionID,14,varchar,20,FOREIGN KEY,Code,JurisdictionCode,CodeID,0
+sqlserver,PSJ_Courts,Charge,ChargeDetail,OffenseID,15,varchar,20,FOREIGN KEY,Code,OffenseCode,OffenseID,0
+sqlserver,PSJ_Courts,Charge,ChargeDetail,ChargeTrackNumber,16,varchar,20,,,,,0
+sqlserver,PSJ_Courts,Charge,ChargeDetail,ChargeTrackSequence,17,varchar,20,,,,,0
+sqlserver,PSJ_Courts,Charge,ChargeDetail,ChargeMitigator,18,varchar,20,,,,,0
+sqlserver,PSJ_Courts,Charge,ChargeDetail,AmendedDate,19,date,0,,,,,0
+sqlserver,PSJ_Courts,Charge,ChargeDetail,AmendedReason,20,varchar,128,,,,,0
+sqlserver,PSJ_Courts,Charge,ChargeDetail,WasChargeChanged,21,bit,0,,,,,0
+sqlserver,PSJ_Courts,Charge,ChargeDetail,Deleted,22,bit,0,,,,,0
+sqlserver,PSJ_Courts,Charge,ChargeDetail,SessionID,23,varchar,40,,,,,0
+sqlserver,PSJ_Courts,Charge,ChargeDetail,TenantID,24,varchar,20,,,,,0
+sqlserver,PSJ_Courts,Charge,ChargeDetail,DataOwnerID,25,varchar,20,,,,,0
+sqlserver,PSJ_Courts,Charge,ChargeDetail,DataSourceID,26,varchar,20,,,,,0
+sqlserver,PSJ_Courts,Charge,ChargeDetail,CreatedDateTime,27,datetimeoffset,0,,,,,0
+sqlserver,PSJ_Courts,Charge,ChargeDetail,UpdatedDateTime,28,datetimeoffset,0,,,,,0
+sqlserver,PSJ_Courts,Charge,ChargeDetail,RecordStatusCodeID,29,char,1,,,,,0
+sqlserver,PSJ_Courts,Charge,ChargeDetail,RecordStatusDateTime,30,datetimeoffset,0,,,,,0
+sqlserver,PSJ_Courts,Activity,HearingEvent,HearingEventID,1,varchar,20,PRIMARY KEY,,,,0
+sqlserver,PSJ_Courts,Activity,HearingEvent,HearingID,2,varchar,20,FOREIGN KEY,Activity,Hearing,HearingID,0
+sqlserver,PSJ_Courts,Activity,HearingEvent,EventID,3,varchar,20,FOREIGN KEY,Activity,CaseEvent,EventID,0
+sqlserver,PSJ_Courts,Activity,HearingEvent,LinkType,4,varchar,20,,,,,0
+sqlserver,PSJ_Courts,Activity,HearingEvent,SessionID,5,varchar,40,,,,,0
+sqlserver,PSJ_Courts,Activity,HearingEvent,TenantID,6,varchar,20,,,,,0
+sqlserver,PSJ_Courts,Activity,HearingEvent,DataOwnerID,7,varchar,20,,,,,0
+sqlserver,PSJ_Courts,Activity,HearingEvent,DataSourceID,8,varchar,20,,,,,0
+sqlserver,PSJ_Courts,Activity,HearingEvent,CreatedDateTime,9,datetimeoffset,0,,,,,0
+sqlserver,PSJ_Courts,Activity,HearingEvent,UpdatedDateTime,10,datetimeoffset,0,,,,,0
+sqlserver,PSJ_Courts,Activity,HearingEvent,RecordStatusCodeID,11,char,1,,,,,0
+sqlserver,PSJ_Courts,Activity,HearingEvent,RecordStatusDateTime,12,datetimeoffset,0,,,,,0
+sqlserver,PSJ_Courts,Case,CaseStatus,CaseID,1,varchar,20,FOREIGN KEY,Case,CaseDetail,CaseID,0
+sqlserver,PSJ_Courts,Case,CaseStatus,CaseID,1,varchar,20,PRIMARY KEY,,,,0
+sqlserver,PSJ_Courts,Case,CaseStatus,CodeID,2,varchar,20,,,,,0
+sqlserver,PSJ_Courts,Case,CaseStatus,Description,3,varchar,20,,,,,0
+sqlserver,PSJ_Courts,Case,CaseStatus,StatusDate,4,datetimeoffset,0,,,,,0
+sqlserver,PSJ_Courts,Case,CaseStatus,SessionID,5,varchar,40,,,,,0
+sqlserver,PSJ_Courts,Case,CaseStatus,TenantID,6,varchar,20,,,,,0
+sqlserver,PSJ_Courts,Case,CaseStatus,DataOwnerID,7,varchar,20,,,,,0
+sqlserver,PSJ_Courts,Case,CaseStatus,DataSourceID,8,varchar,20,,,,,0
+sqlserver,PSJ_Courts,Case,CaseStatus,CreatedDateTime,9,datetimeoffset,0,,,,,0
+sqlserver,PSJ_Courts,Case,CaseStatus,UpdatedDateTime,10,datetimeoffset,0,,,,,0
+sqlserver,PSJ_Courts,Case,CaseStatus,RecordStatusCodeID,11,char,1,,,,,0
+sqlserver,PSJ_Courts,Case,CaseStatus,RecordStatusDateTime,12,datetimeoffset,0,,,,,0

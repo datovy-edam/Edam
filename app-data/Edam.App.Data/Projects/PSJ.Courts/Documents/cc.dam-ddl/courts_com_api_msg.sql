@@ -1,0 +1,10 @@
+-- msg
+CREATE SCHEMA [msg]
+GO
+
+CREATE TABLE [msg].[Justice] (
+   [dbo] VARCHAR(0),
+   [_RECORD_NO_] BIGINT IDENTITY NOT NULL,
+   CONSTRAINT pk_Justice PRIMARY KEY (_RECORD_NO_)
+);
+

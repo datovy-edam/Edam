@@ -1,0 +1,840 @@
+{
+   "Case": {
+      "CaseDetail": {
+         "CaseID": "-1618",
+         "CaseNumber": "string",
+         "CaseType": {
+            "TypeID": "string",
+            "Description": "string"
+         },
+         "CaseTitle": "string",
+         "FiledDate": "",
+         "CourtName": "string",
+      },
+      "CaseFlag": [
+         {
+            "CaseID": "-1618",
+            "FlagCode": "",
+            "FlagDescription": ""
+         }
+      ],
+      "CaseStatus": {
+         "CaseID": "-1618",
+         "CodeID": "string",
+         "Description": "string",
+         "Date": "2008-08-24"
+      },
+      "CaseFiling": [
+         {
+            "CaseID": "-1618",
+            "Authority": {
+               "CodeID": "",
+               "Description": ""
+            },
+            "CaseFilingID": "",
+            "CourtEventID": "",
+            "DateFiled": "",
+            "DateSubmitted": "",
+            "CaseStatus": {
+               "StatusCode": "string",
+               "Description": "string",
+               "Date": "2008-08-24"
+            },
+            "Status": {
+               "CodeID": "string",
+               "Description": "string",
+               "Date": "2008-08-24"
+            }
+         } 
+      ],
+      "CaseCrossReference": [
+         {
+            "TypeID": "string",
+            "Description": "string",
+            "CaseNumber": "string"
+         }
+      ],
+      "RelatedFilling": [
+         {
+            "CaseID": "-1618",
+            "RelatedCaseFilingID": "",
+            "RelatedFillingID": "",
+            "Relationship": {
+               "TypeID": "",
+               "Description": ""
+            },
+            "Reason": ""
+         }
+      ]
+   },
+   "Activity": {
+      "CaseEvent": [
+         {
+            "CaseID": "-1618",
+            "EventID": "",
+            "EventDate": "",
+            "EventTime": "",
+            "EventCode": {
+               "CodeID": "",
+               "Description": ""
+            },
+            "Location": "",
+            "Number": "",
+            "ReviewDateTime": "",
+            "ReviewCompletedDateTime": "",
+            "InstrumentNumber": "",
+            "Plea": {
+               "TypeID": "",
+               "Description": ""
+            },
+            "Amount": 128.34,
+            "Comment": "",
+            "Charge": [
+               {
+                  "ChargeID": ""
+               }
+            ]
+         }
+      ],
+      "BailBondRelease": {
+         "CaseID": "-1618",
+         "ReleaseID": "",
+         "ReleaseType": {
+            "TypeID": "",
+            "Description": ""
+         },
+         "BondType": {
+            "TypeID": "",
+            "Description": ""
+         },
+         "AuthorityID": "",
+         "BondSetDate": "",
+         "BondPostDate": "",
+         "AmountOfBond": 1234.00,
+         "PostDate": "",
+         "Revocation": {
+            "RevocationDate": "",
+            "Reason": ""
+         }
+      },
+      "ReleaseCondition": [
+         {
+            "CaseID": "-1618",
+            "ReleaseConditionID": "",
+            "BailBondReleaseID": "",
+            "ISNoContactOrder": "",
+            "Condition": {
+               "TypeID": "",
+               "Description": ""
+            }
+         }
+      ],
+      "FinancialEvent": [
+         {
+            "EventID": "",
+            "EventType": {
+               "TypeID": "",
+               "Description": ""
+            },
+            "ChargeID": "",
+            "DateAssessed": "",
+            "Fee": {
+               "TypeID": "",
+               "Description": "" 
+            },
+            "Priority": {
+               "CodeID": "",
+               "Description": ""
+            },
+            "Amount": 1384.32,
+            "WasReferredToCollections": false,
+            "BalanceDue": 0.0
+         }
+      ],
+      "AppealEvent": [
+         {
+            "EventID": "",
+            "EventType": {
+               "TypeID": "",
+               "Description": ""
+            },
+            "AppealType": {
+               "TypeID": "",
+               "Description": ""
+            },
+            "FiledDate": "",
+            "FileddBy": "",
+            "AppealDisposition": {
+               "TypeID": "",
+               "Description": ""
+            },
+            "AppealStatus": {
+               "CodeID": "string",
+               "Description": "string",
+               "Date": "2008-08-24"
+            }
+         }
+      ],
+      "Hearing": [
+         {
+            "HearingID": "",
+            "CaseID": "",
+            "CaseNumber": "",
+            "Casetype": "",
+            "CaseTitle": "",
+            "CourtName": "",
+            "Defendant": {
+               "Name": {
+                  "NameType": "",
+                  "GivenName": "",
+                  "MiddleName": "",
+                  "Surname": "",
+                  "NameSuffix": "string"
+               }
+            },
+            "AttorneyName": "",
+            "HearingTypeCode": "",
+            "HearingType": "",
+            "HearingFlag": [
+               {
+                  "Flag": ""
+               }
+            ],
+            "HearingDae": "",
+            "HearingSequence": "",
+            "SesssionDescription": "",
+            "StartTime": "",
+            "SessionEndTime": "",
+            "JudgeCode": "",
+            "DepartmentCode": "",
+            "Department": "",
+            "HearingResultCode": "",
+            "HearingResult": "",
+            "CancelledReasonCode": "",
+            "CancelledReason": "",
+            "RescheduleReasonCode": "",
+            "RescheduleReason": "",
+            "CancelledDateTime": ""
+         }
+      ],
+      "HearingEvent": [
+         {
+            "HearingID": "string",
+            "EventID": "string",
+            "LinkType": "string"
+         }
+      ]
+   },
+   "Party": {
+      "Address": [
+         {
+            "AddressID": "",
+            "AddressLine1": "string",
+            "AddressLine2": "string",
+            "CityName": "",
+            "StateCode": "string",
+            "PostalCode": ""
+         }
+      ],
+      "PartyName": [
+         {
+            "NameType": "",
+            "GivenName": "",
+            "MiddleName": "",
+            "Surname": "",
+            "NameSuffix": "string"
+         }
+      ],
+      "PartyDetail": [
+         {
+            "PartyID": "942",
+            "Gender": {
+               "GenderCode": "string",
+               "GenderDescription": "string"
+            },
+            "Race": {
+               "RaceCode": "string",
+               "RaceDescription": "string"
+            },
+            "Height": "string",
+            "Weight": "string",
+            "DateOfBirth": "2010-05-07",
+            "Phone": [
+               {
+                  "PhoneType": "string",
+                  "Number": "string"
+               }
+            ],
+            "FBINumber": "string",
+            "DriversLicense": {
+               "Number": "string",
+               "StateCode": "string"
+            },
+            "AddressID": ""
+         }
+      ],
+      "CaseParty": [
+         {
+            "CaseID": "-1618",
+            "PartyID": "",
+            "ConnectionCode": "",
+            "Connection": "",
+            "Attorney": [
+               {
+                  "ConnectionCode": "",
+                  "Connection": "",
+                  "Name": {
+                     "NameType": "",
+                     "GivenName": "",
+                     "MiddleName": "",
+                     "Surname": "",
+                     "NameSuffix": "string"
+                  },
+                  "IsLead": true,
+                  "IsPublicDefender": false,
+                  "IsAppinted": true,
+                  "DateAdded": "",
+                  "DateRemoved": "",
+                  "RemoveReasonCode": "",
+                  "RemoveReason": "",
+                  "Comment": ""
+               }
+            ]
+         }
+      ]
+   },
+   "Charge": {
+      "ChargeBookingAgency": [
+         {
+            "CaseID": "-1618",
+            "ChargeID": "",
+            "AgencyCode": "string",
+            "ArrestTime": "string",
+            "ORI": "string",
+            "OfficerBadgeNumber": "string",
+            "OfficerName": "string"
+         }
+      ],
+      "ChargeReportingAgency": [
+         {
+            "CaseID": "-1618",
+            "ChargeID": "",
+            "AgencyCode": "string",
+            "ORI": "string",
+            "ControlNumber": "string",
+            "OfficerBadgeNumber": "string",
+            "OfficerName": "string"
+         }
+      ],
+      "Offense": [
+         {
+            "OffenseID": "",
+            "StatuteNumber": "",
+            "StatuteCode": "",
+            "StatuteDescription": "",
+            "StatuteDegree": ""
+         }
+      ],
+      "ChargeDetail": [
+         {
+            "CaseID": "-1618",
+            "ChargeID": "",
+            "FillingDate": "",
+            "ArrestDate": "",
+            "ArrestTrackID": "",
+            "DispositionDate": "",
+            "OfficerID": "",
+            "OffenseDate": "1976-12-19",
+            "OffenseLocation": "",
+            "ChargeNumber": "4294",
+            "ChargeDescription": "",
+            "DrugType": {
+               "TypeID": "",
+               "Description": ""
+            },
+            "IncidentZoneType": "",
+            "Jurisdiction": {
+               "CodeID": "",
+               "Description": ""
+            },
+            "OffenseID": "",
+            "ChargeTrackNumber": "string",
+            "ChargeTrackSequence": "string",
+            "ChargeMitigator": "",
+            "AmendedDate": "",
+            "AmendedReason": {
+               "CodeID": "",
+               "Description": ""
+            },
+            "WasChargeChanged": false,
+            "Deleted": false
+         }
+      ],
+      "ChargeModifier": [
+         {
+            "CaseID": "-1618",
+            "ChargeID": "",
+            "Modifier": {
+               "CodeID": "",
+               "Description": ""
+            }
+         }
+      ],
+      "PleaEvent": [
+         {
+            "CaseID": "-1618",
+            "PleaID": "-3565",
+            "PleaEventDate": "1973-01-14",
+            "ChargeID": "-1516",
+            "PleaType": {
+               "TypeID": "",
+               "Description": ""
+            },
+            "AmendReasonCode": "string"
+         }
+      ],
+      "DispositionEvent": [
+         {
+            "CaseID": "-1618",
+            "DispositionID": "",
+            "DispositionEventDate": ""
+         }
+      ],
+      "Disposition": [
+         {
+            "ChargeID": "",
+            "DispositionEventID": "",
+            "DispositionType": {
+               "TypeID": "",
+               "Description": ""
+            },
+            "AmendReason": {
+               "CodeID": "",
+               "Description": ""
+            }
+         }
+      ]
+   },
+   "Sentence": {
+      "SentenceEvent": [
+         {
+            "CaseID": "-1618",
+            "SentenceEventID": "2821",
+            "Authority": {
+               "CodeID": "",
+               "Description": ""
+            },
+            "SentenceType": {
+               "TypeID": "",
+               "Description": ""
+            },
+            "SentenceDate": "1993-04-05"
+         }
+      ],
+      "SentenceDetail": [
+         {
+            "CaseID": "-1618",
+            "SentenceEventID": "2821",
+            "SentenceID": "-590",
+            "ChargeID": "-3261"
+         }
+      ],
+      "ConfinementComponent": [
+         {
+            "SentenceEventID": "",
+            "ChargeID": "",
+            "SentenceID": "",
+            "ConfinementComponentID": "2730",
+            "ConfinementType": {
+               "TypeID": "",
+               "Description": ""
+            },
+            "Facility": "string",
+            "StartDate": "1975-12-10",
+            "ImpositionOfSentenceSuspended": "false",
+            "SentencingStayed": "",
+            "SuspendedYears": "",
+            "SuspendedMonts": "",
+            "SuspendedDays": "",
+            "SuspendedWeeks": "",
+            "SuspendedReason": {
+               "CodeID": "",
+               "Description": ""
+            },
+            "Term": "",
+            "TermTypeCode": "string",
+            "YearsToLife": "string",
+            "Life": "true",
+            "Death": "",
+            "UntilAge18": "",
+            "UntilAge21": "true",
+            "UntilAge25": "true",
+            "CreditForTimeServedYears": "",
+            "CreditForTimeServedMonths": "",
+            "CreditForTimeServedDays": "",
+            "CreditForTimeServedWeeks": "",
+            "ConductCreditTypeCode": "string",
+            "ConductCreditYears": "",
+            "ConductCreditMonths": "",
+            "ConductCreditDays": "",
+            "ConductCreditWeeks": "",
+            "TreatmentCreditYears": "",
+            "TreatmentCreditMonths": "",
+            "TreatmentCreditDays": "",
+            "TreatmentCreditWeeks": "",
+            "AdditionalCreditTypeDescription": "string",
+            "AdditionalCreditYears": "",
+            "AdditionalCreditMonths": "",
+            "AdditionalCreditDays": "",
+            "AdditionalCreditWeeks": "",
+            "PostSentenceCreditYears": "",
+            "PostSentenceCreditMonths": "",
+            "PostSentenceCreditDays": "",
+            "PostSentenceCreditWeeks": "",
+            "MandatorySupervisedReleaseCreditYears": "",
+            "MandatorySupervisedReleaseCreditMonths": "",
+            "MandatorySupervisedReleaseCreditDays": "",
+            "MandatorySupervisedReleaseCreditWeeks": "",
+            "PayFineInLieuOfJailTime": null,
+            "FineAmount": null,
+            "FineSuspendedAmount": 200,
+            "PayFine": "string",
+            "PaySuspendedFine": "string",
+            "StayedReason": "string",
+            "LifeParoleEligible": "",
+            "YearsToLifeParoleEligible": "",
+            "FineLengthInLieuOfYears": "",
+            "FineLengthInLieuOfMonths": "",
+            "FineLengthInLieuOfDays": "",
+            "FineLengthInLieuOfWeeks": "",
+            "FineSuspendedYears": "",
+            "FineSuspendedMonths": "",
+            "FineSuspendedDays": "",
+            "FineSuspendedWeeks": "",
+            "TotalCreditSuspendedYears": "",
+            "TotalCreditSuspendedMonths": "",
+            "TotalCreditSuspendedDays": "",
+            "TotalCreditSuspendedWeeks": "",
+            "TermYearsToLife": "true",
+            "AdultConfinementComments": "string",
+            "InLieuOfComments": "string",
+            "FineSuspendedAmountInLieuOf": "string"
+         }
+      ],
+	  "ProbationCondition": [
+	     {
+            "SentenceEventID": "",
+            "ChargeID": "",
+            "SentenceID": "",
+            "ComponentID": "-3159",
+            "TypeCode": "string",
+            "TypeDescription": "string",
+            "ConditionEffectiveDate": "2017-04-07",
+            "StatusCode": "string",
+            "StatusType": "string",
+            "StatusDate": null
+		 }
+	  ],
+	  "ProbationStatus": [
+	     {
+            "SentenceEventID": "",
+            "ChargeID": "",
+            "SentenceID": "",
+            "ComponentID": "-3159",
+            "StatusCode": "string",
+            "StatusType": "string",
+            "StatusDate": null
+		 }
+	  ],
+      "ProbationComponent": [
+         {
+            "SentenceEventID": "",
+            "ChargeID": "",
+            "SentenceID": "",
+            "ComponentID": "-3159",
+            "TypeCode": "string",
+            "TypeDescription": "string",
+            "StartDate": null,
+            "EndDate": null,
+		    "TermYears": "string",
+		    "TermMonths": "string",
+		    "TermDays": "string",
+			"TermWeeks": "string",
+            "Manual": null,
+            "ImpositionOfSentenceSuspended": "",
+            "Comment": "string"
+         }
+      ],
+      "DriverLicenseRestriction": [
+	     {
+            "SentenceEventID": "",
+            "ChargeID": "",
+            "SentenceID": "",
+            "ConditionsID": "-2675",
+		    "RestrictionID": "",
+		    "Type": "string",
+		    "StartDate": null,
+		    "TermYears": "string",
+		    "TermMonths": "string",
+		    "TermDays": "string",
+			"TermWeeks": "string",
+		    "Comment": "string"
+	     }
+	  ],
+      "DriverLicenseCondition": [
+         {
+            "SentenceEventID": "",
+            "ChargeID": "",
+            "SentenceID": "",
+            "ConditionsID": "-2675",
+            "TypeCode": "string",
+            "TypeDescription": "string",
+            "SuspensionTerm": null,
+            "RevocationTerm": "1",
+            "Delay": "",
+		    "TermYears": "string",
+		    "TermMonths": "string",
+		    "TermDays": "string",
+			"TermWeeks": "string",
+            "PursuantToVehicleCode": "string",
+            "HabitualOffender": false,
+            "BACDrugs": "string",
+            "BACLevel": "string"
+         }
+      ],
+      "ProgramComponent": [
+         {
+            "SentenceEventID": "",
+            "ChargeID": "",
+            "SentenceID": "",
+            "ProgramCollectionID": "-606",
+            "Ordered": false,
+            "Recommended": "string",
+            "OrderDate": "2003-06-10",
+            "CompleteBy": "2018-01-20",
+            "InLieuOf": "string",
+		    "TermYears": "string",
+		    "TermMonths": "string",
+		    "TermDays": "string",
+			"TermWeeks": "string",
+            "Comment": "string"
+         }
+      ],
+      "Condition": [
+         {
+            "SentenceEventID": "",
+            "ChargeID": "",
+            "SentenceID": "",
+            "DispComponentConditionId": "string",
+            "TypeID": "string",
+            "Description": "string",
+            "EffectiveDate": "",
+            "Amount": "1732890.2349058"
+         }
+      ],
+      "ConcurrentConsecutive": [
+         {
+            "CaseID": "-1618",
+            "ChargeID": "",
+            "SentenceSentenceID": "",
+            "RelatedSentenceID": "",
+            "ConcurrentOrConsecutive": "",
+            "ToWhatOtherSentenceID": "",
+            "Description": ""
+         }
+      ]
+   },
+   "Warrant": {
+      "WarrantDetail": [
+         {
+            "WarrantID": "3954",
+            "WarrantNumber": "string",
+            "CaseID": "-188",
+            "CaseNumber": "string",
+            "BookingNumber": "string",
+            "BailSettingType": "string",
+            "BailAmount": "3753920.2349058",
+            "ExpirationDate": "1974-01-28",
+            "PartyID": ""
+         }
+      ],
+      "WarrantStatus": [
+         {
+            "WarrantID": "",
+            "CodeID": "string",
+            "Description": "string",
+            "StatusDate": "2017-01-05",
+            "Comment": "string",
+            "WarrantLocation": "string"
+         }
+      ],
+      "WarrantCondition": [
+         {
+            "WarrantID": "",
+            "ConditionType": "string",
+            "Comment": "string"
+         }
+      ]
+   },
+   "NODS": {
+      "EventParticipant": [
+         {
+            "EventParticipantID": "",
+            "EventID": "",
+            "ParticipantType": {
+               "TypeID": "",
+               "Description": ""
+            },
+            "InterpreterLanguage": ""
+         }
+      ],
+      "CaseDispositionEvent": [
+         {
+            "CaseDispositionEventID": "",
+            "EventDate": "",
+            "EventTime": "",
+            "CaseID": "",
+            "AuthorityID": "",
+            "OverallOutcome": "",
+            "MannerOfDisposition": {
+               "TypeID": "",
+               "Description": ""
+            },
+
+            "IsPreAdjudicationDiversion": "",
+            "PreAdjudicationDiversionProgram": "",
+            "PostAdjudicationDiversionProgram": "",
+            "DispositionType": {
+               "TypeID": "",
+               "Description": ""
+            },
+            "PleaType": {
+               "TypeID": "",
+               "Description": ""
+            },
+            
+            "IsDirectedVerdic": true,
+            "CaseClosedDate": "",
+            "PrevailingPartyID": "",
+            "DispositionCategory": {
+               "CodeID": "",
+               "Description": ""
+            },
+            "JudgementType": {
+               "TypeID": "",
+               "Description": ""
+            },
+            "TotalMonetaryDamages": "",
+            "TotalCosts": "",
+            "HasNonMonetaryRelief": true,
+            "DispositionDetail": ""
+         }
+      ],
+      "CaseEventOutcome": [
+         {
+            "CaseEventOutcomeID": "",
+            "CaseID": "",
+            "CaseEventID": "",
+            "OutcomeType": {
+               "TypeID": "",
+               "Description": ""
+            },
+
+            "Reason": ""
+         }
+      ],
+      "CaseFillingAppliesToParty": [
+         {
+            "CaseFillingPartyID": "",
+            "CaseFilingID": "",
+            "CaseID": "",
+            "PartyID": "",
+            "FillingCaseID": "",
+            "PartyCaseID": ""
+         }
+      ],
+      "DisputeResolution": [
+         {
+            "CaseID": "",
+            "ReferralDate": "",
+            "Referral": {
+               "TypeID": "",
+               "Description": ""
+            },
+            "IsCourtOrdereed": false,
+            "IsNeutralInvolved": false,
+            "ReportDate": "",
+            "ReferralToTrial": false,
+            "Facilitation": {
+               "TypeID": "",
+               "Description": ""
+            },
+            "Resolution": {
+               "TypeID": "",
+               "Description": ""
+            }
+         }
+      ],
+      "Intake": [
+         {
+            "CaseID": "",
+            "IntakeID": "",
+            "ReferalDate": "",
+            "ReferalSourceType": {
+               "TypeID": "",
+               "Description": ""
+            },
+            "ReferralPersonAgencyID": "",
+            "IntakeDecisionDate": "",
+            "IntakeDecision": "",
+            "LivingArragementAtIntake": "",
+            "PostalCodeIntake": "",
+            "WasDetained": "",
+            "IsDiversionEligible": "",
+            "WasAssessedAtIntake": ""
+         }
+      ],
+      "TypeOfService": [
+         {
+            "ServiceID": "",
+            "ServiceType": {
+               "TypeID": "",
+               "Description": ""
+            },
+            "CaseID": "",
+            "PersonID": "",
+            "ParticipantCourtCaseID": "",
+            "ParticipantID": ""
+         }
+      ],
+      "RiskAssessment": [
+         {
+            "RiskAssessmentID": "",
+            "CaseID": "",
+            "NameInstrument": "",
+            "Score": ""
+         }
+      ],
+      "SentenceViolation": [
+         {
+            "SentenceID": "",
+            "SentenceViolationID": "",
+            "ViolationType": {
+               "TypeID": "",
+               "Description": ""
+            },
+            "ViolationOutcome": ""
+         }
+      ],
+      "SuspensionTransmission": [
+         {
+            "SuspensionID": "",
+            "SuspensionTransmittedDate": "",
+            "TransmissionAgency": "",
+            "TransmissionDate": "",
+            "LengthOfSuspension": "",
+            "CaseID": ""
+         }
+      ]
+   }
+}

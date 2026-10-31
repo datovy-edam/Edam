@@ -1,0 +1,62 @@
+{
+   "@context": {
+      "edam": "http://www.datovy.com/edam/arguments"
+   },
+   "Domain": {
+      "DomainId": "ECI.HC.CD",
+     "Domain": "HealthCare",
+     "Business": "DiseaseSurveillance",
+      "Description": "Communicable Disease Surveillance"
+   },
+   "Namespace": {
+      "OrganizationDomainId": "eci.hc.cd",
+      "Uri": "http://www.estradaci.com/hc/cd",
+      "Prefix": "cd",
+      "Extension": "",
+      "RootElementName": "cd:Disease_Surveillance_Document"
+   },
+   "Lexicon": {
+      "LexiconId": "",
+      "Title": "",
+      "Uri": "",
+      "Description": ""
+   },
+   "Project": {
+      "Name": "ECI.HC.CD",
+      "VersionId": "v1r0"
+   },
+   "Process": {
+      "RecordId": null,
+      "Name": "Eci.HC.CD.ToAssets",
+      "OrganizationId": "ECI",
+      "OrganizationDomainUri": null,
+      "ProcedureName": "DdlImportToAssets",
+      "ProcedureTag": "DDL.DdlImportFileReader",
+      "SchemaType": 1,
+      "NextProcess": "",
+      "NextProcedure": [""]
+   },
+   "InputFile": {
+      "Extension": "xlsx",
+      "Name": "eci.hc.cd.mdf",
+      "Path": "./Files",
+      "Full": null
+   },
+   "OutputFile": {
+      "Extension": "xlsx",
+      "Name": "eci.hc.cd.dictionary",
+      "Path": "./Documents",
+      "Full": "./Documents/eci.hc.cd.dictionary.xlsx"
+   },
+   "UriList": [
+      "./Archive/eci.hc.cd.schema.xlsx"
+   ],
+   "InspectArguments": {
+      "ListLength": "1",
+      "MaxThreshold": "1"
+   },
+   "ConnectionString": "",
+   "ElementTransform": null,
+   "TextMapFilePath": "./Archive/DdlTextMap.json"
+}
+

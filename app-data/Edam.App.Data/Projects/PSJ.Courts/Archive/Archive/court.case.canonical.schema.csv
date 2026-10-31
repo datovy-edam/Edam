@@ -1,0 +1,1426 @@
+DatabaseName	ParentSchema	ParentTable	ColumnName	ColumnOrder	DataType	ColumnSize	ConstraintType	ChildSchema	ChildTable	ChildColumn
+PSJ_Court_Canonical	Activity	AppealDispositionType	TypeID	1	varchar	20	PRIMARY KEY	NULL	NULL	NULL
+PSJ_Court_Canonical	Activity	AppealDispositionType	Description	2	varchar	20	NULL	NULL	NULL	NULL
+PSJ_Court_Canonical	Activity	AppealDispositionType	SessionID	3	varchar	40	NULL	NULL	NULL	NULL
+PSJ_Court_Canonical	Activity	AppealDispositionType	TenantID	4	varchar	20	NULL	NULL	NULL	NULL
+PSJ_Court_Canonical	Activity	AppealDispositionType	DataOwnerID	5	varchar	20	NULL	NULL	NULL	NULL
+PSJ_Court_Canonical	Activity	AppealDispositionType	DataSourceID	6	varchar	20	NULL	NULL	NULL	NULL
+PSJ_Court_Canonical	Activity	AppealDispositionType	CreatedDateTime	7	datetimeoffset	NULL	NULL	NULL	NULL	NULL
+PSJ_Court_Canonical	Activity	AppealDispositionType	UpdatedDateTime	8	datetimeoffset	NULL	NULL	NULL	NULL	NULL
+PSJ_Court_Canonical	Activity	AppealDispositionType	RecordStatusCodeID	9	char	1	NULL	NULL	NULL	NULL
+PSJ_Court_Canonical	Activity	AppealDispositionType	RecordStatusDateTime	10	datetimeoffset	NULL	NULL	NULL	NULL	NULL
+PSJ_Court_Canonical	Activity	AppealEvent	CaseNo	1	bigint	NULL	FOREIGN KEY	Case	CaseDetail	CaseNo
+PSJ_Court_Canonical	Activity	AppealEvent	EventID	2	varchar	20	PRIMARY KEY	NULL	NULL	NULL
+PSJ_Court_Canonical	Activity	AppealEvent	EventType	3	varchar	20	NULL	NULL	NULL	NULL
+PSJ_Court_Canonical	Activity	AppealEvent	AppealTypeID	4	varchar	20	FOREIGN KEY	Activity	AppealType	TypeID
+PSJ_Court_Canonical	Activity	AppealEvent	FiledDate	5	varchar	20	NULL	NULL	NULL	NULL
+PSJ_Court_Canonical	Activity	AppealEvent	FileddBy	6	varchar	20	NULL	NULL	NULL	NULL
+PSJ_Court_Canonical	Activity	AppealEvent	DispositionTypeID	7	varchar	20	FOREIGN KEY	Activity	AppealDispositionType	TypeID
+PSJ_Court_Canonical	Activity	AppealEvent	AppealStatus	8	varchar	20	FOREIGN KEY	Activity	AppealStatus	CodeID
+PSJ_Court_Canonical	Activity	AppealEvent	SessionID	9	varchar	40	NULL	NULL	NULL	NULL
+PSJ_Court_Canonical	Activity	AppealEvent	TenantID	10	varchar	20	NULL	NULL	NULL	NULL
+PSJ_Court_Canonical	Activity	AppealEvent	DataOwnerID	11	varchar	20	NULL	NULL	NULL	NULL
+PSJ_Court_Canonical	Activity	AppealEvent	DataSourceID	12	varchar	20	NULL	NULL	NULL	NULL
+PSJ_Court_Canonical	Activity	AppealEvent	CreatedDateTime	13	datetimeoffset	NULL	NULL	NULL	NULL	NULL
+PSJ_Court_Canonical	Activity	AppealEvent	UpdatedDateTime	14	datetimeoffset	NULL	NULL	NULL	NULL	NULL
+PSJ_Court_Canonical	Activity	AppealEvent	RecordStatusCodeID	15	char	1	NULL	NULL	NULL	NULL
+PSJ_Court_Canonical	Activity	AppealEvent	RecordStatusDateTime	16	datetimeoffset	NULL	NULL	NULL	NULL	NULL
+PSJ_Court_Canonical	Activity	AppealStatus	CodeID	1	varchar	20	PRIMARY KEY	NULL	NULL	NULL
+PSJ_Court_Canonical	Activity	AppealStatus	Description	2	varchar	20	NULL	NULL	NULL	NULL
+PSJ_Court_Canonical	Activity	AppealStatus	Date	3	date	NULL	NULL	NULL	NULL	NULL
+PSJ_Court_Canonical	Activity	AppealStatus	SessionID	4	varchar	40	NULL	NULL	NULL	NULL
+PSJ_Court_Canonical	Activity	AppealStatus	TenantID	5	varchar	20	NULL	NULL	NULL	NULL
+PSJ_Court_Canonical	Activity	AppealStatus	DataOwnerID	6	varchar	20	NULL	NULL	NULL	NULL
+PSJ_Court_Canonical	Activity	AppealStatus	DataSourceID	7	varchar	20	NULL	NULL	NULL	NULL
+PSJ_Court_Canonical	Activity	AppealStatus	CreatedDateTime	8	datetimeoffset	NULL	NULL	NULL	NULL	NULL
+PSJ_Court_Canonical	Activity	AppealStatus	UpdatedDateTime	9	datetimeoffset	NULL	NULL	NULL	NULL	NULL
+PSJ_Court_Canonical	Activity	AppealStatus	RecordStatusCodeID	10	char	1	NULL	NULL	NULL	NULL
+PSJ_Court_Canonical	Activity	AppealStatus	RecordStatusDateTime	11	datetimeoffset	NULL	NULL	NULL	NULL	NULL
+PSJ_Court_Canonical	Activity	AppealType	TypeID	1	varchar	20	PRIMARY KEY	NULL	NULL	NULL
+PSJ_Court_Canonical	Activity	AppealType	Description	2	varchar	20	NULL	NULL	NULL	NULL
+PSJ_Court_Canonical	Activity	AppealType	SessionID	3	varchar	40	NULL	NULL	NULL	NULL
+PSJ_Court_Canonical	Activity	AppealType	TenantID	4	varchar	20	NULL	NULL	NULL	NULL
+PSJ_Court_Canonical	Activity	AppealType	DataOwnerID	5	varchar	20	NULL	NULL	NULL	NULL
+PSJ_Court_Canonical	Activity	AppealType	DataSourceID	6	varchar	20	NULL	NULL	NULL	NULL
+PSJ_Court_Canonical	Activity	AppealType	CreatedDateTime	7	datetimeoffset	NULL	NULL	NULL	NULL	NULL
+PSJ_Court_Canonical	Activity	AppealType	UpdatedDateTime	8	datetimeoffset	NULL	NULL	NULL	NULL	NULL
+PSJ_Court_Canonical	Activity	AppealType	RecordStatusCodeID	9	char	1	NULL	NULL	NULL	NULL
+PSJ_Court_Canonical	Activity	AppealType	RecordStatusDateTime	10	datetimeoffset	NULL	NULL	NULL	NULL	NULL
+PSJ_Court_Canonical	Activity	BailBondRelease	CaseNo	1	bigint	NULL	FOREIGN KEY	Case	CaseDetail	CaseNo
+PSJ_Court_Canonical	Activity	BailBondRelease	ReleaseID	2	varchar	20	PRIMARY KEY	NULL	NULL	NULL
+PSJ_Court_Canonical	Activity	BailBondRelease	ReleaseType	3	varchar	20	NULL	NULL	NULL	NULL
+PSJ_Court_Canonical	Activity	BailBondRelease	BondType	4	varchar	20	NULL	NULL	NULL	NULL
+PSJ_Court_Canonical	Activity	BailBondRelease	AuthorityID	5	varchar	20	NULL	NULL	NULL	NULL
+PSJ_Court_Canonical	Activity	BailBondRelease	BondSetDate	6	date	NULL	NULL	NULL	NULL	NULL
+PSJ_Court_Canonical	Activity	BailBondRelease	BondPostDate	7	date	NULL	NULL	NULL	NULL	NULL
+PSJ_Court_Canonical	Activity	BailBondRelease	AmountOfBond	8	money	NULL	NULL	NULL	NULL	NULL
+PSJ_Court_Canonical	Activity	BailBondRelease	PostDate	9	date	NULL	NULL	NULL	NULL	NULL
+PSJ_Court_Canonical	Activity	BailBondRelease	RevocationID	10	varchar	20	FOREIGN KEY	Activity	BailBondRevocation	RevocationID
+PSJ_Court_Canonical	Activity	BailBondRelease	SessionID	11	varchar	40	NULL	NULL	NULL	NULL
+PSJ_Court_Canonical	Activity	BailBondRelease	TenantID	12	varchar	20	NULL	NULL	NULL	NULL
+PSJ_Court_Canonical	Activity	BailBondRelease	DataOwnerID	13	varchar	20	NULL	NULL	NULL	NULL
+PSJ_Court_Canonical	Activity	BailBondRelease	DataSourceID	14	varchar	20	NULL	NULL	NULL	NULL
+PSJ_Court_Canonical	Activity	BailBondRelease	CreatedDateTime	15	datetimeoffset	NULL	NULL	NULL	NULL	NULL
+PSJ_Court_Canonical	Activity	BailBondRelease	UpdatedDateTime	16	datetimeoffset	NULL	NULL	NULL	NULL	NULL
+PSJ_Court_Canonical	Activity	BailBondRelease	RecordStatusCodeID	17	char	1	NULL	NULL	NULL	NULL
+PSJ_Court_Canonical	Activity	BailBondRelease	RecordStatusDateTime	18	datetimeoffset	NULL	NULL	NULL	NULL	NULL
+PSJ_Court_Canonical	Activity	BailBondRevocation	CaseNo	1	bigint	NULL	FOREIGN KEY	Case	CaseDetail	CaseNo
+PSJ_Court_Canonical	Activity	BailBondRevocation	RevocationID	2	varchar	20	PRIMARY KEY	NULL	NULL	NULL
+PSJ_Court_Canonical	Activity	BailBondRevocation	RevocationDate	3	date	NULL	NULL	NULL	NULL	NULL
+PSJ_Court_Canonical	Activity	BailBondRevocation	Reason	4	varchar	128	NULL	NULL	NULL	NULL
+PSJ_Court_Canonical	Activity	BailBondRevocation	SessionID	5	varchar	40	NULL	NULL	NULL	NULL
+PSJ_Court_Canonical	Activity	BailBondRevocation	TenantID	6	varchar	20	NULL	NULL	NULL	NULL
+PSJ_Court_Canonical	Activity	BailBondRevocation	DataOwnerID	7	varchar	20	NULL	NULL	NULL	NULL
+PSJ_Court_Canonical	Activity	BailBondRevocation	DataSourceID	8	varchar	20	NULL	NULL	NULL	NULL
+PSJ_Court_Canonical	Activity	BailBondRevocation	CreatedDateTime	9	datetimeoffset	NULL	NULL	NULL	NULL	NULL
+PSJ_Court_Canonical	Activity	BailBondRevocation	UpdatedDateTime	10	datetimeoffset	NULL	NULL	NULL	NULL	NULL
+PSJ_Court_Canonical	Activity	BailBondRevocation	RecordStatusCodeID	11	char	1	NULL	NULL	NULL	NULL
+PSJ_Court_Canonical	Activity	BailBondRevocation	RecordStatusDateTime	12	datetimeoffset	NULL	NULL	NULL	NULL	NULL
+PSJ_Court_Canonical	Activity	BondType	TypeID	1	varchar	20	PRIMARY KEY	NULL	NULL	NULL
+PSJ_Court_Canonical	Activity	BondType	Description	2	varchar	20	NULL	NULL	NULL	NULL
+PSJ_Court_Canonical	Activity	BondType	SessionID	3	varchar	40	NULL	NULL	NULL	NULL
+PSJ_Court_Canonical	Activity	BondType	TenantID	4	varchar	20	NULL	NULL	NULL	NULL
+PSJ_Court_Canonical	Activity	BondType	DataOwnerID	5	varchar	20	NULL	NULL	NULL	NULL
+PSJ_Court_Canonical	Activity	BondType	DataSourceID	6	varchar	20	NULL	NULL	NULL	NULL
+PSJ_Court_Canonical	Activity	BondType	CreatedDateTime	7	datetimeoffset	NULL	NULL	NULL	NULL	NULL
+PSJ_Court_Canonical	Activity	BondType	UpdatedDateTime	8	datetimeoffset	NULL	NULL	NULL	NULL	NULL
+PSJ_Court_Canonical	Activity	BondType	RecordStatusCodeID	9	char	1	NULL	NULL	NULL	NULL
+PSJ_Court_Canonical	Activity	BondType	RecordStatusDateTime	10	datetimeoffset	NULL	NULL	NULL	NULL	NULL
+PSJ_Court_Canonical	Activity	ConditionType	TypeID	1	varchar	20	PRIMARY KEY	NULL	NULL	NULL
+PSJ_Court_Canonical	Activity	ConditionType	Description	2	varchar	256	NULL	NULL	NULL	NULL
+PSJ_Court_Canonical	Activity	ConditionType	SessionID	3	varchar	40	NULL	NULL	NULL	NULL
+PSJ_Court_Canonical	Activity	ConditionType	TenantID	4	varchar	20	NULL	NULL	NULL	NULL
+PSJ_Court_Canonical	Activity	ConditionType	DataOwnerID	5	varchar	20	NULL	NULL	NULL	NULL
+PSJ_Court_Canonical	Activity	ConditionType	DataSourceID	6	varchar	20	NULL	NULL	NULL	NULL
+PSJ_Court_Canonical	Activity	ConditionType	CreatedDateTime	7	datetimeoffset	NULL	NULL	NULL	NULL	NULL
+PSJ_Court_Canonical	Activity	ConditionType	UpdatedDateTime	8	datetimeoffset	NULL	NULL	NULL	NULL	NULL
+PSJ_Court_Canonical	Activity	ConditionType	RecordStatusCodeID	9	char	1	NULL	NULL	NULL	NULL
+PSJ_Court_Canonical	Activity	ConditionType	RecordStatusDateTime	10	datetimeoffset	NULL	NULL	NULL	NULL	NULL
+PSJ_Court_Canonical	Activity	FeeType	TypeID	1	varchar	20	PRIMARY KEY	NULL	NULL	NULL
+PSJ_Court_Canonical	Activity	FeeType	Description	2	varchar	256	NULL	NULL	NULL	NULL
+PSJ_Court_Canonical	Activity	FeeType	SessionID	3	varchar	40	NULL	NULL	NULL	NULL
+PSJ_Court_Canonical	Activity	FeeType	TenantID	4	varchar	20	NULL	NULL	NULL	NULL
+PSJ_Court_Canonical	Activity	FeeType	DataOwnerID	5	varchar	20	NULL	NULL	NULL	NULL
+PSJ_Court_Canonical	Activity	FeeType	DataSourceID	6	varchar	20	NULL	NULL	NULL	NULL
+PSJ_Court_Canonical	Activity	FeeType	CreatedDateTime	7	datetimeoffset	NULL	NULL	NULL	NULL	NULL
+PSJ_Court_Canonical	Activity	FeeType	UpdatedDateTime	8	datetimeoffset	NULL	NULL	NULL	NULL	NULL
+PSJ_Court_Canonical	Activity	FeeType	RecordStatusCodeID	9	char	1	NULL	NULL	NULL	NULL
+PSJ_Court_Canonical	Activity	FeeType	RecordStatusDateTime	10	datetimeoffset	NULL	NULL	NULL	NULL	NULL
+PSJ_Court_Canonical	Activity	FinancialEvent	CaseNo	1	bigint	NULL	FOREIGN KEY	Case	CaseDetail	CaseNo
+PSJ_Court_Canonical	Activity	FinancialEvent	EventID	2	varchar	20	PRIMARY KEY	NULL	NULL	NULL
+PSJ_Court_Canonical	Activity	FinancialEvent	TypeID	3	varchar	20	FOREIGN KEY	Activity	FinancialEventType	TypeID
+PSJ_Court_Canonical	Activity	FinancialEvent	ChargeID	4	varchar	20	NULL	NULL	NULL	NULL
+PSJ_Court_Canonical	Activity	FinancialEvent	DateAssessed	5	date	NULL	NULL	NULL	NULL	NULL
+PSJ_Court_Canonical	Activity	FinancialEvent	FeeCodeID	6	varchar	20	NULL	NULL	NULL	NULL
+PSJ_Court_Canonical	Activity	FinancialEvent	PriorityCodeID	7	varchar	20	NULL	NULL	NULL	NULL
+PSJ_Court_Canonical	Activity	FinancialEvent	WasReferredToCollections	8	bit	NULL	NULL	NULL	NULL	NULL
+PSJ_Court_Canonical	Activity	FinancialEvent	Amount	9	money	NULL	NULL	NULL	NULL	NULL
+PSJ_Court_Canonical	Activity	FinancialEvent	BalanceDue	10	money	NULL	NULL	NULL	NULL	NULL
+PSJ_Court_Canonical	Activity	FinancialEvent	SessionID	11	varchar	40	NULL	NULL	NULL	NULL
+PSJ_Court_Canonical	Activity	FinancialEvent	TenantID	12	varchar	20	NULL	NULL	NULL	NULL
+PSJ_Court_Canonical	Activity	FinancialEvent	DataOwnerID	13	varchar	20	NULL	NULL	NULL	NULL
+PSJ_Court_Canonical	Activity	FinancialEvent	DataSourceID	14	varchar	20	NULL	NULL	NULL	NULL
+PSJ_Court_Canonical	Activity	FinancialEvent	CreatedDateTime	15	datetimeoffset	NULL	NULL	NULL	NULL	NULL
+PSJ_Court_Canonical	Activity	FinancialEvent	UpdatedDateTime	16	datetimeoffset	NULL	NULL	NULL	NULL	NULL
+PSJ_Court_Canonical	Activity	FinancialEvent	RecordStatusCodeID	17	char	1	NULL	NULL	NULL	NULL
+PSJ_Court_Canonical	Activity	FinancialEvent	RecordStatusDateTime	18	datetimeoffset	NULL	NULL	NULL	NULL	NULL
+PSJ_Court_Canonical	Activity	FinancialEventType	TypeID	1	varchar	20	PRIMARY KEY	NULL	NULL	NULL
+PSJ_Court_Canonical	Activity	FinancialEventType	Description	2	varchar	256	NULL	NULL	NULL	NULL
+PSJ_Court_Canonical	Activity	FinancialEventType	SessionID	3	varchar	40	NULL	NULL	NULL	NULL
+PSJ_Court_Canonical	Activity	FinancialEventType	TenantID	4	varchar	20	NULL	NULL	NULL	NULL
+PSJ_Court_Canonical	Activity	FinancialEventType	DataOwnerID	5	varchar	20	NULL	NULL	NULL	NULL
+PSJ_Court_Canonical	Activity	FinancialEventType	DataSourceID	6	varchar	20	NULL	NULL	NULL	NULL
+PSJ_Court_Canonical	Activity	FinancialEventType	CreatedDateTime	7	datetimeoffset	NULL	NULL	NULL	NULL	NULL
+PSJ_Court_Canonical	Activity	FinancialEventType	UpdatedDateTime	8	datetimeoffset	NULL	NULL	NULL	NULL	NULL
+PSJ_Court_Canonical	Activity	FinancialEventType	RecordStatusCodeID	9	char	1	NULL	NULL	NULL	NULL
+PSJ_Court_Canonical	Activity	FinancialEventType	RecordStatusDateTime	10	datetimeoffset	NULL	NULL	NULL	NULL	NULL
+PSJ_Court_Canonical	Activity	Hearing	CaseNo	1	bigint	NULL	FOREIGN KEY	Case	CaseDetail	CaseNo
+PSJ_Court_Canonical	Activity	Hearing	HearingID	2	varchar	20	PRIMARY KEY	NULL	NULL	NULL
+PSJ_Court_Canonical	Activity	Hearing	CaseNumber	3	varchar	20	NULL	NULL	NULL	NULL
+PSJ_Court_Canonical	Activity	Hearing	CaseTypeID	4	varchar	20	FOREIGN KEY	Case	CaseType	TypeID
+PSJ_Court_Canonical	Activity	Hearing	CaseTitle	5	varchar	20	NULL	NULL	NULL	NULL
+PSJ_Court_Canonical	Activity	Hearing	CourtName	6	varchar	128	NULL	NULL	NULL	NULL
+PSJ_Court_Canonical	Activity	Hearing	Defendant	7	varchar	128	NULL	NULL	NULL	NULL
+PSJ_Court_Canonical	Activity	Hearing	AttorneyName	8	varchar	128	NULL	NULL	NULL	NULL
+PSJ_Court_Canonical	Activity	Hearing	TypeID	9	varchar	20	FOREIGN KEY	Activity	HearingType	TypeID
+PSJ_Court_Canonical	Activity	Hearing	HearingFlagID	10	varchar	20	FOREIGN KEY	Activity	HearingFlag	FlagID
+PSJ_Court_Canonical	Activity	Hearing	HearingDate	11	date	NULL	NULL	NULL	NULL	NULL
+PSJ_Court_Canonical	Activity	Hearing	HearingSequence	12	varchar	20	NULL	NULL	NULL	NULL
+PSJ_Court_Canonical	Activity	Hearing	SesssionDescription	13	varchar	20	NULL	NULL	NULL	NULL
+PSJ_Court_Canonical	Activity	Hearing	StartTime	14	varchar	20	NULL	NULL	NULL	NULL
+PSJ_Court_Canonical	Activity	Hearing	SessionEndTime	15	varchar	20	NULL	NULL	NULL	NULL
+PSJ_Court_Canonical	Activity	Hearing	JudgeID	16	varchar	20	FOREIGN KEY	Entity	Officer	OfficerID
+PSJ_Court_Canonical	Activity	Hearing	DepartmentNo	17	bigint	NULL	FOREIGN KEY	Entity	Organization	OrganizationNo
+PSJ_Court_Canonical	Activity	Hearing	ResultCodeID	18	varchar	20	FOREIGN KEY	Activity	HearingResultCode	CodeID
+PSJ_Court_Canonical	Activity	Hearing	CancelledReasonCode	19	varchar	20	NULL	NULL	NULL	NULL
+PSJ_Court_Canonical	Activity	Hearing	RescheduleReasonCode	20	varchar	20	NULL	NULL	NULL	NULL
+PSJ_Court_Canonical	Activity	Hearing	CancelledDateTime	21	datetimeoffset	NULL	NULL	NULL	NULL	NULL
+PSJ_Court_Canonical	Activity	Hearing	SessionID	22	varchar	40	NULL	NULL	NULL	NULL
+PSJ_Court_Canonical	Activity	Hearing	TenantID	23	varchar	20	NULL	NULL	NULL	NULL
+PSJ_Court_Canonical	Activity	Hearing	DataOwnerID	24	varchar	20	NULL	NULL	NULL	NULL
+PSJ_Court_Canonical	Activity	Hearing	DataSourceID	25	varchar	20	NULL	NULL	NULL	NULL
+PSJ_Court_Canonical	Activity	Hearing	CreatedDateTime	26	datetimeoffset	NULL	NULL	NULL	NULL	NULL
+PSJ_Court_Canonical	Activity	Hearing	UpdatedDateTime	27	datetimeoffset	NULL	NULL	NULL	NULL	NULL
+PSJ_Court_Canonical	Activity	Hearing	RecordStatusCodeID	28	char	1	NULL	NULL	NULL	NULL
+PSJ_Court_Canonical	Activity	Hearing	RecordStatusDateTime	29	datetimeoffset	NULL	NULL	NULL	NULL	NULL
+PSJ_Court_Canonical	Activity	HearingEvent	HearingEventID	1	varchar	20	PRIMARY KEY	NULL	NULL	NULL
+PSJ_Court_Canonical	Activity	HearingEvent	HearingID	2	varchar	20	FOREIGN KEY	Activity	Hearing	HearingID
+PSJ_Court_Canonical	Activity	HearingEvent	EventNo	3	bigint	NULL	FOREIGN KEY	Case	Event	EventNo
+PSJ_Court_Canonical	Activity	HearingEvent	LinkType	4	varchar	20	NULL	NULL	NULL	NULL
+PSJ_Court_Canonical	Activity	HearingEvent	SessionID	5	varchar	40	NULL	NULL	NULL	NULL
+PSJ_Court_Canonical	Activity	HearingEvent	TenantID	6	varchar	20	NULL	NULL	NULL	NULL
+PSJ_Court_Canonical	Activity	HearingEvent	DataOwnerID	7	varchar	20	NULL	NULL	NULL	NULL
+PSJ_Court_Canonical	Activity	HearingEvent	DataSourceID	8	varchar	20	NULL	NULL	NULL	NULL
+PSJ_Court_Canonical	Activity	HearingEvent	CreatedDateTime	9	datetimeoffset	NULL	NULL	NULL	NULL	NULL
+PSJ_Court_Canonical	Activity	HearingEvent	UpdatedDateTime	10	datetimeoffset	NULL	NULL	NULL	NULL	NULL
+PSJ_Court_Canonical	Activity	HearingEvent	RecordStatusCodeID	11	char	1	NULL	NULL	NULL	NULL
+PSJ_Court_Canonical	Activity	HearingEvent	RecordStatusDateTime	12	datetimeoffset	NULL	NULL	NULL	NULL	NULL
+PSJ_Court_Canonical	Activity	HearingFlag	FlagID	1	varchar	20	PRIMARY KEY	NULL	NULL	NULL
+PSJ_Court_Canonical	Activity	HearingFlag	Description	2	varchar	256	NULL	NULL	NULL	NULL
+PSJ_Court_Canonical	Activity	HearingFlag	SessionID	3	varchar	40	NULL	NULL	NULL	NULL
+PSJ_Court_Canonical	Activity	HearingFlag	TenantID	4	varchar	20	NULL	NULL	NULL	NULL
+PSJ_Court_Canonical	Activity	HearingFlag	DataOwnerID	5	varchar	20	NULL	NULL	NULL	NULL
+PSJ_Court_Canonical	Activity	HearingFlag	DataSourceID	6	varchar	20	NULL	NULL	NULL	NULL
+PSJ_Court_Canonical	Activity	HearingFlag	CreatedDateTime	7	datetimeoffset	NULL	NULL	NULL	NULL	NULL
+PSJ_Court_Canonical	Activity	HearingFlag	UpdatedDateTime	8	datetimeoffset	NULL	NULL	NULL	NULL	NULL
+PSJ_Court_Canonical	Activity	HearingFlag	RecordStatusCodeID	9	char	1	NULL	NULL	NULL	NULL
+PSJ_Court_Canonical	Activity	HearingFlag	RecordStatusDateTime	10	datetimeoffset	NULL	NULL	NULL	NULL	NULL
+PSJ_Court_Canonical	Activity	HearingResultCode	CodeID	1	varchar	20	PRIMARY KEY	NULL	NULL	NULL
+PSJ_Court_Canonical	Activity	HearingResultCode	Description	2	varchar	256	NULL	NULL	NULL	NULL
+PSJ_Court_Canonical	Activity	HearingResultCode	SessionID	3	varchar	40	NULL	NULL	NULL	NULL
+PSJ_Court_Canonical	Activity	HearingResultCode	TenantID	4	varchar	20	NULL	NULL	NULL	NULL
+PSJ_Court_Canonical	Activity	HearingResultCode	DataOwnerID	5	varchar	20	NULL	NULL	NULL	NULL
+PSJ_Court_Canonical	Activity	HearingResultCode	DataSourceID	6	varchar	20	NULL	NULL	NULL	NULL
+PSJ_Court_Canonical	Activity	HearingResultCode	CreatedDateTime	7	datetimeoffset	NULL	NULL	NULL	NULL	NULL
+PSJ_Court_Canonical	Activity	HearingResultCode	UpdatedDateTime	8	datetimeoffset	NULL	NULL	NULL	NULL	NULL
+PSJ_Court_Canonical	Activity	HearingResultCode	RecordStatusCodeID	9	char	1	NULL	NULL	NULL	NULL
+PSJ_Court_Canonical	Activity	HearingResultCode	RecordStatusDateTime	10	datetimeoffset	NULL	NULL	NULL	NULL	NULL
+PSJ_Court_Canonical	Activity	HearingType	TypeID	1	varchar	20	PRIMARY KEY	NULL	NULL	NULL
+PSJ_Court_Canonical	Activity	HearingType	Description	2	varchar	256	NULL	NULL	NULL	NULL
+PSJ_Court_Canonical	Activity	HearingType	SessionID	3	varchar	40	NULL	NULL	NULL	NULL
+PSJ_Court_Canonical	Activity	HearingType	TenantID	4	varchar	20	NULL	NULL	NULL	NULL
+PSJ_Court_Canonical	Activity	HearingType	DataOwnerID	5	varchar	20	NULL	NULL	NULL	NULL
+PSJ_Court_Canonical	Activity	HearingType	DataSourceID	6	varchar	20	NULL	NULL	NULL	NULL
+PSJ_Court_Canonical	Activity	HearingType	CreatedDateTime	7	datetimeoffset	NULL	NULL	NULL	NULL	NULL
+PSJ_Court_Canonical	Activity	HearingType	UpdatedDateTime	8	datetimeoffset	NULL	NULL	NULL	NULL	NULL
+PSJ_Court_Canonical	Activity	HearingType	RecordStatusCodeID	9	char	1	NULL	NULL	NULL	NULL
+PSJ_Court_Canonical	Activity	HearingType	RecordStatusDateTime	10	datetimeoffset	NULL	NULL	NULL	NULL	NULL
+PSJ_Court_Canonical	Activity	PleaType	TypeID	1	varchar	20	PRIMARY KEY	NULL	NULL	NULL
+PSJ_Court_Canonical	Activity	PleaType	Description	2	varchar	20	NULL	NULL	NULL	NULL
+PSJ_Court_Canonical	Activity	PleaType	SessionID	3	varchar	40	NULL	NULL	NULL	NULL
+PSJ_Court_Canonical	Activity	PleaType	TenantID	4	varchar	20	NULL	NULL	NULL	NULL
+PSJ_Court_Canonical	Activity	PleaType	DataOwnerID	5	varchar	20	NULL	NULL	NULL	NULL
+PSJ_Court_Canonical	Activity	PleaType	DataSourceID	6	varchar	20	NULL	NULL	NULL	NULL
+PSJ_Court_Canonical	Activity	PleaType	CreatedDateTime	7	datetimeoffset	NULL	NULL	NULL	NULL	NULL
+PSJ_Court_Canonical	Activity	PleaType	UpdatedDateTime	8	datetimeoffset	NULL	NULL	NULL	NULL	NULL
+PSJ_Court_Canonical	Activity	PleaType	RecordStatusCodeID	9	char	1	NULL	NULL	NULL	NULL
+PSJ_Court_Canonical	Activity	PleaType	RecordStatusDateTime	10	datetimeoffset	NULL	NULL	NULL	NULL	NULL
+PSJ_Court_Canonical	Activity	PriorityCode	CodeID	1	varchar	20	PRIMARY KEY	NULL	NULL	NULL
+PSJ_Court_Canonical	Activity	PriorityCode	Description	2	varchar	256	NULL	NULL	NULL	NULL
+PSJ_Court_Canonical	Activity	PriorityCode	SessionID	3	varchar	40	NULL	NULL	NULL	NULL
+PSJ_Court_Canonical	Activity	PriorityCode	TenantID	4	varchar	20	NULL	NULL	NULL	NULL
+PSJ_Court_Canonical	Activity	PriorityCode	DataOwnerID	5	varchar	20	NULL	NULL	NULL	NULL
+PSJ_Court_Canonical	Activity	PriorityCode	DataSourceID	6	varchar	20	NULL	NULL	NULL	NULL
+PSJ_Court_Canonical	Activity	PriorityCode	CreatedDateTime	7	datetimeoffset	NULL	NULL	NULL	NULL	NULL
+PSJ_Court_Canonical	Activity	PriorityCode	UpdatedDateTime	8	datetimeoffset	NULL	NULL	NULL	NULL	NULL
+PSJ_Court_Canonical	Activity	PriorityCode	RecordStatusCodeID	9	char	1	NULL	NULL	NULL	NULL
+PSJ_Court_Canonical	Activity	PriorityCode	RecordStatusDateTime	10	datetimeoffset	NULL	NULL	NULL	NULL	NULL
+PSJ_Court_Canonical	Activity	ReleaseCondition	CaseNo	1	bigint	NULL	FOREIGN KEY	Case	CaseDetail	CaseNo
+PSJ_Court_Canonical	Activity	ReleaseCondition	ReleaseConditionID	2	varchar	20	NULL	NULL	NULL	NULL
+PSJ_Court_Canonical	Activity	ReleaseCondition	BailBondReleaseID	3	varchar	20	NULL	NULL	NULL	NULL
+PSJ_Court_Canonical	Activity	ReleaseCondition	ISNoContactOrder	4	bit	NULL	NULL	NULL	NULL	NULL
+PSJ_Court_Canonical	Activity	ReleaseCondition	ConditionTypeID	5	varchar	20	FOREIGN KEY	Activity	ConditionType	TypeID
+PSJ_Court_Canonical	Activity	ReleaseCondition	SessionID	6	varchar	40	NULL	NULL	NULL	NULL
+PSJ_Court_Canonical	Activity	ReleaseCondition	TenantID	7	varchar	20	NULL	NULL	NULL	NULL
+PSJ_Court_Canonical	Activity	ReleaseCondition	DataOwnerID	8	varchar	20	NULL	NULL	NULL	NULL
+PSJ_Court_Canonical	Activity	ReleaseCondition	DataSourceID	9	varchar	20	NULL	NULL	NULL	NULL
+PSJ_Court_Canonical	Activity	ReleaseCondition	CreatedDateTime	10	datetimeoffset	NULL	NULL	NULL	NULL	NULL
+PSJ_Court_Canonical	Activity	ReleaseCondition	UpdatedDateTime	11	datetimeoffset	NULL	NULL	NULL	NULL	NULL
+PSJ_Court_Canonical	Activity	ReleaseCondition	RecordStatusCodeID	12	char	1	NULL	NULL	NULL	NULL
+PSJ_Court_Canonical	Activity	ReleaseCondition	RecordStatusDateTime	13	datetimeoffset	NULL	NULL	NULL	NULL	NULL
+PSJ_Court_Canonical	Activity	ReleaseType	TypeID	1	varchar	20	PRIMARY KEY	NULL	NULL	NULL
+PSJ_Court_Canonical	Activity	ReleaseType	Description	2	varchar	20	NULL	NULL	NULL	NULL
+PSJ_Court_Canonical	Activity	ReleaseType	SessionID	3	varchar	40	NULL	NULL	NULL	NULL
+PSJ_Court_Canonical	Activity	ReleaseType	TenantID	4	varchar	20	NULL	NULL	NULL	NULL
+PSJ_Court_Canonical	Activity	ReleaseType	DataOwnerID	5	varchar	20	NULL	NULL	NULL	NULL
+PSJ_Court_Canonical	Activity	ReleaseType	DataSourceID	6	varchar	20	NULL	NULL	NULL	NULL
+PSJ_Court_Canonical	Activity	ReleaseType	CreatedDateTime	7	datetimeoffset	NULL	NULL	NULL	NULL	NULL
+PSJ_Court_Canonical	Activity	ReleaseType	UpdatedDateTime	8	datetimeoffset	NULL	NULL	NULL	NULL	NULL
+PSJ_Court_Canonical	Activity	ReleaseType	RecordStatusCodeID	9	char	1	NULL	NULL	NULL	NULL
+PSJ_Court_Canonical	Activity	ReleaseType	RecordStatusDateTime	10	datetimeoffset	NULL	NULL	NULL	NULL	NULL
+PSJ_Court_Canonical	Case	CaseAttorney	CaseAttorneyNo	1	bigint	NULL	PRIMARY KEY	NULL	NULL	NULL
+PSJ_Court_Canonical	Case	CaseAttorney	CaseAttorneyID	2	varchar	20	NULL	NULL	NULL	NULL
+PSJ_Court_Canonical	Case	CaseAttorney	RoleCodeID	3	varchar	20	FOREIGN KEY	Party	PartyRoleCode	CodeID
+PSJ_Court_Canonical	Case	CaseAttorney	OfficerID	4	varchar	20	FOREIGN KEY	Entity	Officer	OfficerID
+PSJ_Court_Canonical	Case	CaseAttorney	Name	5	varchar	128	NULL	NULL	NULL	NULL
+PSJ_Court_Canonical	Case	CaseAttorney	IsLead	6	bit	NULL	NULL	NULL	NULL	NULL
+PSJ_Court_Canonical	Case	CaseAttorney	IsPublicDefender	7	bit	NULL	NULL	NULL	NULL	NULL
+PSJ_Court_Canonical	Case	CaseAttorney	IsAppinted	8	bit	NULL	NULL	NULL	NULL	NULL
+PSJ_Court_Canonical	Case	CaseAttorney	DateAdded	9	date	NULL	NULL	NULL	NULL	NULL
+PSJ_Court_Canonical	Case	CaseAttorney	DateRemoved	10	date	NULL	NULL	NULL	NULL	NULL
+PSJ_Court_Canonical	Case	CaseAttorney	RemoveReasonCodeID	11	varchar	20	NULL	NULL	NULL	NULL
+PSJ_Court_Canonical	Case	CaseAttorney	Comment	12	varchar	1024	NULL	NULL	NULL	NULL
+PSJ_Court_Canonical	Case	CaseAttorney	SessionID	13	varchar	40	NULL	NULL	NULL	NULL
+PSJ_Court_Canonical	Case	CaseAttorney	TenantID	14	varchar	20	NULL	NULL	NULL	NULL
+PSJ_Court_Canonical	Case	CaseAttorney	DataOwnerID	15	varchar	20	NULL	NULL	NULL	NULL
+PSJ_Court_Canonical	Case	CaseAttorney	DataSourceID	16	varchar	20	NULL	NULL	NULL	NULL
+PSJ_Court_Canonical	Case	CaseAttorney	CreatedDateTime	17	datetimeoffset	NULL	NULL	NULL	NULL	NULL
+PSJ_Court_Canonical	Case	CaseAttorney	UpdatedDateTime	18	datetimeoffset	NULL	NULL	NULL	NULL	NULL
+PSJ_Court_Canonical	Case	CaseAttorney	RecordStatusCodeID	19	char	1	NULL	NULL	NULL	NULL
+PSJ_Court_Canonical	Case	CaseAttorney	RecordStatusDateTime	20	datetimeoffset	NULL	NULL	NULL	NULL	NULL
+PSJ_Court_Canonical	Case	CaseCrossReference	CaseNo	1	bigint	NULL	FOREIGN KEY	Case	CaseDetail	CaseNo
+PSJ_Court_Canonical	Case	CaseCrossReference	CrossReferenceID	2	varchar	20	PRIMARY KEY	NULL	NULL	NULL
+PSJ_Court_Canonical	Case	CaseCrossReference	TypeID	3	varchar	20	FOREIGN KEY	Case	CrossReferenceType	TypeID
+PSJ_Court_Canonical	Case	CaseCrossReference	Description	4	varchar	256	NULL	NULL	NULL	NULL
+PSJ_Court_Canonical	Case	CaseCrossReference	CaseNumber	5	varchar	20	NULL	NULL	NULL	NULL
+PSJ_Court_Canonical	Case	CaseCrossReference	SessionID	6	varchar	40	NULL	NULL	NULL	NULL
+PSJ_Court_Canonical	Case	CaseCrossReference	TenantID	7	varchar	20	NULL	NULL	NULL	NULL
+PSJ_Court_Canonical	Case	CaseCrossReference	DataOwnerID	8	varchar	20	NULL	NULL	NULL	NULL
+PSJ_Court_Canonical	Case	CaseCrossReference	DataSourceID	9	varchar	20	NULL	NULL	NULL	NULL
+PSJ_Court_Canonical	Case	CaseCrossReference	CreatedDateTime	10	datetimeoffset	NULL	NULL	NULL	NULL	NULL
+PSJ_Court_Canonical	Case	CaseCrossReference	UpdatedDateTime	11	datetimeoffset	NULL	NULL	NULL	NULL	NULL
+PSJ_Court_Canonical	Case	CaseCrossReference	RecordStatusCodeID	12	char	1	NULL	NULL	NULL	NULL
+PSJ_Court_Canonical	Case	CaseCrossReference	RecordStatusDateTime	13	datetimeoffset	NULL	NULL	NULL	NULL	NULL
+PSJ_Court_Canonical	Case	CaseDetail	CaseNo	1	bigint	NULL	PRIMARY KEY	NULL	NULL	NULL
+PSJ_Court_Canonical	Case	CaseDetail	CaseID	2	varchar	20	NULL	NULL	NULL	NULL
+PSJ_Court_Canonical	Case	CaseDetail	CaseNumber	3	varchar	20	NULL	NULL	NULL	NULL
+PSJ_Court_Canonical	Case	CaseDetail	TypeID	4	varchar	20	FOREIGN KEY	Case	CaseType	TypeID
+PSJ_Court_Canonical	Case	CaseDetail	CaseTitle	5	varchar	128	NULL	NULL	NULL	NULL
+PSJ_Court_Canonical	Case	CaseDetail	FiledDate	6	date	NULL	NULL	NULL	NULL	NULL
+PSJ_Court_Canonical	Case	CaseDetail	JudgeID	7	varchar	20	FOREIGN KEY	Entity	Officer	OfficerID
+PSJ_Court_Canonical	Case	CaseDetail	CourtNo	8	bigint	NULL	FOREIGN KEY	Entity	Organization	OrganizationNo
+PSJ_Court_Canonical	Case	CaseDetail	SessionID	9	varchar	40	NULL	NULL	NULL	NULL
+PSJ_Court_Canonical	Case	CaseDetail	TenantID	10	varchar	20	NULL	NULL	NULL	NULL
+PSJ_Court_Canonical	Case	CaseDetail	DataOwnerID	11	varchar	20	NULL	NULL	NULL	NULL
+PSJ_Court_Canonical	Case	CaseDetail	DataSourceID	12	varchar	20	NULL	NULL	NULL	NULL
+PSJ_Court_Canonical	Case	CaseDetail	CreatedDateTime	13	datetimeoffset	NULL	NULL	NULL	NULL	NULL
+PSJ_Court_Canonical	Case	CaseDetail	UpdatedDateTime	14	datetimeoffset	NULL	NULL	NULL	NULL	NULL
+PSJ_Court_Canonical	Case	CaseDetail	RecordStatusCodeID	15	char	1	NULL	NULL	NULL	NULL
+PSJ_Court_Canonical	Case	CaseDetail	RecordStatusDateTime	16	datetimeoffset	NULL	NULL	NULL	NULL	NULL
+PSJ_Court_Canonical	Case	CaseFiling	CaseFilingNo	1	bigint	NULL	PRIMARY KEY	NULL	NULL	NULL
+PSJ_Court_Canonical	Case	CaseFiling	CaseNo	2	bigint	NULL	FOREIGN KEY	Case	CaseDetail	CaseNo
+PSJ_Court_Canonical	Case	CaseFiling	AuthorityNo	3	bigint	NULL	FOREIGN KEY	Entity	Organization	OrganizationNo
+PSJ_Court_Canonical	Case	CaseFiling	CaseFilingID	4	varchar	20	NULL	NULL	NULL	NULL
+PSJ_Court_Canonical	Case	CaseFiling	CourtEventID	5	varchar	20	NULL	NULL	NULL	NULL
+PSJ_Court_Canonical	Case	CaseFiling	DateFiled	6	date	NULL	NULL	NULL	NULL	NULL
+PSJ_Court_Canonical	Case	CaseFiling	DateSubmitted	7	date	NULL	NULL	NULL	NULL	NULL
+PSJ_Court_Canonical	Case	CaseFiling	StatusCode	8	varchar	20	NULL	NULL	NULL	NULL
+PSJ_Court_Canonical	Case	CaseFiling	StatusDate	9	datetimeoffset	NULL	NULL	NULL	NULL	NULL
+PSJ_Court_Canonical	Case	CaseFiling	SessionID	10	varchar	40	NULL	NULL	NULL	NULL
+PSJ_Court_Canonical	Case	CaseFiling	TenantID	11	varchar	20	NULL	NULL	NULL	NULL
+PSJ_Court_Canonical	Case	CaseFiling	DataOwnerID	12	varchar	20	NULL	NULL	NULL	NULL
+PSJ_Court_Canonical	Case	CaseFiling	DataSourceID	13	varchar	20	NULL	NULL	NULL	NULL
+PSJ_Court_Canonical	Case	CaseFiling	CreatedDateTime	14	datetimeoffset	NULL	NULL	NULL	NULL	NULL
+PSJ_Court_Canonical	Case	CaseFiling	UpdatedDateTime	15	datetimeoffset	NULL	NULL	NULL	NULL	NULL
+PSJ_Court_Canonical	Case	CaseFiling	RecordStatusCodeID	16	char	1	NULL	NULL	NULL	NULL
+PSJ_Court_Canonical	Case	CaseFiling	RecordStatusDateTime	17	datetimeoffset	NULL	NULL	NULL	NULL	NULL
+PSJ_Court_Canonical	Case	CaseFlag	CaseNo	1	bigint	NULL	FOREIGN KEY	Case	CaseDetail	CaseNo
+PSJ_Court_Canonical	Case	CaseFlag	FlageID	2	varchar	20	PRIMARY KEY	NULL	NULL	NULL
+PSJ_Court_Canonical	Case	CaseFlag	FlagCode	3	varchar	20	NULL	NULL	NULL	NULL
+PSJ_Court_Canonical	Case	CaseFlag	FlagDescription	4	varchar	20	NULL	NULL	NULL	NULL
+PSJ_Court_Canonical	Case	CaseFlag	SessionID	5	varchar	40	NULL	NULL	NULL	NULL
+PSJ_Court_Canonical	Case	CaseFlag	TenantID	6	varchar	20	NULL	NULL	NULL	NULL
+PSJ_Court_Canonical	Case	CaseFlag	DataOwnerID	7	varchar	20	NULL	NULL	NULL	NULL
+PSJ_Court_Canonical	Case	CaseFlag	DataSourceID	8	varchar	20	NULL	NULL	NULL	NULL
+PSJ_Court_Canonical	Case	CaseFlag	CreatedDateTime	9	datetimeoffset	NULL	NULL	NULL	NULL	NULL
+PSJ_Court_Canonical	Case	CaseFlag	UpdatedDateTime	10	datetimeoffset	NULL	NULL	NULL	NULL	NULL
+PSJ_Court_Canonical	Case	CaseFlag	RecordStatusCodeID	11	char	1	NULL	NULL	NULL	NULL
+PSJ_Court_Canonical	Case	CaseFlag	RecordStatusDateTime	12	datetimeoffset	NULL	NULL	NULL	NULL	NULL
+PSJ_Court_Canonical	Case	CaseParty	CasePartyNo	1	bigint	NULL	PRIMARY KEY	NULL	NULL	NULL
+PSJ_Court_Canonical	Case	CaseParty	CasePartyID	2	varchar	20	NULL	NULL	NULL	NULL
+PSJ_Court_Canonical	Case	CaseParty	CaseNo	3	bigint	NULL	FOREIGN KEY	Case	CaseDetail	CaseNo
+PSJ_Court_Canonical	Case	CaseParty	PartyNo	4	bigint	NULL	FOREIGN KEY	Party	PartyDetail	PartyNo
+PSJ_Court_Canonical	Case	CaseParty	RoleCodeID	5	varchar	20	FOREIGN KEY	Party	PartyRoleCode	CodeID
+PSJ_Court_Canonical	Case	CaseParty	AttorneyNo	6	bigint	NULL	FOREIGN KEY	Case	CaseAttorney	CaseAttorneyNo
+PSJ_Court_Canonical	Case	CaseParty	SessionID	7	varchar	40	NULL	NULL	NULL	NULL
+PSJ_Court_Canonical	Case	CaseParty	TenantID	8	varchar	20	NULL	NULL	NULL	NULL
+PSJ_Court_Canonical	Case	CaseParty	DataOwnerID	9	varchar	20	NULL	NULL	NULL	NULL
+PSJ_Court_Canonical	Case	CaseParty	DataSourceID	10	varchar	20	NULL	NULL	NULL	NULL
+PSJ_Court_Canonical	Case	CaseParty	CreatedDateTime	11	datetimeoffset	NULL	NULL	NULL	NULL	NULL
+PSJ_Court_Canonical	Case	CaseParty	UpdatedDateTime	12	datetimeoffset	NULL	NULL	NULL	NULL	NULL
+PSJ_Court_Canonical	Case	CaseParty	RecordStatusCodeID	13	char	1	NULL	NULL	NULL	NULL
+PSJ_Court_Canonical	Case	CaseParty	RecordStatusDateTime	14	datetimeoffset	NULL	NULL	NULL	NULL	NULL
+PSJ_Court_Canonical	Case	CaseState	StateNo	1	bigint	NULL	PRIMARY KEY	NULL	NULL	NULL
+PSJ_Court_Canonical	Case	CaseState	StateID	2	varchar	20	NULL	NULL	NULL	NULL
+PSJ_Court_Canonical	Case	CaseState	StateDate	3	date	NULL	NULL	NULL	NULL	NULL
+PSJ_Court_Canonical	Case	CaseState	StateDateID	4	varchar	20	NULL	NULL	NULL	NULL
+PSJ_Court_Canonical	Case	CaseState	CaseNo	5	bigint	NULL	FOREIGN KEY	Case	CaseDetail	CaseNo
+PSJ_Court_Canonical	Case	CaseState	EventNo	6	bigint	NULL	FOREIGN KEY	Case	Event	EventNo
+PSJ_Court_Canonical	Case	CaseState	EventDateTime	7	datetimeoffset	NULL	NULL	NULL	NULL	NULL
+PSJ_Court_Canonical	Case	CaseState	DispositionNo	8	bigint	NULL	NULL	NULL	NULL	NULL
+PSJ_Court_Canonical	Case	CaseState	JudgementNo	9	bigint	NULL	NULL	NULL	NULL	NULL
+PSJ_Court_Canonical	Case	CaseState	ChargeDispositionNo	10	bigint	NULL	NULL	NULL	NULL	NULL
+PSJ_Court_Canonical	Case	CaseState	UnservedWarrantID	11	bigint	NULL	NULL	NULL	NULL	NULL
+PSJ_Court_Canonical	Case	CaseState	FailureToAppearWarrantID	12	bigint	NULL	NULL	NULL	NULL	NULL
+PSJ_Court_Canonical	Case	CaseState	HasDismissedJudgement	13	bit	NULL	NULL	NULL	NULL	NULL
+PSJ_Court_Canonical	Case	CaseState	HasJudgementWithoutFutureHearing	14	bit	NULL	NULL	NULL	NULL	NULL
+PSJ_Court_Canonical	Case	CaseState	HasFailedToPayRent	15	bit	NULL	NULL	NULL	NULL	NULL
+PSJ_Court_Canonical	Case	CaseState	HasAllChargesDisposed	16	bit	NULL	NULL	NULL	NULL	NULL
+PSJ_Court_Canonical	Case	CaseState	CaseIsSealed	17	bit	NULL	NULL	NULL	NULL	NULL
+PSJ_Court_Canonical	Case	CaseState	SessionID	18	varchar	40	NULL	NULL	NULL	NULL
+PSJ_Court_Canonical	Case	CaseState	TenantID	19	varchar	20	NULL	NULL	NULL	NULL
+PSJ_Court_Canonical	Case	CaseState	DataOwnerID	20	varchar	20	NULL	NULL	NULL	NULL
+PSJ_Court_Canonical	Case	CaseState	DataSourceID	21	varchar	20	NULL	NULL	NULL	NULL
+PSJ_Court_Canonical	Case	CaseState	CreatedDateTime	22	datetimeoffset	NULL	NULL	NULL	NULL	NULL
+PSJ_Court_Canonical	Case	CaseState	UpdatedDateTime	23	datetimeoffset	NULL	NULL	NULL	NULL	NULL
+PSJ_Court_Canonical	Case	CaseState	RecordStatusCodeID	24	char	1	NULL	NULL	NULL	NULL
+PSJ_Court_Canonical	Case	CaseState	RecordStatusDateTime	25	datetimeoffset	NULL	NULL	NULL	NULL	NULL
+PSJ_Court_Canonical	Case	CaseStatus	StatusNo	1	bigint	NULL	PRIMARY KEY	NULL	NULL	NULL
+PSJ_Court_Canonical	Case	CaseStatus	CaseNo	2	bigint	NULL	FOREIGN KEY	Case	CaseDetail	CaseNo
+PSJ_Court_Canonical	Case	CaseStatus	CodeID	3	varchar	20	FOREIGN KEY	Case	StatusCode	CodeID
+PSJ_Court_Canonical	Case	CaseStatus	Description	4	varchar	20	NULL	NULL	NULL	NULL
+PSJ_Court_Canonical	Case	CaseStatus	StatusDate	5	datetimeoffset	NULL	NULL	NULL	NULL	NULL
+PSJ_Court_Canonical	Case	CaseStatus	SessionID	6	varchar	40	NULL	NULL	NULL	NULL
+PSJ_Court_Canonical	Case	CaseStatus	TenantID	7	varchar	20	NULL	NULL	NULL	NULL
+PSJ_Court_Canonical	Case	CaseStatus	DataOwnerID	8	varchar	20	NULL	NULL	NULL	NULL
+PSJ_Court_Canonical	Case	CaseStatus	DataSourceID	9	varchar	20	NULL	NULL	NULL	NULL
+PSJ_Court_Canonical	Case	CaseStatus	CreatedDateTime	10	datetimeoffset	NULL	NULL	NULL	NULL	NULL
+PSJ_Court_Canonical	Case	CaseStatus	UpdatedDateTime	11	datetimeoffset	NULL	NULL	NULL	NULL	NULL
+PSJ_Court_Canonical	Case	CaseStatus	RecordStatusCodeID	12	char	1	NULL	NULL	NULL	NULL
+PSJ_Court_Canonical	Case	CaseStatus	RecordStatusDateTime	13	datetimeoffset	NULL	NULL	NULL	NULL	NULL
+PSJ_Court_Canonical	Case	CaseType	TypeID	1	varchar	20	PRIMARY KEY	NULL	NULL	NULL
+PSJ_Court_Canonical	Case	CaseType	Description	2	varchar	128	NULL	NULL	NULL	NULL
+PSJ_Court_Canonical	Case	CaseType	SessionID	3	varchar	40	NULL	NULL	NULL	NULL
+PSJ_Court_Canonical	Case	CaseType	TenantID	4	varchar	20	NULL	NULL	NULL	NULL
+PSJ_Court_Canonical	Case	CaseType	DataOwnerID	5	varchar	20	NULL	NULL	NULL	NULL
+PSJ_Court_Canonical	Case	CaseType	DataSourceID	6	varchar	20	NULL	NULL	NULL	NULL
+PSJ_Court_Canonical	Case	CaseType	CreatedDateTime	7	datetimeoffset	NULL	NULL	NULL	NULL	NULL
+PSJ_Court_Canonical	Case	CaseType	UpdatedDateTime	8	datetimeoffset	NULL	NULL	NULL	NULL	NULL
+PSJ_Court_Canonical	Case	CaseType	RecordStatusCodeID	9	char	1	NULL	NULL	NULL	NULL
+PSJ_Court_Canonical	Case	CaseType	RecordStatusDateTime	10	datetimeoffset	NULL	NULL	NULL	NULL	NULL
+PSJ_Court_Canonical	Case	CrossReferenceType	TypeID	1	varchar	20	PRIMARY KEY	NULL	NULL	NULL
+PSJ_Court_Canonical	Case	CrossReferenceType	Description	2	varchar	20	NULL	NULL	NULL	NULL
+PSJ_Court_Canonical	Case	CrossReferenceType	SessionID	3	varchar	40	NULL	NULL	NULL	NULL
+PSJ_Court_Canonical	Case	CrossReferenceType	TenantID	4	varchar	20	NULL	NULL	NULL	NULL
+PSJ_Court_Canonical	Case	CrossReferenceType	DataOwnerID	5	varchar	20	NULL	NULL	NULL	NULL
+PSJ_Court_Canonical	Case	CrossReferenceType	DataSourceID	6	varchar	20	NULL	NULL	NULL	NULL
+PSJ_Court_Canonical	Case	CrossReferenceType	CreatedDateTime	7	datetimeoffset	NULL	NULL	NULL	NULL	NULL
+PSJ_Court_Canonical	Case	CrossReferenceType	UpdatedDateTime	8	datetimeoffset	NULL	NULL	NULL	NULL	NULL
+PSJ_Court_Canonical	Case	CrossReferenceType	RecordStatusCodeID	9	char	1	NULL	NULL	NULL	NULL
+PSJ_Court_Canonical	Case	CrossReferenceType	RecordStatusDateTime	10	datetimeoffset	NULL	NULL	NULL	NULL	NULL
+PSJ_Court_Canonical	Case	Event	EventNo	1	bigint	NULL	PRIMARY KEY	NULL	NULL	NULL
+PSJ_Court_Canonical	Case	Event	CaseNo	2	bigint	NULL	FOREIGN KEY	Case	CaseDetail	CaseNo
+PSJ_Court_Canonical	Case	Event	EventID	3	varchar	20	NULL	NULL	NULL	NULL
+PSJ_Court_Canonical	Case	Event	EventDate	4	date	NULL	NULL	NULL	NULL	NULL
+PSJ_Court_Canonical	Case	Event	EventTime	5	varchar	20	NULL	NULL	NULL	NULL
+PSJ_Court_Canonical	Case	Event	TypeID	6	varchar	20	FOREIGN KEY	Case	EventType	TypeID
+PSJ_Court_Canonical	Case	Event	Location	7	varchar	20	NULL	NULL	NULL	NULL
+PSJ_Court_Canonical	Case	Event	Number	8	varchar	20	NULL	NULL	NULL	NULL
+PSJ_Court_Canonical	Case	Event	ReviewDateTime	9	varchar	20	NULL	NULL	NULL	NULL
+PSJ_Court_Canonical	Case	Event	ReviewCompletedDateTime	10	datetimeoffset	NULL	NULL	NULL	NULL	NULL
+PSJ_Court_Canonical	Case	Event	InstrumentNumber	11	varchar	20	NULL	NULL	NULL	NULL
+PSJ_Court_Canonical	Case	Event	PleaID	12	varchar	20	NULL	NULL	NULL	NULL
+PSJ_Court_Canonical	Case	Event	Amount	13	money	NULL	NULL	NULL	NULL	NULL
+PSJ_Court_Canonical	Case	Event	Comment	14	varchar	1024	NULL	NULL	NULL	NULL
+PSJ_Court_Canonical	Case	Event	ChargeID	15	varchar	20	NULL	NULL	NULL	NULL
+PSJ_Court_Canonical	Case	Event	SessionID	16	varchar	40	NULL	NULL	NULL	NULL
+PSJ_Court_Canonical	Case	Event	TenantID	17	varchar	20	NULL	NULL	NULL	NULL
+PSJ_Court_Canonical	Case	Event	DataOwnerID	18	varchar	20	NULL	NULL	NULL	NULL
+PSJ_Court_Canonical	Case	Event	DataSourceID	19	varchar	20	NULL	NULL	NULL	NULL
+PSJ_Court_Canonical	Case	Event	CreatedDateTime	20	datetimeoffset	NULL	NULL	NULL	NULL	NULL
+PSJ_Court_Canonical	Case	Event	UpdatedDateTime	21	datetimeoffset	NULL	NULL	NULL	NULL	NULL
+PSJ_Court_Canonical	Case	Event	RecordStatusCodeID	22	char	1	NULL	NULL	NULL	NULL
+PSJ_Court_Canonical	Case	Event	RecordStatusDateTime	23	datetimeoffset	NULL	NULL	NULL	NULL	NULL
+PSJ_Court_Canonical	Case	EventType	TypeID	1	varchar	20	PRIMARY KEY	NULL	NULL	NULL
+PSJ_Court_Canonical	Case	EventType	Description	2	varchar	20	NULL	NULL	NULL	NULL
+PSJ_Court_Canonical	Case	EventType	SessionID	3	varchar	40	NULL	NULL	NULL	NULL
+PSJ_Court_Canonical	Case	EventType	TenantID	4	varchar	20	NULL	NULL	NULL	NULL
+PSJ_Court_Canonical	Case	EventType	DataOwnerID	5	varchar	20	NULL	NULL	NULL	NULL
+PSJ_Court_Canonical	Case	EventType	DataSourceID	6	varchar	20	NULL	NULL	NULL	NULL
+PSJ_Court_Canonical	Case	EventType	CreatedDateTime	7	datetimeoffset	NULL	NULL	NULL	NULL	NULL
+PSJ_Court_Canonical	Case	EventType	UpdatedDateTime	8	datetimeoffset	NULL	NULL	NULL	NULL	NULL
+PSJ_Court_Canonical	Case	EventType	RecordStatusCodeID	9	char	1	NULL	NULL	NULL	NULL
+PSJ_Court_Canonical	Case	EventType	RecordStatusDateTime	10	datetimeoffset	NULL	NULL	NULL	NULL	NULL
+PSJ_Court_Canonical	Case	JudgementEvent	JudgementEventNo	1	bigint	NULL	PRIMARY KEY	NULL	NULL	NULL
+PSJ_Court_Canonical	Case	JudgementEvent	CaseJudgementID	2	varchar	20	NULL	NULL	NULL	NULL
+PSJ_Court_Canonical	Case	JudgementEvent	EventNo	3	bigint	NULL	FOREIGN KEY	Case	Event	EventNo
+PSJ_Court_Canonical	Case	JudgementEvent	EventDateTime	4	datetimeoffset	NULL	NULL	NULL	NULL	NULL
+PSJ_Court_Canonical	Case	JudgementEvent	CaseNo	5	bigint	NULL	FOREIGN KEY	Case	CaseDetail	CaseNo
+PSJ_Court_Canonical	Case	JudgementEvent	TypeID	6	varchar	20	FOREIGN KEY	Case	JudgementType	TypeID
+PSJ_Court_Canonical	Case	JudgementEvent	SessionID	7	varchar	40	NULL	NULL	NULL	NULL
+PSJ_Court_Canonical	Case	JudgementEvent	TenantID	8	varchar	20	NULL	NULL	NULL	NULL
+PSJ_Court_Canonical	Case	JudgementEvent	DataOwnerID	9	varchar	20	NULL	NULL	NULL	NULL
+PSJ_Court_Canonical	Case	JudgementEvent	DataSourceID	10	varchar	20	NULL	NULL	NULL	NULL
+PSJ_Court_Canonical	Case	JudgementEvent	CreatedDateTime	11	datetimeoffset	NULL	NULL	NULL	NULL	NULL
+PSJ_Court_Canonical	Case	JudgementEvent	UpdatedDateTime	12	datetimeoffset	NULL	NULL	NULL	NULL	NULL
+PSJ_Court_Canonical	Case	JudgementEvent	RecordStatusCodeID	13	char	1	NULL	NULL	NULL	NULL
+PSJ_Court_Canonical	Case	JudgementEvent	RecordStatusDateTime	14	datetimeoffset	NULL	NULL	NULL	NULL	NULL
+PSJ_Court_Canonical	Case	JudgementType	TypeID	1	varchar	20	PRIMARY KEY	NULL	NULL	NULL
+PSJ_Court_Canonical	Case	JudgementType	Description	2	varchar	20	NULL	NULL	NULL	NULL
+PSJ_Court_Canonical	Case	JudgementType	SessionID	3	varchar	40	NULL	NULL	NULL	NULL
+PSJ_Court_Canonical	Case	JudgementType	TenantID	4	varchar	20	NULL	NULL	NULL	NULL
+PSJ_Court_Canonical	Case	JudgementType	DataOwnerID	5	varchar	20	NULL	NULL	NULL	NULL
+PSJ_Court_Canonical	Case	JudgementType	DataSourceID	6	varchar	20	NULL	NULL	NULL	NULL
+PSJ_Court_Canonical	Case	JudgementType	CreatedDateTime	7	datetimeoffset	NULL	NULL	NULL	NULL	NULL
+PSJ_Court_Canonical	Case	JudgementType	UpdatedDateTime	8	datetimeoffset	NULL	NULL	NULL	NULL	NULL
+PSJ_Court_Canonical	Case	JudgementType	RecordStatusCodeID	9	char	1	NULL	NULL	NULL	NULL
+PSJ_Court_Canonical	Case	JudgementType	RecordStatusDateTime	10	datetimeoffset	NULL	NULL	NULL	NULL	NULL
+PSJ_Court_Canonical	Case	ProtectionOrder	ProtectionOrderNo	1	bigint	NULL	PRIMARY KEY	NULL	NULL	NULL
+PSJ_Court_Canonical	Case	ProtectionOrder	CaseNo	2	bigint	NULL	FOREIGN KEY	Case	CaseDetail	CaseNo
+PSJ_Court_Canonical	Case	ProtectionOrder	ProtectionOrderLegacyID	3	bigint	NULL	NULL	NULL	NULL	NULL
+PSJ_Court_Canonical	Case	ProtectionOrder	OrderNumber	4	varchar	30	NULL	NULL	NULL	NULL
+PSJ_Court_Canonical	Case	ProtectionOrder	CourtNo	5	bigint	NULL	FOREIGN KEY	Entity	Organization	OrganizationNo
+PSJ_Court_Canonical	Case	ProtectionOrder	TypeID	6	varchar	20	FOREIGN KEY	Case	ProtectionOrderType	TypeID
+PSJ_Court_Canonical	Case	ProtectionOrder	IssuedDate	7	date	NULL	NULL	NULL	NULL	NULL
+PSJ_Court_Canonical	Case	ProtectionOrder	ExpirationDate	8	date	NULL	NULL	NULL	NULL	NULL
+PSJ_Court_Canonical	Case	ProtectionOrder	RespondentPartyNo	9	bigint	NULL	FOREIGN KEY	Party	PartyDetail	PartyNo
+PSJ_Court_Canonical	Case	ProtectionOrder	BradyIndicatorFlag	10	varchar	20	NULL	NULL	NULL	NULL
+PSJ_Court_Canonical	Case	ProtectionOrder	IsDeleted	11	bit	NULL	NULL	NULL	NULL	NULL
+PSJ_Court_Canonical	Case	ProtectionOrder	IsExpirationUnknown	12	bit	NULL	NULL	NULL	NULL	NULL
+PSJ_Court_Canonical	Case	ProtectionOrder	SessionID	13	varchar	40	NULL	NULL	NULL	NULL
+PSJ_Court_Canonical	Case	ProtectionOrder	TenantID	14	varchar	20	NULL	NULL	NULL	NULL
+PSJ_Court_Canonical	Case	ProtectionOrder	DataOwnerID	15	varchar	20	NULL	NULL	NULL	NULL
+PSJ_Court_Canonical	Case	ProtectionOrder	DataSourceID	16	varchar	20	NULL	NULL	NULL	NULL
+PSJ_Court_Canonical	Case	ProtectionOrder	CreatedDateTime	17	datetimeoffset	NULL	NULL	NULL	NULL	NULL
+PSJ_Court_Canonical	Case	ProtectionOrder	UpdatedDateTime	18	datetimeoffset	NULL	NULL	NULL	NULL	NULL
+PSJ_Court_Canonical	Case	ProtectionOrder	RecordStatusCodeID	19	char	1	NULL	NULL	NULL	NULL
+PSJ_Court_Canonical	Case	ProtectionOrder	RecordStatusDateTime	20	datetimeoffset	NULL	NULL	NULL	NULL	NULL
+PSJ_Court_Canonical	Case	ProtectionOrderStatus	ProtectionOrderStatusNo	1	bigint	NULL	PRIMARY KEY	NULL	NULL	NULL
+PSJ_Court_Canonical	Case	ProtectionOrderStatus	CaseNo	2	bigint	NULL	FOREIGN KEY	Case	CaseDetail	CaseNo
+PSJ_Court_Canonical	Case	ProtectionOrderStatus	ProtectionOrderNo	3	bigint	NULL	NULL	NULL	NULL	NULL
+PSJ_Court_Canonical	Case	ProtectionOrderStatus	StatusDate	4	datetimeoffset	NULL	NULL	NULL	NULL	NULL
+PSJ_Court_Canonical	Case	ProtectionOrderStatus	StatusCodeID	5	varchar	20	FOREIGN KEY	Case	ProtectionOrderStatusCode	CodeID
+PSJ_Court_Canonical	Case	ProtectionOrderStatus	SessionID	6	varchar	40	NULL	NULL	NULL	NULL
+PSJ_Court_Canonical	Case	ProtectionOrderStatus	TenantID	7	varchar	20	NULL	NULL	NULL	NULL
+PSJ_Court_Canonical	Case	ProtectionOrderStatus	DataOwnerID	8	varchar	20	NULL	NULL	NULL	NULL
+PSJ_Court_Canonical	Case	ProtectionOrderStatus	DataSourceID	9	varchar	20	NULL	NULL	NULL	NULL
+PSJ_Court_Canonical	Case	ProtectionOrderStatus	CreatedDateTime	10	datetimeoffset	NULL	NULL	NULL	NULL	NULL
+PSJ_Court_Canonical	Case	ProtectionOrderStatus	UpdatedDateTime	11	datetimeoffset	NULL	NULL	NULL	NULL	NULL
+PSJ_Court_Canonical	Case	ProtectionOrderStatus	RecordStatusCodeID	12	char	1	NULL	NULL	NULL	NULL
+PSJ_Court_Canonical	Case	ProtectionOrderStatus	RecordStatusDateTime	13	datetimeoffset	NULL	NULL	NULL	NULL	NULL
+PSJ_Court_Canonical	Case	ProtectionOrderStatusCode	CodeID	1	varchar	20	PRIMARY KEY	NULL	NULL	NULL
+PSJ_Court_Canonical	Case	ProtectionOrderStatusCode	Description	2	varchar	128	NULL	NULL	NULL	NULL
+PSJ_Court_Canonical	Case	ProtectionOrderStatusCode	SessionID	3	varchar	40	NULL	NULL	NULL	NULL
+PSJ_Court_Canonical	Case	ProtectionOrderStatusCode	TenantID	4	varchar	20	NULL	NULL	NULL	NULL
+PSJ_Court_Canonical	Case	ProtectionOrderStatusCode	DataOwnerID	5	varchar	20	NULL	NULL	NULL	NULL
+PSJ_Court_Canonical	Case	ProtectionOrderStatusCode	DataSourceID	6	varchar	20	NULL	NULL	NULL	NULL
+PSJ_Court_Canonical	Case	ProtectionOrderStatusCode	CreatedDateTime	7	datetimeoffset	NULL	NULL	NULL	NULL	NULL
+PSJ_Court_Canonical	Case	ProtectionOrderStatusCode	UpdatedDateTime	8	datetimeoffset	NULL	NULL	NULL	NULL	NULL
+PSJ_Court_Canonical	Case	ProtectionOrderStatusCode	RecordStatusCodeID	9	char	1	NULL	NULL	NULL	NULL
+PSJ_Court_Canonical	Case	ProtectionOrderStatusCode	RecordStatusDateTime	10	datetimeoffset	NULL	NULL	NULL	NULL	NULL
+PSJ_Court_Canonical	Case	ProtectionOrderType	TypeID	1	varchar	20	PRIMARY KEY	NULL	NULL	NULL
+PSJ_Court_Canonical	Case	ProtectionOrderType	Description	2	varchar	128	NULL	NULL	NULL	NULL
+PSJ_Court_Canonical	Case	ProtectionOrderType	SessionID	3	varchar	40	NULL	NULL	NULL	NULL
+PSJ_Court_Canonical	Case	ProtectionOrderType	TenantID	4	varchar	20	NULL	NULL	NULL	NULL
+PSJ_Court_Canonical	Case	ProtectionOrderType	DataOwnerID	5	varchar	20	NULL	NULL	NULL	NULL
+PSJ_Court_Canonical	Case	ProtectionOrderType	DataSourceID	6	varchar	20	NULL	NULL	NULL	NULL
+PSJ_Court_Canonical	Case	ProtectionOrderType	CreatedDateTime	7	datetimeoffset	NULL	NULL	NULL	NULL	NULL
+PSJ_Court_Canonical	Case	ProtectionOrderType	UpdatedDateTime	8	datetimeoffset	NULL	NULL	NULL	NULL	NULL
+PSJ_Court_Canonical	Case	ProtectionOrderType	RecordStatusCodeID	9	char	1	NULL	NULL	NULL	NULL
+PSJ_Court_Canonical	Case	ProtectionOrderType	RecordStatusDateTime	10	datetimeoffset	NULL	NULL	NULL	NULL	NULL
+PSJ_Court_Canonical	Case	RelatedFilling	CaseNo	1	bigint	NULL	FOREIGN KEY	Case	CaseDetail	CaseNo
+PSJ_Court_Canonical	Case	RelatedFilling	RelatedCaseFilingID	2	varchar	20	PRIMARY KEY	NULL	NULL	NULL
+PSJ_Court_Canonical	Case	RelatedFilling	RelatedFillingID	3	varchar	20	NULL	NULL	NULL	NULL
+PSJ_Court_Canonical	Case	RelatedFilling	TypeID	4	varchar	20	FOREIGN KEY	Case	RelatedFillingType	TypeID
+PSJ_Court_Canonical	Case	RelatedFilling	Reason	5	varchar	256	NULL	NULL	NULL	NULL
+PSJ_Court_Canonical	Case	RelatedFilling	SessionID	6	varchar	40	NULL	NULL	NULL	NULL
+PSJ_Court_Canonical	Case	RelatedFilling	TenantID	7	varchar	20	NULL	NULL	NULL	NULL
+PSJ_Court_Canonical	Case	RelatedFilling	DataOwnerID	8	varchar	20	NULL	NULL	NULL	NULL
+PSJ_Court_Canonical	Case	RelatedFilling	DataSourceID	9	varchar	20	NULL	NULL	NULL	NULL
+PSJ_Court_Canonical	Case	RelatedFilling	CreatedDateTime	10	datetimeoffset	NULL	NULL	NULL	NULL	NULL
+PSJ_Court_Canonical	Case	RelatedFilling	UpdatedDateTime	11	datetimeoffset	NULL	NULL	NULL	NULL	NULL
+PSJ_Court_Canonical	Case	RelatedFilling	RecordStatusCodeID	12	char	1	NULL	NULL	NULL	NULL
+PSJ_Court_Canonical	Case	RelatedFilling	RecordStatusDateTime	13	datetimeoffset	NULL	NULL	NULL	NULL	NULL
+PSJ_Court_Canonical	Case	RelatedFillingType	TypeID	1	varchar	20	PRIMARY KEY	NULL	NULL	NULL
+PSJ_Court_Canonical	Case	RelatedFillingType	Description	2	varchar	20	NULL	NULL	NULL	NULL
+PSJ_Court_Canonical	Case	RelatedFillingType	SessionID	3	varchar	40	NULL	NULL	NULL	NULL
+PSJ_Court_Canonical	Case	RelatedFillingType	TenantID	4	varchar	20	NULL	NULL	NULL	NULL
+PSJ_Court_Canonical	Case	RelatedFillingType	DataOwnerID	5	varchar	20	NULL	NULL	NULL	NULL
+PSJ_Court_Canonical	Case	RelatedFillingType	DataSourceID	6	varchar	20	NULL	NULL	NULL	NULL
+PSJ_Court_Canonical	Case	RelatedFillingType	CreatedDateTime	7	datetimeoffset	NULL	NULL	NULL	NULL	NULL
+PSJ_Court_Canonical	Case	RelatedFillingType	UpdatedDateTime	8	datetimeoffset	NULL	NULL	NULL	NULL	NULL
+PSJ_Court_Canonical	Case	RelatedFillingType	RecordStatusCodeID	9	char	1	NULL	NULL	NULL	NULL
+PSJ_Court_Canonical	Case	RelatedFillingType	RecordStatusDateTime	10	datetimeoffset	NULL	NULL	NULL	NULL	NULL
+PSJ_Court_Canonical	Case	StatusCode	CodeID	1	varchar	20	PRIMARY KEY	NULL	NULL	NULL
+PSJ_Court_Canonical	Case	StatusCode	Description	2	varchar	128	NULL	NULL	NULL	NULL
+PSJ_Court_Canonical	Case	StatusCode	SessionID	3	varchar	40	NULL	NULL	NULL	NULL
+PSJ_Court_Canonical	Case	StatusCode	TenantID	4	varchar	20	NULL	NULL	NULL	NULL
+PSJ_Court_Canonical	Case	StatusCode	DataOwnerID	5	varchar	20	NULL	NULL	NULL	NULL
+PSJ_Court_Canonical	Case	StatusCode	DataSourceID	6	varchar	20	NULL	NULL	NULL	NULL
+PSJ_Court_Canonical	Case	StatusCode	CreatedDateTime	7	datetimeoffset	NULL	NULL	NULL	NULL	NULL
+PSJ_Court_Canonical	Case	StatusCode	UpdatedDateTime	8	datetimeoffset	NULL	NULL	NULL	NULL	NULL
+PSJ_Court_Canonical	Case	StatusCode	RecordStatusCodeID	9	char	1	NULL	NULL	NULL	NULL
+PSJ_Court_Canonical	Case	StatusCode	RecordStatusDateTime	10	datetimeoffset	NULL	NULL	NULL	NULL	NULL
+PSJ_Court_Canonical	Charge	AmendReasonCode	CodeID	1	varchar	20	PRIMARY KEY	NULL	NULL	NULL
+PSJ_Court_Canonical	Charge	AmendReasonCode	Description	2	varchar	128	NULL	NULL	NULL	NULL
+PSJ_Court_Canonical	Charge	AmendReasonCode	SessionID	3	varchar	40	NULL	NULL	NULL	NULL
+PSJ_Court_Canonical	Charge	AmendReasonCode	TenantID	4	varchar	20	NULL	NULL	NULL	NULL
+PSJ_Court_Canonical	Charge	AmendReasonCode	DataOwnerID	5	varchar	20	NULL	NULL	NULL	NULL
+PSJ_Court_Canonical	Charge	AmendReasonCode	DataSourceID	6	varchar	20	NULL	NULL	NULL	NULL
+PSJ_Court_Canonical	Charge	AmendReasonCode	CreatedDateTime	7	datetimeoffset	NULL	NULL	NULL	NULL	NULL
+PSJ_Court_Canonical	Charge	AmendReasonCode	UpdatedDateTime	8	datetimeoffset	NULL	NULL	NULL	NULL	NULL
+PSJ_Court_Canonical	Charge	AmendReasonCode	RecordStatusCodeID	9	char	1	NULL	NULL	NULL	NULL
+PSJ_Court_Canonical	Charge	AmendReasonCode	RecordStatusDateTime	10	datetimeoffset	NULL	NULL	NULL	NULL	NULL
+PSJ_Court_Canonical	Charge	ChargeAmendedReasonCode	CodeID	1	varchar	20	PRIMARY KEY	NULL	NULL	NULL
+PSJ_Court_Canonical	Charge	ChargeAmendedReasonCode	Description	2	varchar	128	NULL	NULL	NULL	NULL
+PSJ_Court_Canonical	Charge	ChargeAmendedReasonCode	SessionID	3	varchar	40	NULL	NULL	NULL	NULL
+PSJ_Court_Canonical	Charge	ChargeAmendedReasonCode	TenantID	4	varchar	20	NULL	NULL	NULL	NULL
+PSJ_Court_Canonical	Charge	ChargeAmendedReasonCode	DataOwnerID	5	varchar	20	NULL	NULL	NULL	NULL
+PSJ_Court_Canonical	Charge	ChargeAmendedReasonCode	DataSourceID	6	varchar	20	NULL	NULL	NULL	NULL
+PSJ_Court_Canonical	Charge	ChargeAmendedReasonCode	CreatedDateTime	7	datetimeoffset	NULL	NULL	NULL	NULL	NULL
+PSJ_Court_Canonical	Charge	ChargeAmendedReasonCode	UpdatedDateTime	8	datetimeoffset	NULL	NULL	NULL	NULL	NULL
+PSJ_Court_Canonical	Charge	ChargeAmendedReasonCode	RecordStatusCodeID	9	char	1	NULL	NULL	NULL	NULL
+PSJ_Court_Canonical	Charge	ChargeAmendedReasonCode	RecordStatusDateTime	10	datetimeoffset	NULL	NULL	NULL	NULL	NULL
+PSJ_Court_Canonical	Charge	ChargeBookingAgency	ChargeBookingAgencyID	1	varchar	20	PRIMARY KEY	NULL	NULL	NULL
+PSJ_Court_Canonical	Charge	ChargeBookingAgency	CaseNo	2	bigint	NULL	FOREIGN KEY	Case	CaseDetail	CaseNo
+PSJ_Court_Canonical	Charge	ChargeBookingAgency	ChargeNo	3	bigint	NULL	FOREIGN KEY	Charge	ChargeDetail	ChargeNo
+PSJ_Court_Canonical	Charge	ChargeBookingAgency	AgencyNo	4	bigint	NULL	FOREIGN KEY	Entity	Organization	OrganizationNo
+PSJ_Court_Canonical	Charge	ChargeBookingAgency	ArrestTime	5	varchar	20	NULL	NULL	NULL	NULL
+PSJ_Court_Canonical	Charge	ChargeBookingAgency	OfficerID	6	varchar	20	FOREIGN KEY	Entity	Officer	OfficerID
+PSJ_Court_Canonical	Charge	ChargeBookingAgency	SessionID	7	varchar	40	NULL	NULL	NULL	NULL
+PSJ_Court_Canonical	Charge	ChargeBookingAgency	TenantID	8	varchar	20	NULL	NULL	NULL	NULL
+PSJ_Court_Canonical	Charge	ChargeBookingAgency	DataOwnerID	9	varchar	20	NULL	NULL	NULL	NULL
+PSJ_Court_Canonical	Charge	ChargeBookingAgency	DataSourceID	10	varchar	20	NULL	NULL	NULL	NULL
+PSJ_Court_Canonical	Charge	ChargeBookingAgency	CreatedDateTime	11	datetimeoffset	NULL	NULL	NULL	NULL	NULL
+PSJ_Court_Canonical	Charge	ChargeBookingAgency	UpdatedDateTime	12	datetimeoffset	NULL	NULL	NULL	NULL	NULL
+PSJ_Court_Canonical	Charge	ChargeBookingAgency	RecordStatusCodeID	13	char	1	NULL	NULL	NULL	NULL
+PSJ_Court_Canonical	Charge	ChargeBookingAgency	RecordStatusDateTime	14	datetimeoffset	NULL	NULL	NULL	NULL	NULL
+PSJ_Court_Canonical	Charge	ChargeDetail	ChargeNo	1	bigint	NULL	PRIMARY KEY	NULL	NULL	NULL
+PSJ_Court_Canonical	Charge	ChargeDetail	CaseNo	2	bigint	NULL	FOREIGN KEY	Case	CaseDetail	CaseNo
+PSJ_Court_Canonical	Charge	ChargeDetail	ChargeID	3	varchar	20	NULL	NULL	NULL	NULL
+PSJ_Court_Canonical	Charge	ChargeDetail	FillingDate	4	date	NULL	NULL	NULL	NULL	NULL
+PSJ_Court_Canonical	Charge	ChargeDetail	ArrestDate	5	date	NULL	NULL	NULL	NULL	NULL
+PSJ_Court_Canonical	Charge	ChargeDetail	ArrestTrackID	6	varchar	20	NULL	NULL	NULL	NULL
+PSJ_Court_Canonical	Charge	ChargeDetail	DispositionDate	7	date	NULL	NULL	NULL	NULL	NULL
+PSJ_Court_Canonical	Charge	ChargeDetail	OfficerID	8	varchar	20	NULL	NULL	NULL	NULL
+PSJ_Court_Canonical	Charge	ChargeDetail	OffenseDate	9	date	NULL	NULL	NULL	NULL	NULL
+PSJ_Court_Canonical	Charge	ChargeDetail	OffenseLocationID	10	varchar	20	NULL	NULL	NULL	NULL
+PSJ_Court_Canonical	Charge	ChargeDetail	ChargeNumber	11	varchar	20	NULL	NULL	NULL	NULL
+PSJ_Court_Canonical	Charge	ChargeDetail	ChargeDescription	12	varchar	256	NULL	NULL	NULL	NULL
+PSJ_Court_Canonical	Charge	ChargeDetail	DrugTypeID	13	varchar	256	NULL	NULL	NULL	NULL
+PSJ_Court_Canonical	Charge	ChargeDetail	IncidentZoneTypeID	14	varchar	20	NULL	NULL	NULL	NULL
+PSJ_Court_Canonical	Charge	ChargeDetail	JurisdictionID	15	varchar	20	FOREIGN KEY	Code	JurisdictionCode	CodeID
+PSJ_Court_Canonical	Charge	ChargeDetail	OffenseID	16	varchar	20	FOREIGN KEY	Code	OffenseCode	OffenseID
+PSJ_Court_Canonical	Charge	ChargeDetail	ChargeTrackNumber	17	varchar	20	NULL	NULL	NULL	NULL
+PSJ_Court_Canonical	Charge	ChargeDetail	ChargeTrackSequence	18	varchar	20	NULL	NULL	NULL	NULL
+PSJ_Court_Canonical	Charge	ChargeDetail	ChargeMitigator	19	varchar	20	NULL	NULL	NULL	NULL
+PSJ_Court_Canonical	Charge	ChargeDetail	AmendedDate	20	date	NULL	NULL	NULL	NULL	NULL
+PSJ_Court_Canonical	Charge	ChargeDetail	AmendedReason	21	varchar	128	NULL	NULL	NULL	NULL
+PSJ_Court_Canonical	Charge	ChargeDetail	WasChargeChanged	22	bit	NULL	NULL	NULL	NULL	NULL
+PSJ_Court_Canonical	Charge	ChargeDetail	Deleted	23	bit	NULL	NULL	NULL	NULL	NULL
+PSJ_Court_Canonical	Charge	ChargeDetail	SessionID	24	varchar	40	NULL	NULL	NULL	NULL
+PSJ_Court_Canonical	Charge	ChargeDetail	TenantID	25	varchar	20	NULL	NULL	NULL	NULL
+PSJ_Court_Canonical	Charge	ChargeDetail	DataOwnerID	26	varchar	20	NULL	NULL	NULL	NULL
+PSJ_Court_Canonical	Charge	ChargeDetail	DataSourceID	27	varchar	20	NULL	NULL	NULL	NULL
+PSJ_Court_Canonical	Charge	ChargeDetail	CreatedDateTime	28	datetimeoffset	NULL	NULL	NULL	NULL	NULL
+PSJ_Court_Canonical	Charge	ChargeDetail	UpdatedDateTime	29	datetimeoffset	NULL	NULL	NULL	NULL	NULL
+PSJ_Court_Canonical	Charge	ChargeDetail	RecordStatusCodeID	30	char	1	NULL	NULL	NULL	NULL
+PSJ_Court_Canonical	Charge	ChargeDetail	RecordStatusDateTime	31	datetimeoffset	NULL	NULL	NULL	NULL	NULL
+PSJ_Court_Canonical	Charge	ChargeModifier	ChargeModifierID	1	varchar	20	PRIMARY KEY	NULL	NULL	NULL
+PSJ_Court_Canonical	Charge	ChargeModifier	CaseNo	2	bigint	NULL	FOREIGN KEY	Case	CaseDetail	CaseNo
+PSJ_Court_Canonical	Charge	ChargeModifier	ChargeNo	3	bigint	NULL	FOREIGN KEY	Charge	ChargeDetail	ChargeNo
+PSJ_Court_Canonical	Charge	ChargeModifier	ModifierID	4	varchar	20	FOREIGN KEY	Charge	ChargeModifierCode	CodeID
+PSJ_Court_Canonical	Charge	ChargeModifier	SessionID	5	varchar	40	NULL	NULL	NULL	NULL
+PSJ_Court_Canonical	Charge	ChargeModifier	TenantID	6	varchar	20	NULL	NULL	NULL	NULL
+PSJ_Court_Canonical	Charge	ChargeModifier	DataOwnerID	7	varchar	20	NULL	NULL	NULL	NULL
+PSJ_Court_Canonical	Charge	ChargeModifier	DataSourceID	8	varchar	20	NULL	NULL	NULL	NULL
+PSJ_Court_Canonical	Charge	ChargeModifier	CreatedDateTime	9	datetimeoffset	NULL	NULL	NULL	NULL	NULL
+PSJ_Court_Canonical	Charge	ChargeModifier	UpdatedDateTime	10	datetimeoffset	NULL	NULL	NULL	NULL	NULL
+PSJ_Court_Canonical	Charge	ChargeModifier	RecordStatusCodeID	11	char	1	NULL	NULL	NULL	NULL
+PSJ_Court_Canonical	Charge	ChargeModifier	RecordStatusDateTime	12	datetimeoffset	NULL	NULL	NULL	NULL	NULL
+PSJ_Court_Canonical	Charge	ChargeModifierCode	CodeID	1	varchar	20	PRIMARY KEY	NULL	NULL	NULL
+PSJ_Court_Canonical	Charge	ChargeModifierCode	Description	2	varchar	128	NULL	NULL	NULL	NULL
+PSJ_Court_Canonical	Charge	ChargeModifierCode	SessionID	3	varchar	40	NULL	NULL	NULL	NULL
+PSJ_Court_Canonical	Charge	ChargeModifierCode	TenantID	4	varchar	20	NULL	NULL	NULL	NULL
+PSJ_Court_Canonical	Charge	ChargeModifierCode	DataOwnerID	5	varchar	20	NULL	NULL	NULL	NULL
+PSJ_Court_Canonical	Charge	ChargeModifierCode	DataSourceID	6	varchar	20	NULL	NULL	NULL	NULL
+PSJ_Court_Canonical	Charge	ChargeModifierCode	CreatedDateTime	7	datetimeoffset	NULL	NULL	NULL	NULL	NULL
+PSJ_Court_Canonical	Charge	ChargeModifierCode	UpdatedDateTime	8	datetimeoffset	NULL	NULL	NULL	NULL	NULL
+PSJ_Court_Canonical	Charge	ChargeModifierCode	RecordStatusCodeID	9	char	1	NULL	NULL	NULL	NULL
+PSJ_Court_Canonical	Charge	ChargeModifierCode	RecordStatusDateTime	10	datetimeoffset	NULL	NULL	NULL	NULL	NULL
+PSJ_Court_Canonical	Charge	ChargeReportingAgency	ChargeReportingAgencyID	1	varchar	20	PRIMARY KEY	NULL	NULL	NULL
+PSJ_Court_Canonical	Charge	ChargeReportingAgency	CaseNo	2	bigint	NULL	FOREIGN KEY	Case	CaseDetail	CaseNo
+PSJ_Court_Canonical	Charge	ChargeReportingAgency	ChargeNo	3	bigint	NULL	FOREIGN KEY	Charge	ChargeDetail	ChargeNo
+PSJ_Court_Canonical	Charge	ChargeReportingAgency	AgencyNo	4	bigint	NULL	FOREIGN KEY	Entity	Organization	OrganizationNo
+PSJ_Court_Canonical	Charge	ChargeReportingAgency	ControlNumber	5	varchar	20	NULL	NULL	NULL	NULL
+PSJ_Court_Canonical	Charge	ChargeReportingAgency	OfficerID	6	varchar	20	FOREIGN KEY	Entity	Officer	OfficerID
+PSJ_Court_Canonical	Charge	ChargeReportingAgency	SessionID	7	varchar	40	NULL	NULL	NULL	NULL
+PSJ_Court_Canonical	Charge	ChargeReportingAgency	TenantID	8	varchar	20	NULL	NULL	NULL	NULL
+PSJ_Court_Canonical	Charge	ChargeReportingAgency	DataOwnerID	9	varchar	20	NULL	NULL	NULL	NULL
+PSJ_Court_Canonical	Charge	ChargeReportingAgency	DataSourceID	10	varchar	20	NULL	NULL	NULL	NULL
+PSJ_Court_Canonical	Charge	ChargeReportingAgency	CreatedDateTime	11	datetimeoffset	NULL	NULL	NULL	NULL	NULL
+PSJ_Court_Canonical	Charge	ChargeReportingAgency	UpdatedDateTime	12	datetimeoffset	NULL	NULL	NULL	NULL	NULL
+PSJ_Court_Canonical	Charge	ChargeReportingAgency	RecordStatusCodeID	13	char	1	NULL	NULL	NULL	NULL
+PSJ_Court_Canonical	Charge	ChargeReportingAgency	RecordStatusDateTime	14	datetimeoffset	NULL	NULL	NULL	NULL	NULL
+PSJ_Court_Canonical	Charge	DispositionEvent	DispositionEventNo	1	bigint	NULL	PRIMARY KEY	NULL	NULL	NULL
+PSJ_Court_Canonical	Charge	DispositionEvent	DispositionEventID	2	varchar	20	NULL	NULL	NULL	NULL
+PSJ_Court_Canonical	Charge	DispositionEvent	CaseNo	3	bigint	NULL	FOREIGN KEY	Case	CaseDetail	CaseNo
+PSJ_Court_Canonical	Charge	DispositionEvent	DispositionTypeID	4	varchar	20	FOREIGN KEY	Charge	DispositionType	TypeID
+PSJ_Court_Canonical	Charge	DispositionEvent	EventDate	5	date	NULL	NULL	NULL	NULL	NULL
+PSJ_Court_Canonical	Charge	DispositionEvent	AmendReasonCodeID	6	varchar	20	FOREIGN KEY	Charge	AmendReasonCode	CodeID
+PSJ_Court_Canonical	Charge	DispositionEvent	SessionID	7	varchar	40	NULL	NULL	NULL	NULL
+PSJ_Court_Canonical	Charge	DispositionEvent	TenantID	8	varchar	20	NULL	NULL	NULL	NULL
+PSJ_Court_Canonical	Charge	DispositionEvent	DataOwnerID	9	varchar	20	NULL	NULL	NULL	NULL
+PSJ_Court_Canonical	Charge	DispositionEvent	DataSourceID	10	varchar	20	NULL	NULL	NULL	NULL
+PSJ_Court_Canonical	Charge	DispositionEvent	CreatedDateTime	11	datetimeoffset	NULL	NULL	NULL	NULL	NULL
+PSJ_Court_Canonical	Charge	DispositionEvent	UpdatedDateTime	12	datetimeoffset	NULL	NULL	NULL	NULL	NULL
+PSJ_Court_Canonical	Charge	DispositionEvent	RecordStatusCodeID	13	char	1	NULL	NULL	NULL	NULL
+PSJ_Court_Canonical	Charge	DispositionEvent	RecordStatusDateTime	14	datetimeoffset	NULL	NULL	NULL	NULL	NULL
+PSJ_Court_Canonical	Charge	DispositionType	TypeID	1	varchar	20	PRIMARY KEY	NULL	NULL	NULL
+PSJ_Court_Canonical	Charge	DispositionType	Description	2	varchar	128	NULL	NULL	NULL	NULL
+PSJ_Court_Canonical	Charge	DispositionType	LegacyID	3	varchar	20	NULL	NULL	NULL	NULL
+PSJ_Court_Canonical	Charge	DispositionType	IsRetired	4	bit	NULL	NULL	NULL	NULL	NULL
+PSJ_Court_Canonical	Charge	DispositionType	IsDismissed	5	bit	NULL	NULL	NULL	NULL	NULL
+PSJ_Court_Canonical	Charge	DispositionType	IsGuilty	6	bit	NULL	NULL	NULL	NULL	NULL
+PSJ_Court_Canonical	Charge	DispositionType	IsAcquitted	7	bit	NULL	NULL	NULL	NULL	NULL
+PSJ_Court_Canonical	Charge	DispositionType	IsNolleProsequi	8	bit	NULL	NULL	NULL	NULL	NULL
+PSJ_Court_Canonical	Charge	DispositionType	IsMistrial	9	bit	NULL	NULL	NULL	NULL	NULL
+PSJ_Court_Canonical	Charge	DispositionType	IsDisposed	10	bit	NULL	NULL	NULL	NULL	NULL
+PSJ_Court_Canonical	Charge	DispositionType	IsPlea	11	bit	NULL	NULL	NULL	NULL	NULL
+PSJ_Court_Canonical	Charge	DispositionType	IsFinalDisposition	12	bit	NULL	NULL	NULL	NULL	NULL
+PSJ_Court_Canonical	Charge	DispositionType	DispositionText	13	varchar	20	NULL	NULL	NULL	NULL
+PSJ_Court_Canonical	Charge	DispositionType	RetiredDate	14	date	NULL	NULL	NULL	NULL	NULL
+PSJ_Court_Canonical	Charge	DispositionType	SessionID	15	varchar	40	NULL	NULL	NULL	NULL
+PSJ_Court_Canonical	Charge	DispositionType	TenantID	16	varchar	20	NULL	NULL	NULL	NULL
+PSJ_Court_Canonical	Charge	DispositionType	DataOwnerID	17	varchar	20	NULL	NULL	NULL	NULL
+PSJ_Court_Canonical	Charge	DispositionType	DataSourceID	18	varchar	20	NULL	NULL	NULL	NULL
+PSJ_Court_Canonical	Charge	DispositionType	CreatedDateTime	19	datetimeoffset	NULL	NULL	NULL	NULL	NULL
+PSJ_Court_Canonical	Charge	DispositionType	UpdatedDateTime	20	datetimeoffset	NULL	NULL	NULL	NULL	NULL
+PSJ_Court_Canonical	Charge	DispositionType	RecordStatusCodeID	21	char	1	NULL	NULL	NULL	NULL
+PSJ_Court_Canonical	Charge	DispositionType	RecordStatusDateTime	22	datetimeoffset	NULL	NULL	NULL	NULL	NULL
+PSJ_Court_Canonical	Charge	PleaEvent	PleaEventNo	1	bigint	NULL	NULL	NULL	NULL	NULL
+PSJ_Court_Canonical	Charge	PleaEvent	PleaEventID	2	varchar	20	NULL	NULL	NULL	NULL
+PSJ_Court_Canonical	Charge	PleaEvent	CaseNo	3	bigint	NULL	FOREIGN KEY	Case	CaseDetail	CaseNo
+PSJ_Court_Canonical	Charge	PleaEvent	PleaID	4	varchar	20	NULL	NULL	NULL	NULL
+PSJ_Court_Canonical	Charge	PleaEvent	EventDate	5	date	NULL	NULL	NULL	NULL	NULL
+PSJ_Court_Canonical	Charge	PleaEvent	ChargeNo	6	bigint	NULL	FOREIGN KEY	Charge	ChargeDetail	ChargeNo
+PSJ_Court_Canonical	Charge	PleaEvent	PleaType	7	varchar	256	NULL	NULL	NULL	NULL
+PSJ_Court_Canonical	Charge	PleaEvent	AmendReasonCodeID	8	varchar	20	NULL	NULL	NULL	NULL
+PSJ_Court_Canonical	Charge	PleaEvent	SessionID	9	varchar	40	NULL	NULL	NULL	NULL
+PSJ_Court_Canonical	Charge	PleaEvent	TenantID	10	varchar	20	NULL	NULL	NULL	NULL
+PSJ_Court_Canonical	Charge	PleaEvent	DataOwnerID	11	varchar	20	NULL	NULL	NULL	NULL
+PSJ_Court_Canonical	Charge	PleaEvent	DataSourceID	12	varchar	20	NULL	NULL	NULL	NULL
+PSJ_Court_Canonical	Charge	PleaEvent	CreatedDateTime	13	datetimeoffset	NULL	NULL	NULL	NULL	NULL
+PSJ_Court_Canonical	Charge	PleaEvent	UpdatedDateTime	14	datetimeoffset	NULL	NULL	NULL	NULL	NULL
+PSJ_Court_Canonical	Charge	PleaEvent	RecordStatusCodeID	15	char	1	NULL	NULL	NULL	NULL
+PSJ_Court_Canonical	Charge	PleaEvent	RecordStatusDateTime	16	datetimeoffset	NULL	NULL	NULL	NULL	NULL
+PSJ_Court_Canonical	Charge	PleaType	TypeID	1	varchar	20	PRIMARY KEY	NULL	NULL	NULL
+PSJ_Court_Canonical	Charge	PleaType	Description	2	varchar	128	NULL	NULL	NULL	NULL
+PSJ_Court_Canonical	Charge	PleaType	SessionID	3	varchar	40	NULL	NULL	NULL	NULL
+PSJ_Court_Canonical	Charge	PleaType	TenantID	4	varchar	20	NULL	NULL	NULL	NULL
+PSJ_Court_Canonical	Charge	PleaType	DataOwnerID	5	varchar	20	NULL	NULL	NULL	NULL
+PSJ_Court_Canonical	Charge	PleaType	DataSourceID	6	varchar	20	NULL	NULL	NULL	NULL
+PSJ_Court_Canonical	Charge	PleaType	CreatedDateTime	7	datetimeoffset	NULL	NULL	NULL	NULL	NULL
+PSJ_Court_Canonical	Charge	PleaType	UpdatedDateTime	8	datetimeoffset	NULL	NULL	NULL	NULL	NULL
+PSJ_Court_Canonical	Charge	PleaType	RecordStatusCodeID	9	char	1	NULL	NULL	NULL	NULL
+PSJ_Court_Canonical	Charge	PleaType	RecordStatusDateTime	10	datetimeoffset	NULL	NULL	NULL	NULL	NULL
+PSJ_Court_Canonical	Citation	CitationEvent	CitationEventNo	1	bigint	NULL	PRIMARY KEY	NULL	NULL	NULL
+PSJ_Court_Canonical	Citation	CitationEvent	CitationLegacyNo	2	bigint	NULL	NULL	NULL	NULL	NULL
+PSJ_Court_Canonical	Citation	CitationEvent	CitationID	3	varchar	40	NULL	NULL	NULL	NULL
+PSJ_Court_Canonical	Citation	CitationEvent	EventDate	4	date	NULL	NULL	NULL	NULL	NULL
+PSJ_Court_Canonical	Citation	CitationEvent	EventTime	5	varchar	20	NULL	NULL	NULL	NULL
+PSJ_Court_Canonical	Citation	CitationEvent	CourtNo	6	bigint	NULL	FOREIGN KEY	Entity	Organization	OrganizationNo
+PSJ_Court_Canonical	Citation	CitationEvent	CaseNo	7	bigint	NULL	FOREIGN KEY	Case	CaseDetail	CaseNo
+PSJ_Court_Canonical	Citation	CitationEvent	PartyNo	8	bigint	NULL	FOREIGN KEY	Party	PartyDetail	PartyNo
+PSJ_Court_Canonical	Citation	CitationEvent	OfficerID	9	varchar	20	FOREIGN KEY	Entity	Officer	OfficerID
+PSJ_Court_Canonical	Code	DateDetail	DateID	1	varchar	8	PRIMARY KEY	NULL	NULL	NULL
+PSJ_Court_Canonical	Code	DateDetail	Date	2	datetime	NULL	NULL	NULL	NULL	NULL
+PSJ_Court_Canonical	Code	DateDetail	MonthAlias	3	char	3	NULL	NULL	NULL	NULL
+PSJ_Court_Canonical	Code	DateDetail	YearText	4	char	4	NULL	NULL	NULL	NULL
+PSJ_Court_Canonical	Code	DateDetail	MonthText	5	char	2	NULL	NULL	NULL	NULL
+PSJ_Court_Canonical	Code	DateDetail	DayText	6	char	2	NULL	NULL	NULL	NULL
+PSJ_Court_Canonical	Code	DateDetail	DateText	7	char	10	NULL	NULL	NULL	NULL
+PSJ_Court_Canonical	Code	DateDetail	Year	8	smallint	NULL	NULL	NULL	NULL	NULL
+PSJ_Court_Canonical	Code	DateDetail	Month	9	smallint	NULL	NULL	NULL	NULL	NULL
+PSJ_Court_Canonical	Code	DateDetail	Day	10	smallint	NULL	NULL	NULL	NULL	NULL
+PSJ_Court_Canonical	Code	DateDetail	DayOfMonth	11	smallint	NULL	NULL	NULL	NULL	NULL
+PSJ_Court_Canonical	Code	DateDetail	YearWeek	12	smallint	NULL	NULL	NULL	NULL	NULL
+PSJ_Court_Canonical	Code	DateDetail	MonthWeek	13	smallint	NULL	NULL	NULL	NULL	NULL
+PSJ_Court_Canonical	Code	DateDetail	WeekDay	14	smallint	NULL	NULL	NULL	NULL	NULL
+PSJ_Court_Canonical	Code	DateDetail	DayAlias	15	varchar	10	NULL	NULL	NULL	NULL
+PSJ_Court_Canonical	Code	DateDetail	QuaterNo	16	smallint	NULL	NULL	NULL	NULL	NULL
+PSJ_Court_Canonical	Code	DateDetail	TrimesterNo	17	smallint	NULL	NULL	NULL	NULL	NULL
+PSJ_Court_Canonical	Code	DateDetail	OfficialHolidayNo	18	smallint	NULL	NULL	NULL	NULL	NULL
+PSJ_Court_Canonical	Code	DateDetail	WeekDayTypeId	19	char	1	NULL	NULL	NULL	NULL
+PSJ_Court_Canonical	Code	DateDetail	WorkHours	20	smallint	NULL	NULL	NULL	NULL	NULL
+PSJ_Court_Canonical	Code	DateDetail	MonthName	21	varchar	10	NULL	NULL	NULL	NULL
+PSJ_Court_Canonical	Code	DateDetail	DayCount	22	smallint	NULL	NULL	NULL	NULL	NULL
+PSJ_Court_Canonical	Code	DrugType	TypeID	1	varchar	20	PRIMARY KEY	NULL	NULL	NULL
+PSJ_Court_Canonical	Code	DrugType	Description	2	varchar	128	NULL	NULL	NULL	NULL
+PSJ_Court_Canonical	Code	DrugType	SessionID	3	varchar	40	NULL	NULL	NULL	NULL
+PSJ_Court_Canonical	Code	DrugType	TenantID	4	varchar	20	NULL	NULL	NULL	NULL
+PSJ_Court_Canonical	Code	DrugType	DataOwnerID	5	varchar	20	NULL	NULL	NULL	NULL
+PSJ_Court_Canonical	Code	DrugType	DataSourceID	6	varchar	20	NULL	NULL	NULL	NULL
+PSJ_Court_Canonical	Code	DrugType	CreatedDateTime	7	datetimeoffset	NULL	NULL	NULL	NULL	NULL
+PSJ_Court_Canonical	Code	DrugType	UpdatedDateTime	8	datetimeoffset	NULL	NULL	NULL	NULL	NULL
+PSJ_Court_Canonical	Code	DrugType	RecordStatusCodeID	9	char	1	NULL	NULL	NULL	NULL
+PSJ_Court_Canonical	Code	DrugType	RecordStatusDateTime	10	datetimeoffset	NULL	NULL	NULL	NULL	NULL
+PSJ_Court_Canonical	Code	JurisdictionCode	CodeID	1	varchar	20	PRIMARY KEY	NULL	NULL	NULL
+PSJ_Court_Canonical	Code	JurisdictionCode	Description	2	varchar	20	NULL	NULL	NULL	NULL
+PSJ_Court_Canonical	Code	JurisdictionCode	SessionID	3	varchar	40	NULL	NULL	NULL	NULL
+PSJ_Court_Canonical	Code	JurisdictionCode	TenantID	4	varchar	20	NULL	NULL	NULL	NULL
+PSJ_Court_Canonical	Code	JurisdictionCode	DataOwnerID	5	varchar	20	NULL	NULL	NULL	NULL
+PSJ_Court_Canonical	Code	JurisdictionCode	DataSourceID	6	varchar	20	NULL	NULL	NULL	NULL
+PSJ_Court_Canonical	Code	JurisdictionCode	CreatedDateTime	7	datetimeoffset	NULL	NULL	NULL	NULL	NULL
+PSJ_Court_Canonical	Code	JurisdictionCode	UpdatedDateTime	8	datetimeoffset	NULL	NULL	NULL	NULL	NULL
+PSJ_Court_Canonical	Code	JurisdictionCode	RecordStatusCodeID	9	char	1	NULL	NULL	NULL	NULL
+PSJ_Court_Canonical	Code	JurisdictionCode	RecordStatusDateTime	10	datetimeoffset	NULL	NULL	NULL	NULL	NULL
+PSJ_Court_Canonical	Code	OffenseCategoryCode	CodeID	1	varchar	20	PRIMARY KEY	NULL	NULL	NULL
+PSJ_Court_Canonical	Code	OffenseCategoryCode	Description	2	varchar	20	NULL	NULL	NULL	NULL
+PSJ_Court_Canonical	Code	OffenseCategoryCode	SessionID	3	varchar	40	NULL	NULL	NULL	NULL
+PSJ_Court_Canonical	Code	OffenseCategoryCode	TenantID	4	varchar	20	NULL	NULL	NULL	NULL
+PSJ_Court_Canonical	Code	OffenseCategoryCode	DataOwnerID	5	varchar	20	NULL	NULL	NULL	NULL
+PSJ_Court_Canonical	Code	OffenseCategoryCode	DataSourceID	6	varchar	20	NULL	NULL	NULL	NULL
+PSJ_Court_Canonical	Code	OffenseCategoryCode	CreatedDateTime	7	datetimeoffset	NULL	NULL	NULL	NULL	NULL
+PSJ_Court_Canonical	Code	OffenseCategoryCode	UpdatedDateTime	8	datetimeoffset	NULL	NULL	NULL	NULL	NULL
+PSJ_Court_Canonical	Code	OffenseCategoryCode	RecordStatusCodeID	9	char	1	NULL	NULL	NULL	NULL
+PSJ_Court_Canonical	Code	OffenseCategoryCode	RecordStatusDateTime	10	datetimeoffset	NULL	NULL	NULL	NULL	NULL
+PSJ_Court_Canonical	Code	OffenseCode	OffenseID	1	varchar	20	PRIMARY KEY	NULL	NULL	NULL
+PSJ_Court_Canonical	Code	OffenseCode	StatuteNumber	2	varchar	20	NULL	NULL	NULL	NULL
+PSJ_Court_Canonical	Code	OffenseCode	StatuteCode	3	varchar	20	NULL	NULL	NULL	NULL
+PSJ_Court_Canonical	Code	OffenseCode	StatuteDescription	4	varchar	128	NULL	NULL	NULL	NULL
+PSJ_Court_Canonical	Code	OffenseCode	StatuteDegree	5	varchar	20	NULL	NULL	NULL	NULL
+PSJ_Court_Canonical	Code	OffenseCode	TitleCodeID	6	varchar	20	FOREIGN KEY	Code	StatuteTitleCode	CodeID
+PSJ_Court_Canonical	Code	OffenseCode	CategoryCodeID	7	varchar	20	FOREIGN KEY	Code	OffenseCategoryCode	CodeID
+PSJ_Court_Canonical	Code	OffenseCode	CjisCodeID	8	varchar	20	NULL	NULL	NULL	NULL
+PSJ_Court_Canonical	Code	OffenseCode	EnactedDate	9	date	NULL	NULL	NULL	NULL	NULL
+PSJ_Court_Canonical	Code	OffenseCode	RepealedDate	10	date	NULL	NULL	NULL	NULL	NULL
+PSJ_Court_Canonical	Code	OffenseCode	SessionID	11	varchar	40	NULL	NULL	NULL	NULL
+PSJ_Court_Canonical	Code	OffenseCode	TenantID	12	varchar	20	NULL	NULL	NULL	NULL
+PSJ_Court_Canonical	Code	OffenseCode	DataOwnerID	13	varchar	20	NULL	NULL	NULL	NULL
+PSJ_Court_Canonical	Code	OffenseCode	DataSourceID	14	varchar	20	NULL	NULL	NULL	NULL
+PSJ_Court_Canonical	Code	OffenseCode	CreatedDateTime	15	datetimeoffset	NULL	NULL	NULL	NULL	NULL
+PSJ_Court_Canonical	Code	OffenseCode	UpdatedDateTime	16	datetimeoffset	NULL	NULL	NULL	NULL	NULL
+PSJ_Court_Canonical	Code	OffenseCode	RecordStatusCodeID	17	char	1	NULL	NULL	NULL	NULL
+PSJ_Court_Canonical	Code	OffenseCode	RecordStatusDateTime	18	datetimeoffset	NULL	NULL	NULL	NULL	NULL
+PSJ_Court_Canonical	Code	StatuteTitleCode	CodeID	1	varchar	20	PRIMARY KEY	NULL	NULL	NULL
+PSJ_Court_Canonical	Code	StatuteTitleCode	Description	2	varchar	128	NULL	NULL	NULL	NULL
+PSJ_Court_Canonical	Code	StatuteTitleCode	SessionID	3	varchar	40	NULL	NULL	NULL	NULL
+PSJ_Court_Canonical	Code	StatuteTitleCode	TenantID	4	varchar	20	NULL	NULL	NULL	NULL
+PSJ_Court_Canonical	Code	StatuteTitleCode	DataOwnerID	5	varchar	20	NULL	NULL	NULL	NULL
+PSJ_Court_Canonical	Code	StatuteTitleCode	DataSourceID	6	varchar	20	NULL	NULL	NULL	NULL
+PSJ_Court_Canonical	Code	StatuteTitleCode	CreatedDateTime	7	datetimeoffset	NULL	NULL	NULL	NULL	NULL
+PSJ_Court_Canonical	Code	StatuteTitleCode	UpdatedDateTime	8	datetimeoffset	NULL	NULL	NULL	NULL	NULL
+PSJ_Court_Canonical	Code	StatuteTitleCode	RecordStatusCodeID	9	char	1	NULL	NULL	NULL	NULL
+PSJ_Court_Canonical	Code	StatuteTitleCode	RecordStatusDateTime	10	datetimeoffset	NULL	NULL	NULL	NULL	NULL
+PSJ_Court_Canonical	Entity	Location	LocationID	1	varchar	20	PRIMARY KEY	NULL	NULL	NULL
+PSJ_Court_Canonical	Entity	Location	TypeID	2	varchar	20	FOREIGN KEY	Entity	LocationType	TypeID
+PSJ_Court_Canonical	Entity	Location	AddressLine1	3	varchar	128	NULL	NULL	NULL	NULL
+PSJ_Court_Canonical	Entity	Location	AddressLine2	4	varchar	128	NULL	NULL	NULL	NULL
+PSJ_Court_Canonical	Entity	Location	CityCodeID	5	varchar	20	NULL	NULL	NULL	NULL
+PSJ_Court_Canonical	Entity	Location	StateCodeID	6	varchar	20	NULL	NULL	NULL	NULL
+PSJ_Court_Canonical	Entity	Location	PostalCodeID	7	varchar	20	NULL	NULL	NULL	NULL
+PSJ_Court_Canonical	Entity	Location	DivisionNo	8	bigint	NULL	FOREIGN KEY	Entity	LocationDivision	DivisionNo
+PSJ_Court_Canonical	Entity	Location	SessionID	9	varchar	40	NULL	NULL	NULL	NULL
+PSJ_Court_Canonical	Entity	Location	TenantID	10	varchar	20	NULL	NULL	NULL	NULL
+PSJ_Court_Canonical	Entity	Location	DataOwnerID	11	varchar	20	NULL	NULL	NULL	NULL
+PSJ_Court_Canonical	Entity	Location	DataSourceID	12	varchar	20	NULL	NULL	NULL	NULL
+PSJ_Court_Canonical	Entity	Location	CreatedDateTime	13	datetimeoffset	NULL	NULL	NULL	NULL	NULL
+PSJ_Court_Canonical	Entity	Location	UpdatedDateTime	14	datetimeoffset	NULL	NULL	NULL	NULL	NULL
+PSJ_Court_Canonical	Entity	Location	RecordStatusCodeID	15	char	1	NULL	NULL	NULL	NULL
+PSJ_Court_Canonical	Entity	Location	RecordStatusDateTime	16	datetimeoffset	NULL	NULL	NULL	NULL	NULL
+PSJ_Court_Canonical	Entity	LocationDivision	DivisionNo	1	bigint	NULL	PRIMARY KEY	NULL	NULL	NULL
+PSJ_Court_Canonical	Entity	LocationDivision	DivisionID	2	varchar	20	NULL	NULL	NULL	NULL
+PSJ_Court_Canonical	Entity	LocationDivision	TypeID	3	varchar	20	FOREIGN KEY	Entity	LocationDivisionType	TypeID
+PSJ_Court_Canonical	Entity	LocationDivision	FipsCodeID	4	varchar	20	NULL	NULL	NULL	NULL
+PSJ_Court_Canonical	Entity	LocationDivision	CountryID	5	varchar	20	NULL	NULL	NULL	NULL
+PSJ_Court_Canonical	Entity	LocationDivision	CountyID	6	varchar	20	NULL	NULL	NULL	NULL
+PSJ_Court_Canonical	Entity	LocationDivision	StateID	7	varchar	20	NULL	NULL	NULL	NULL
+PSJ_Court_Canonical	Entity	LocationDivision	CityID	8	varchar	20	NULL	NULL	NULL	NULL
+PSJ_Court_Canonical	Entity	LocationDivision	DistrictID	9	varchar	20	NULL	NULL	NULL	NULL
+PSJ_Court_Canonical	Entity	LocationDivision	Name	10	varchar	128	NULL	NULL	NULL	NULL
+PSJ_Court_Canonical	Entity	LocationDivision	SessionID	11	varchar	40	NULL	NULL	NULL	NULL
+PSJ_Court_Canonical	Entity	LocationDivision	TenantID	12	varchar	20	NULL	NULL	NULL	NULL
+PSJ_Court_Canonical	Entity	LocationDivision	DataOwnerID	13	varchar	20	NULL	NULL	NULL	NULL
+PSJ_Court_Canonical	Entity	LocationDivision	DataSourceID	14	varchar	20	NULL	NULL	NULL	NULL
+PSJ_Court_Canonical	Entity	LocationDivision	CreatedDateTime	15	datetimeoffset	NULL	NULL	NULL	NULL	NULL
+PSJ_Court_Canonical	Entity	LocationDivision	UpdatedDateTime	16	datetimeoffset	NULL	NULL	NULL	NULL	NULL
+PSJ_Court_Canonical	Entity	LocationDivision	RecordStatusCodeID	17	char	1	NULL	NULL	NULL	NULL
+PSJ_Court_Canonical	Entity	LocationDivision	RecordStatusDateTime	18	datetimeoffset	NULL	NULL	NULL	NULL	NULL
+PSJ_Court_Canonical	Entity	LocationDivisionType	TypeID	1	varchar	20	PRIMARY KEY	NULL	NULL	NULL
+PSJ_Court_Canonical	Entity	LocationDivisionType	Description	2	varchar	128	NULL	NULL	NULL	NULL
+PSJ_Court_Canonical	Entity	LocationDivisionType	SessionID	3	varchar	40	NULL	NULL	NULL	NULL
+PSJ_Court_Canonical	Entity	LocationDivisionType	TenantID	4	varchar	20	NULL	NULL	NULL	NULL
+PSJ_Court_Canonical	Entity	LocationDivisionType	DataOwnerID	5	varchar	20	NULL	NULL	NULL	NULL
+PSJ_Court_Canonical	Entity	LocationDivisionType	DataSourceID	6	varchar	20	NULL	NULL	NULL	NULL
+PSJ_Court_Canonical	Entity	LocationDivisionType	CreatedDateTime	7	datetimeoffset	NULL	NULL	NULL	NULL	NULL
+PSJ_Court_Canonical	Entity	LocationDivisionType	UpdatedDateTime	8	datetimeoffset	NULL	NULL	NULL	NULL	NULL
+PSJ_Court_Canonical	Entity	LocationDivisionType	RecordStatusCodeID	9	char	1	NULL	NULL	NULL	NULL
+PSJ_Court_Canonical	Entity	LocationDivisionType	RecordStatusDateTime	10	datetimeoffset	NULL	NULL	NULL	NULL	NULL
+PSJ_Court_Canonical	Entity	LocationType	TypeID	1	varchar	20	PRIMARY KEY	NULL	NULL	NULL
+PSJ_Court_Canonical	Entity	LocationType	Description	2	varchar	128	NULL	NULL	NULL	NULL
+PSJ_Court_Canonical	Entity	LocationType	SessionID	3	varchar	40	NULL	NULL	NULL	NULL
+PSJ_Court_Canonical	Entity	LocationType	TenantID	4	varchar	20	NULL	NULL	NULL	NULL
+PSJ_Court_Canonical	Entity	LocationType	DataOwnerID	5	varchar	20	NULL	NULL	NULL	NULL
+PSJ_Court_Canonical	Entity	LocationType	DataSourceID	6	varchar	20	NULL	NULL	NULL	NULL
+PSJ_Court_Canonical	Entity	LocationType	CreatedDateTime	7	datetimeoffset	NULL	NULL	NULL	NULL	NULL
+PSJ_Court_Canonical	Entity	LocationType	UpdatedDateTime	8	datetimeoffset	NULL	NULL	NULL	NULL	NULL
+PSJ_Court_Canonical	Entity	LocationType	RecordStatusCodeID	9	char	1	NULL	NULL	NULL	NULL
+PSJ_Court_Canonical	Entity	LocationType	RecordStatusDateTime	10	datetimeoffset	NULL	NULL	NULL	NULL	NULL
+PSJ_Court_Canonical	Entity	Officer	OfficerID	1	varchar	20	PRIMARY KEY	NULL	NULL	NULL
+PSJ_Court_Canonical	Entity	Officer	TypeID	2	varchar	20	NULL	NULL	NULL	NULL
+PSJ_Court_Canonical	Entity	Officer	RegistrationID	3	varchar	40	NULL	NULL	NULL	NULL
+PSJ_Court_Canonical	Entity	Officer	Name	4	varchar	128	NULL	NULL	NULL	NULL
+PSJ_Court_Canonical	Entity	Officer	SessionID	5	varchar	40	NULL	NULL	NULL	NULL
+PSJ_Court_Canonical	Entity	Officer	TenantID	6	varchar	20	NULL	NULL	NULL	NULL
+PSJ_Court_Canonical	Entity	Officer	DataOwnerID	7	varchar	20	NULL	NULL	NULL	NULL
+PSJ_Court_Canonical	Entity	Officer	DataSourceID	8	varchar	20	NULL	NULL	NULL	NULL
+PSJ_Court_Canonical	Entity	Officer	CreatedDateTime	9	datetimeoffset	NULL	NULL	NULL	NULL	NULL
+PSJ_Court_Canonical	Entity	Officer	UpdatedDateTime	10	datetimeoffset	NULL	NULL	NULL	NULL	NULL
+PSJ_Court_Canonical	Entity	Officer	RecordStatusCodeID	11	char	1	NULL	NULL	NULL	NULL
+PSJ_Court_Canonical	Entity	Officer	RecordStatusDateTime	12	datetimeoffset	NULL	NULL	NULL	NULL	NULL
+PSJ_Court_Canonical	Entity	Organization	OrganizationNo	1	bigint	NULL	PRIMARY KEY	NULL	NULL	NULL
+PSJ_Court_Canonical	Entity	Organization	OrganizationID	2	varchar	20	NULL	NULL	NULL	NULL
+PSJ_Court_Canonical	Entity	Organization	TypeID	3	varchar	20	NULL	NULL	NULL	NULL
+PSJ_Court_Canonical	Entity	Organization	ORI	4	varchar	10	NULL	NULL	NULL	NULL
+PSJ_Court_Canonical	Entity	Organization	OrganizationName	5	varchar	20	NULL	NULL	NULL	NULL
+PSJ_Court_Canonical	Entity	Organization	SessionID	6	varchar	40	NULL	NULL	NULL	NULL
+PSJ_Court_Canonical	Entity	Organization	TenantID	7	varchar	20	NULL	NULL	NULL	NULL
+PSJ_Court_Canonical	Entity	Organization	DataOwnerID	8	varchar	20	NULL	NULL	NULL	NULL
+PSJ_Court_Canonical	Entity	Organization	DataSourceID	9	varchar	20	NULL	NULL	NULL	NULL
+PSJ_Court_Canonical	Entity	Organization	CreatedDateTime	10	datetimeoffset	NULL	NULL	NULL	NULL	NULL
+PSJ_Court_Canonical	Entity	Organization	UpdatedDateTime	11	datetimeoffset	NULL	NULL	NULL	NULL	NULL
+PSJ_Court_Canonical	Entity	Organization	RecordStatusCodeID	12	char	1	NULL	NULL	NULL	NULL
+PSJ_Court_Canonical	Entity	Organization	RecordStatusDateTime	13	datetimeoffset	NULL	NULL	NULL	NULL	NULL
+PSJ_Court_Canonical	Entity	OrganizationType	TypeID	1	varchar	20	PRIMARY KEY	NULL	NULL	NULL
+PSJ_Court_Canonical	Entity	OrganizationType	Description	2	varchar	128	NULL	NULL	NULL	NULL
+PSJ_Court_Canonical	Entity	OrganizationType	SessionID	3	varchar	40	NULL	NULL	NULL	NULL
+PSJ_Court_Canonical	Entity	OrganizationType	TenantID	4	varchar	20	NULL	NULL	NULL	NULL
+PSJ_Court_Canonical	Entity	OrganizationType	DataOwnerID	5	varchar	20	NULL	NULL	NULL	NULL
+PSJ_Court_Canonical	Entity	OrganizationType	DataSourceID	6	varchar	20	NULL	NULL	NULL	NULL
+PSJ_Court_Canonical	Entity	OrganizationType	CreatedDateTime	7	datetimeoffset	NULL	NULL	NULL	NULL	NULL
+PSJ_Court_Canonical	Entity	OrganizationType	UpdatedDateTime	8	datetimeoffset	NULL	NULL	NULL	NULL	NULL
+PSJ_Court_Canonical	Entity	OrganizationType	RecordStatusCodeID	9	char	1	NULL	NULL	NULL	NULL
+PSJ_Court_Canonical	Entity	OrganizationType	RecordStatusDateTime	10	datetimeoffset	NULL	NULL	NULL	NULL	NULL
+PSJ_Court_Canonical	Party	DriverLicenseStatusCode	CodeID	1	varchar	20	PRIMARY KEY	NULL	NULL	NULL
+PSJ_Court_Canonical	Party	DriverLicenseStatusCode	Description	2	varchar	256	NULL	NULL	NULL	NULL
+PSJ_Court_Canonical	Party	DriverLicenseStatusCode	SessionID	3	varchar	40	NULL	NULL	NULL	NULL
+PSJ_Court_Canonical	Party	DriverLicenseStatusCode	TenantID	4	varchar	20	NULL	NULL	NULL	NULL
+PSJ_Court_Canonical	Party	DriverLicenseStatusCode	DataOwnerID	5	varchar	20	NULL	NULL	NULL	NULL
+PSJ_Court_Canonical	Party	DriverLicenseStatusCode	DataSourceID	6	varchar	20	NULL	NULL	NULL	NULL
+PSJ_Court_Canonical	Party	DriverLicenseStatusCode	CreatedDateTime	7	datetimeoffset	NULL	NULL	NULL	NULL	NULL
+PSJ_Court_Canonical	Party	DriverLicenseStatusCode	UpdatedDateTime	8	datetimeoffset	NULL	NULL	NULL	NULL	NULL
+PSJ_Court_Canonical	Party	DriverLicenseStatusCode	RecordStatusCodeID	9	char	1	NULL	NULL	NULL	NULL
+PSJ_Court_Canonical	Party	DriverLicenseStatusCode	RecordStatusDateTime	10	datetimeoffset	NULL	NULL	NULL	NULL	NULL
+PSJ_Court_Canonical	Party	DriverLicenseType	TypeID	1	varchar	20	PRIMARY KEY	NULL	NULL	NULL
+PSJ_Court_Canonical	Party	DriverLicenseType	Description	2	varchar	256	NULL	NULL	NULL	NULL
+PSJ_Court_Canonical	Party	DriverLicenseType	SessionID	3	varchar	40	NULL	NULL	NULL	NULL
+PSJ_Court_Canonical	Party	DriverLicenseType	TenantID	4	varchar	20	NULL	NULL	NULL	NULL
+PSJ_Court_Canonical	Party	DriverLicenseType	DataOwnerID	5	varchar	20	NULL	NULL	NULL	NULL
+PSJ_Court_Canonical	Party	DriverLicenseType	DataSourceID	6	varchar	20	NULL	NULL	NULL	NULL
+PSJ_Court_Canonical	Party	DriverLicenseType	CreatedDateTime	7	datetimeoffset	NULL	NULL	NULL	NULL	NULL
+PSJ_Court_Canonical	Party	DriverLicenseType	UpdatedDateTime	8	datetimeoffset	NULL	NULL	NULL	NULL	NULL
+PSJ_Court_Canonical	Party	DriverLicenseType	RecordStatusCodeID	9	char	1	NULL	NULL	NULL	NULL
+PSJ_Court_Canonical	Party	DriverLicenseType	RecordStatusDateTime	10	datetimeoffset	NULL	NULL	NULL	NULL	NULL
+PSJ_Court_Canonical	Party	GenderCode	CodeID	1	varchar	20	PRIMARY KEY	NULL	NULL	NULL
+PSJ_Court_Canonical	Party	GenderCode	Description	2	varchar	20	NULL	NULL	NULL	NULL
+PSJ_Court_Canonical	Party	GenderCode	SessionID	3	varchar	40	NULL	NULL	NULL	NULL
+PSJ_Court_Canonical	Party	GenderCode	TenantID	4	varchar	20	NULL	NULL	NULL	NULL
+PSJ_Court_Canonical	Party	GenderCode	DataOwnerID	5	varchar	20	NULL	NULL	NULL	NULL
+PSJ_Court_Canonical	Party	GenderCode	DataSourceID	6	varchar	20	NULL	NULL	NULL	NULL
+PSJ_Court_Canonical	Party	GenderCode	CreatedDateTime	7	datetimeoffset	NULL	NULL	NULL	NULL	NULL
+PSJ_Court_Canonical	Party	GenderCode	UpdatedDateTime	8	datetimeoffset	NULL	NULL	NULL	NULL	NULL
+PSJ_Court_Canonical	Party	GenderCode	RecordStatusCodeID	9	char	1	NULL	NULL	NULL	NULL
+PSJ_Court_Canonical	Party	GenderCode	RecordStatusDateTime	10	datetimeoffset	NULL	NULL	NULL	NULL	NULL
+PSJ_Court_Canonical	Party	NameType	TypeID	1	varchar	20	PRIMARY KEY	NULL	NULL	NULL
+PSJ_Court_Canonical	Party	NameType	Description	2	varchar	256	NULL	NULL	NULL	NULL
+PSJ_Court_Canonical	Party	NameType	SessionID	3	varchar	40	NULL	NULL	NULL	NULL
+PSJ_Court_Canonical	Party	NameType	TenantID	4	varchar	20	NULL	NULL	NULL	NULL
+PSJ_Court_Canonical	Party	NameType	DataOwnerID	5	varchar	20	NULL	NULL	NULL	NULL
+PSJ_Court_Canonical	Party	NameType	DataSourceID	6	varchar	20	NULL	NULL	NULL	NULL
+PSJ_Court_Canonical	Party	NameType	CreatedDateTime	7	datetimeoffset	NULL	NULL	NULL	NULL	NULL
+PSJ_Court_Canonical	Party	NameType	UpdatedDateTime	8	datetimeoffset	NULL	NULL	NULL	NULL	NULL
+PSJ_Court_Canonical	Party	NameType	RecordStatusCodeID	9	char	1	NULL	NULL	NULL	NULL
+PSJ_Court_Canonical	Party	NameType	RecordStatusDateTime	10	datetimeoffset	NULL	NULL	NULL	NULL	NULL
+PSJ_Court_Canonical	Party	PartyDetail	PartyNo	1	bigint	NULL	PRIMARY KEY	NULL	NULL	NULL
+PSJ_Court_Canonical	Party	PartyDetail	PartyID	2	varchar	20	NULL	NULL	NULL	NULL
+PSJ_Court_Canonical	Party	PartyDetail	GenderCodeID	3	varchar	20	FOREIGN KEY	Party	GenderCode	CodeID
+PSJ_Court_Canonical	Party	PartyDetail	RaceCodeID	4	varchar	20	FOREIGN KEY	Party	RaceCode	CodeID
+PSJ_Court_Canonical	Party	PartyDetail	Height	5	varchar	20	NULL	NULL	NULL	NULL
+PSJ_Court_Canonical	Party	PartyDetail	Weight	6	varchar	20	NULL	NULL	NULL	NULL
+PSJ_Court_Canonical	Party	PartyDetail	DateOfBirth	7	date	NULL	NULL	NULL	NULL	NULL
+PSJ_Court_Canonical	Party	PartyDetail	DateOfDeath	8	date	NULL	NULL	NULL	NULL	NULL
+PSJ_Court_Canonical	Party	PartyDetail	StateID	9	varchar	20	NULL	NULL	NULL	NULL
+PSJ_Court_Canonical	Party	PartyDetail	FBINumber	10	varchar	20	NULL	NULL	NULL	NULL
+PSJ_Court_Canonical	Party	PartyDetail	SessionID	11	varchar	40	NULL	NULL	NULL	NULL
+PSJ_Court_Canonical	Party	PartyDetail	TenantID	12	varchar	20	NULL	NULL	NULL	NULL
+PSJ_Court_Canonical	Party	PartyDetail	DataOwnerID	13	varchar	20	NULL	NULL	NULL	NULL
+PSJ_Court_Canonical	Party	PartyDetail	DataSourceID	14	varchar	20	NULL	NULL	NULL	NULL
+PSJ_Court_Canonical	Party	PartyDetail	CreatedDateTime	15	datetimeoffset	NULL	NULL	NULL	NULL	NULL
+PSJ_Court_Canonical	Party	PartyDetail	UpdatedDateTime	16	datetimeoffset	NULL	NULL	NULL	NULL	NULL
+PSJ_Court_Canonical	Party	PartyDetail	RecordStatusCodeID	17	char	1	NULL	NULL	NULL	NULL
+PSJ_Court_Canonical	Party	PartyDetail	RecordStatusDateTime	18	datetimeoffset	NULL	NULL	NULL	NULL	NULL
+PSJ_Court_Canonical	Party	PartyDriversLicense	PartyNo	1	bigint	NULL	FOREIGN KEY	Party	PartyDetail	PartyNo
+PSJ_Court_Canonical	Party	PartyDriversLicense	PartyDriversLicenseID	2	varchar	20	PRIMARY KEY	NULL	NULL	NULL
+PSJ_Court_Canonical	Party	PartyDriversLicense	TypeID	3	varchar	20	FOREIGN KEY	Party	DriverLicenseType	TypeID
+PSJ_Court_Canonical	Party	PartyDriversLicense	Number	4	varchar	20	NULL	NULL	NULL	NULL
+PSJ_Court_Canonical	Party	PartyDriversLicense	StateCode	5	varchar	20	NULL	NULL	NULL	NULL
+PSJ_Court_Canonical	Party	PartyDriversLicense	IssuedDate	6	date	NULL	NULL	NULL	NULL	NULL
+PSJ_Court_Canonical	Party	PartyDriversLicense	ExpirationDate	7	date	NULL	NULL	NULL	NULL	NULL
+PSJ_Court_Canonical	Party	PartyDriversLicense	StatusCodeID	8	varchar	20	FOREIGN KEY	Party	DriverLicenseStatusCode	CodeID
+PSJ_Court_Canonical	Party	PartyDriversLicense	IsUSLicense	9	bit	NULL	NULL	NULL	NULL	NULL
+PSJ_Court_Canonical	Party	PartyDriversLicense	SessionID	10	varchar	40	NULL	NULL	NULL	NULL
+PSJ_Court_Canonical	Party	PartyDriversLicense	TenantID	11	varchar	20	NULL	NULL	NULL	NULL
+PSJ_Court_Canonical	Party	PartyDriversLicense	DataOwnerID	12	varchar	20	NULL	NULL	NULL	NULL
+PSJ_Court_Canonical	Party	PartyDriversLicense	DataSourceID	13	varchar	20	NULL	NULL	NULL	NULL
+PSJ_Court_Canonical	Party	PartyDriversLicense	CreatedDateTime	14	datetimeoffset	NULL	NULL	NULL	NULL	NULL
+PSJ_Court_Canonical	Party	PartyDriversLicense	UpdatedDateTime	15	datetimeoffset	NULL	NULL	NULL	NULL	NULL
+PSJ_Court_Canonical	Party	PartyDriversLicense	RecordStatusCodeID	16	char	1	NULL	NULL	NULL	NULL
+PSJ_Court_Canonical	Party	PartyDriversLicense	RecordStatusDateTime	17	datetimeoffset	NULL	NULL	NULL	NULL	NULL
+PSJ_Court_Canonical	Party	PartyName	PartyNo	1	bigint	NULL	FOREIGN KEY	Party	PartyDetail	PartyNo
+PSJ_Court_Canonical	Party	PartyName	PartyNameID	2	varchar	20	PRIMARY KEY	NULL	NULL	NULL
+PSJ_Court_Canonical	Party	PartyName	TypeID	3	varchar	20	FOREIGN KEY	Party	NameType	TypeID
+PSJ_Court_Canonical	Party	PartyName	GivenName	4	varchar	30	NULL	NULL	NULL	NULL
+PSJ_Court_Canonical	Party	PartyName	MiddleName	5	varchar	30	NULL	NULL	NULL	NULL
+PSJ_Court_Canonical	Party	PartyName	Surname	6	varchar	30	NULL	NULL	NULL	NULL
+PSJ_Court_Canonical	Party	PartyName	NameSuffix	7	varchar	30	NULL	NULL	NULL	NULL
+PSJ_Court_Canonical	Party	PartyName	IsPrimary	8	bit	NULL	NULL	NULL	NULL	NULL
+PSJ_Court_Canonical	Party	PartyName	SessionID	9	varchar	40	NULL	NULL	NULL	NULL
+PSJ_Court_Canonical	Party	PartyName	TenantID	10	varchar	20	NULL	NULL	NULL	NULL
+PSJ_Court_Canonical	Party	PartyName	DataOwnerID	11	varchar	20	NULL	NULL	NULL	NULL
+PSJ_Court_Canonical	Party	PartyName	DataSourceID	12	varchar	20	NULL	NULL	NULL	NULL
+PSJ_Court_Canonical	Party	PartyName	CreatedDateTime	13	datetimeoffset	NULL	NULL	NULL	NULL	NULL
+PSJ_Court_Canonical	Party	PartyName	UpdatedDateTime	14	datetimeoffset	NULL	NULL	NULL	NULL	NULL
+PSJ_Court_Canonical	Party	PartyName	RecordStatusCodeID	15	char	1	NULL	NULL	NULL	NULL
+PSJ_Court_Canonical	Party	PartyName	RecordStatusDateTime	16	datetimeoffset	NULL	NULL	NULL	NULL	NULL
+PSJ_Court_Canonical	Party	PartyPhone	PartyNo	1	bigint	NULL	FOREIGN KEY	Party	PartyDetail	PartyNo
+PSJ_Court_Canonical	Party	PartyPhone	PartyPhoneID	2	varchar	20	PRIMARY KEY	NULL	NULL	NULL
+PSJ_Court_Canonical	Party	PartyPhone	TypeID	3	varchar	20	FOREIGN KEY	Party	PhoneType	TypeID
+PSJ_Court_Canonical	Party	PartyPhone	Number	4	varchar	20	NULL	NULL	NULL	NULL
+PSJ_Court_Canonical	Party	PartyPhone	IsPrimary	5	bit	NULL	NULL	NULL	NULL	NULL
+PSJ_Court_Canonical	Party	PartyPhone	SessionID	6	varchar	40	NULL	NULL	NULL	NULL
+PSJ_Court_Canonical	Party	PartyPhone	TenantID	7	varchar	20	NULL	NULL	NULL	NULL
+PSJ_Court_Canonical	Party	PartyPhone	DataOwnerID	8	varchar	20	NULL	NULL	NULL	NULL
+PSJ_Court_Canonical	Party	PartyPhone	DataSourceID	9	varchar	20	NULL	NULL	NULL	NULL
+PSJ_Court_Canonical	Party	PartyPhone	CreatedDateTime	10	datetimeoffset	NULL	NULL	NULL	NULL	NULL
+PSJ_Court_Canonical	Party	PartyPhone	UpdatedDateTime	11	datetimeoffset	NULL	NULL	NULL	NULL	NULL
+PSJ_Court_Canonical	Party	PartyPhone	RecordStatusCodeID	12	char	1	NULL	NULL	NULL	NULL
+PSJ_Court_Canonical	Party	PartyPhone	RecordStatusDateTime	13	datetimeoffset	NULL	NULL	NULL	NULL	NULL
+PSJ_Court_Canonical	Party	PartyRoleCode	CodeID	1	varchar	20	PRIMARY KEY	NULL	NULL	NULL
+PSJ_Court_Canonical	Party	PartyRoleCode	Description	2	varchar	256	NULL	NULL	NULL	NULL
+PSJ_Court_Canonical	Party	PartyRoleCode	SessionID	3	varchar	40	NULL	NULL	NULL	NULL
+PSJ_Court_Canonical	Party	PartyRoleCode	TenantID	4	varchar	20	NULL	NULL	NULL	NULL
+PSJ_Court_Canonical	Party	PartyRoleCode	DataOwnerID	5	varchar	20	NULL	NULL	NULL	NULL
+PSJ_Court_Canonical	Party	PartyRoleCode	DataSourceID	6	varchar	20	NULL	NULL	NULL	NULL
+PSJ_Court_Canonical	Party	PartyRoleCode	CreatedDateTime	7	datetimeoffset	NULL	NULL	NULL	NULL	NULL
+PSJ_Court_Canonical	Party	PartyRoleCode	UpdatedDateTime	8	datetimeoffset	NULL	NULL	NULL	NULL	NULL
+PSJ_Court_Canonical	Party	PartyRoleCode	RecordStatusCodeID	9	char	1	NULL	NULL	NULL	NULL
+PSJ_Court_Canonical	Party	PartyRoleCode	RecordStatusDateTime	10	datetimeoffset	NULL	NULL	NULL	NULL	NULL
+PSJ_Court_Canonical	Party	PhoneType	TypeID	1	varchar	20	PRIMARY KEY	NULL	NULL	NULL
+PSJ_Court_Canonical	Party	PhoneType	Description	2	varchar	20	NULL	NULL	NULL	NULL
+PSJ_Court_Canonical	Party	PhoneType	SessionID	3	varchar	40	NULL	NULL	NULL	NULL
+PSJ_Court_Canonical	Party	PhoneType	TenantID	4	varchar	20	NULL	NULL	NULL	NULL
+PSJ_Court_Canonical	Party	PhoneType	DataOwnerID	5	varchar	20	NULL	NULL	NULL	NULL
+PSJ_Court_Canonical	Party	PhoneType	DataSourceID	6	varchar	20	NULL	NULL	NULL	NULL
+PSJ_Court_Canonical	Party	PhoneType	CreatedDateTime	7	datetimeoffset	NULL	NULL	NULL	NULL	NULL
+PSJ_Court_Canonical	Party	PhoneType	UpdatedDateTime	8	datetimeoffset	NULL	NULL	NULL	NULL	NULL
+PSJ_Court_Canonical	Party	PhoneType	RecordStatusCodeID	9	char	1	NULL	NULL	NULL	NULL
+PSJ_Court_Canonical	Party	PhoneType	RecordStatusDateTime	10	datetimeoffset	NULL	NULL	NULL	NULL	NULL
+PSJ_Court_Canonical	Party	RaceCode	CodeID	1	varchar	20	PRIMARY KEY	NULL	NULL	NULL
+PSJ_Court_Canonical	Party	RaceCode	Description	2	varchar	20	NULL	NULL	NULL	NULL
+PSJ_Court_Canonical	Party	RaceCode	SessionID	3	varchar	40	NULL	NULL	NULL	NULL
+PSJ_Court_Canonical	Party	RaceCode	TenantID	4	varchar	20	NULL	NULL	NULL	NULL
+PSJ_Court_Canonical	Party	RaceCode	DataOwnerID	5	varchar	20	NULL	NULL	NULL	NULL
+PSJ_Court_Canonical	Party	RaceCode	DataSourceID	6	varchar	20	NULL	NULL	NULL	NULL
+PSJ_Court_Canonical	Party	RaceCode	CreatedDateTime	7	datetimeoffset	NULL	NULL	NULL	NULL	NULL
+PSJ_Court_Canonical	Party	RaceCode	UpdatedDateTime	8	datetimeoffset	NULL	NULL	NULL	NULL	NULL
+PSJ_Court_Canonical	Party	RaceCode	RecordStatusCodeID	9	char	1	NULL	NULL	NULL	NULL
+PSJ_Court_Canonical	Party	RaceCode	RecordStatusDateTime	10	datetimeoffset	NULL	NULL	NULL	NULL	NULL
+PSJ_Court_Canonical	Sentence	ConcurrentConsecutive	ConcurrentConsecutiveNo	1	bigint	NULL	PRIMARY KEY	NULL	NULL	NULL
+PSJ_Court_Canonical	Sentence	ConcurrentConsecutive	ChargeNo	2	bigint	NULL	FOREIGN KEY	Charge	ChargeDetail	ChargeNo
+PSJ_Court_Canonical	Sentence	ConcurrentConsecutive	SentenceNo	3	bigint	NULL	FOREIGN KEY	Sentence	SentenceDetail	SentenceDetailNo
+PSJ_Court_Canonical	Sentence	ConcurrentConsecutive	RelatedSentenceNo	4	bigint	NULL	FOREIGN KEY	Sentence	SentenceDetail	SentenceDetailNo
+PSJ_Court_Canonical	Sentence	ConcurrentConsecutive	ConcurrentOrConsecutive	5	varchar	20	NULL	NULL	NULL	NULL
+PSJ_Court_Canonical	Sentence	ConcurrentConsecutive	ToWhatOtherSentenceID	6	varchar	20	NULL	NULL	NULL	NULL
+PSJ_Court_Canonical	Sentence	ConcurrentConsecutive	Description	7	varchar	20	NULL	NULL	NULL	NULL
+PSJ_Court_Canonical	Sentence	ConcurrentConsecutive	SessionID	8	varchar	40	NULL	NULL	NULL	NULL
+PSJ_Court_Canonical	Sentence	ConcurrentConsecutive	TenantID	9	varchar	20	NULL	NULL	NULL	NULL
+PSJ_Court_Canonical	Sentence	ConcurrentConsecutive	DataOwnerID	10	varchar	20	NULL	NULL	NULL	NULL
+PSJ_Court_Canonical	Sentence	ConcurrentConsecutive	DataSourceID	11	varchar	20	NULL	NULL	NULL	NULL
+PSJ_Court_Canonical	Sentence	ConcurrentConsecutive	CreatedDateTime	12	datetimeoffset	NULL	NULL	NULL	NULL	NULL
+PSJ_Court_Canonical	Sentence	ConcurrentConsecutive	UpdatedDateTime	13	datetimeoffset	NULL	NULL	NULL	NULL	NULL
+PSJ_Court_Canonical	Sentence	ConcurrentConsecutive	RecordStatusCodeID	14	char	1	NULL	NULL	NULL	NULL
+PSJ_Court_Canonical	Sentence	ConcurrentConsecutive	RecordStatusDateTime	15	datetimeoffset	NULL	NULL	NULL	NULL	NULL
+PSJ_Court_Canonical	Sentence	Condition	ConditionNo	1	bigint	NULL	PRIMARY KEY	NULL	NULL	NULL
+PSJ_Court_Canonical	Sentence	Condition	ConditionID	2	varchar	20	NULL	NULL	NULL	NULL
+PSJ_Court_Canonical	Sentence	Condition	ChargeNo	3	bigint	NULL	FOREIGN KEY	Charge	ChargeDetail	ChargeNo
+PSJ_Court_Canonical	Sentence	Condition	SentenceNo	4	bigint	NULL	FOREIGN KEY	Sentence	SentenceDetail	SentenceDetailNo
+PSJ_Court_Canonical	Sentence	Condition	DispComponentConditionId	5	varchar	20	NULL	NULL	NULL	NULL
+PSJ_Court_Canonical	Sentence	Condition	TypeID	6	varchar	20	FOREIGN KEY	Sentence	ProgramType	TypeID
+PSJ_Court_Canonical	Sentence	Condition	Description	7	varchar	20	NULL	NULL	NULL	NULL
+PSJ_Court_Canonical	Sentence	Condition	EffectiveDate	8	date	NULL	NULL	NULL	NULL	NULL
+PSJ_Court_Canonical	Sentence	Condition	Amount	9	varchar	20	NULL	NULL	NULL	NULL
+PSJ_Court_Canonical	Sentence	Condition	SessionID	10	varchar	40	NULL	NULL	NULL	NULL
+PSJ_Court_Canonical	Sentence	Condition	TenantID	11	varchar	20	NULL	NULL	NULL	NULL
+PSJ_Court_Canonical	Sentence	Condition	DataOwnerID	12	varchar	20	NULL	NULL	NULL	NULL
+PSJ_Court_Canonical	Sentence	Condition	DataSourceID	13	varchar	20	NULL	NULL	NULL	NULL
+PSJ_Court_Canonical	Sentence	Condition	CreatedDateTime	14	datetimeoffset	NULL	NULL	NULL	NULL	NULL
+PSJ_Court_Canonical	Sentence	Condition	UpdatedDateTime	15	datetimeoffset	NULL	NULL	NULL	NULL	NULL
+PSJ_Court_Canonical	Sentence	Condition	RecordStatusCodeID	16	char	1	NULL	NULL	NULL	NULL
+PSJ_Court_Canonical	Sentence	Condition	RecordStatusDateTime	17	datetimeoffset	NULL	NULL	NULL	NULL	NULL
+PSJ_Court_Canonical	Sentence	ConditionType	TypeID	1	varchar	20	PRIMARY KEY	NULL	NULL	NULL
+PSJ_Court_Canonical	Sentence	ConditionType	Description	2	varchar	128	NULL	NULL	NULL	NULL
+PSJ_Court_Canonical	Sentence	ConditionType	SessionID	3	varchar	40	NULL	NULL	NULL	NULL
+PSJ_Court_Canonical	Sentence	ConditionType	TenantID	4	varchar	20	NULL	NULL	NULL	NULL
+PSJ_Court_Canonical	Sentence	ConditionType	DataOwnerID	5	varchar	20	NULL	NULL	NULL	NULL
+PSJ_Court_Canonical	Sentence	ConditionType	DataSourceID	6	varchar	20	NULL	NULL	NULL	NULL
+PSJ_Court_Canonical	Sentence	ConditionType	CreatedDateTime	7	datetimeoffset	NULL	NULL	NULL	NULL	NULL
+PSJ_Court_Canonical	Sentence	ConditionType	UpdatedDateTime	8	datetimeoffset	NULL	NULL	NULL	NULL	NULL
+PSJ_Court_Canonical	Sentence	ConditionType	RecordStatusCodeID	9	char	1	NULL	NULL	NULL	NULL
+PSJ_Court_Canonical	Sentence	ConditionType	RecordStatusDateTime	10	datetimeoffset	NULL	NULL	NULL	NULL	NULL
+PSJ_Court_Canonical	Sentence	ConfinementComponent	ConfinementComponentNo	1	bigint	NULL	PRIMARY KEY	NULL	NULL	NULL
+PSJ_Court_Canonical	Sentence	ConfinementComponent	SentenceEventID	2	varchar	20	NULL	NULL	NULL	NULL
+PSJ_Court_Canonical	Sentence	ConfinementComponent	ChargeNo	3	bigint	NULL	FOREIGN KEY	Charge	ChargeDetail	ChargeNo
+PSJ_Court_Canonical	Sentence	ConfinementComponent	SentenceNo	4	bigint	NULL	FOREIGN KEY	Sentence	SentenceDetail	SentenceDetailNo
+PSJ_Court_Canonical	Sentence	ConfinementComponent	ComponentID	5	varchar	20	NULL	NULL	NULL	NULL
+PSJ_Court_Canonical	Sentence	ConfinementComponent	TypeID	6	varchar	20	FOREIGN KEY	Sentence	ConfinementType	TypeID
+PSJ_Court_Canonical	Sentence	ConfinementComponent	FacilityNo	7	bigint	NULL	FOREIGN KEY	Entity	Organization	OrganizationNo
+PSJ_Court_Canonical	Sentence	ConfinementComponent	StartDate	8	date	NULL	NULL	NULL	NULL	NULL
+PSJ_Court_Canonical	Sentence	ConfinementComponent	ImpositionOfSentenceSuspended	9	varchar	20	NULL	NULL	NULL	NULL
+PSJ_Court_Canonical	Sentence	ConfinementComponent	SentencingStayed	10	varchar	20	NULL	NULL	NULL	NULL
+PSJ_Court_Canonical	Sentence	ConfinementComponent	SuspendedYears	11	varchar	20	NULL	NULL	NULL	NULL
+PSJ_Court_Canonical	Sentence	ConfinementComponent	SuspendedMonts	12	varchar	20	NULL	NULL	NULL	NULL
+PSJ_Court_Canonical	Sentence	ConfinementComponent	SuspendedDays	13	varchar	20	NULL	NULL	NULL	NULL
+PSJ_Court_Canonical	Sentence	ConfinementComponent	SuspendedWeeks	14	varchar	20	NULL	NULL	NULL	NULL
+PSJ_Court_Canonical	Sentence	ConfinementComponent	SuspendedReasonCodeID	15	varchar	20	FOREIGN KEY	Sentence	SuspendedReasonCode	CodeID
+PSJ_Court_Canonical	Sentence	ConfinementComponent	Term	16	varchar	20	NULL	NULL	NULL	NULL
+PSJ_Court_Canonical	Sentence	ConfinementComponent	TermTypeCodeID	17	varchar	20	NULL	NULL	NULL	NULL
+PSJ_Court_Canonical	Sentence	ConfinementComponent	YearsToLife	18	varchar	20	NULL	NULL	NULL	NULL
+PSJ_Court_Canonical	Sentence	ConfinementComponent	Life	19	varchar	20	NULL	NULL	NULL	NULL
+PSJ_Court_Canonical	Sentence	ConfinementComponent	Death	20	varchar	20	NULL	NULL	NULL	NULL
+PSJ_Court_Canonical	Sentence	ConfinementComponent	UntilAge18	21	varchar	20	NULL	NULL	NULL	NULL
+PSJ_Court_Canonical	Sentence	ConfinementComponent	UntilAge21	22	varchar	20	NULL	NULL	NULL	NULL
+PSJ_Court_Canonical	Sentence	ConfinementComponent	UntilAge25	23	varchar	20	NULL	NULL	NULL	NULL
+PSJ_Court_Canonical	Sentence	ConfinementComponent	CreditForTimeServedYears	24	varchar	20	NULL	NULL	NULL	NULL
+PSJ_Court_Canonical	Sentence	ConfinementComponent	CreditForTimeServedMonths	25	varchar	20	NULL	NULL	NULL	NULL
+PSJ_Court_Canonical	Sentence	ConfinementComponent	CreditForTimeServedDays	26	varchar	20	NULL	NULL	NULL	NULL
+PSJ_Court_Canonical	Sentence	ConfinementComponent	CreditForTimeServedWeeks	27	varchar	20	NULL	NULL	NULL	NULL
+PSJ_Court_Canonical	Sentence	ConfinementComponent	ConductCreditTypeCode	28	varchar	20	NULL	NULL	NULL	NULL
+PSJ_Court_Canonical	Sentence	ConfinementComponent	ConductCreditYears	29	varchar	20	NULL	NULL	NULL	NULL
+PSJ_Court_Canonical	Sentence	ConfinementComponent	ConductCreditMonths	30	varchar	20	NULL	NULL	NULL	NULL
+PSJ_Court_Canonical	Sentence	ConfinementComponent	ConductCreditDays	31	varchar	20	NULL	NULL	NULL	NULL
+PSJ_Court_Canonical	Sentence	ConfinementComponent	ConductCreditWeeks	32	varchar	20	NULL	NULL	NULL	NULL
+PSJ_Court_Canonical	Sentence	ConfinementComponent	TreatmentCreditYears	33	varchar	20	NULL	NULL	NULL	NULL
+PSJ_Court_Canonical	Sentence	ConfinementComponent	TreatmentCreditMonths	34	varchar	20	NULL	NULL	NULL	NULL
+PSJ_Court_Canonical	Sentence	ConfinementComponent	TreatmentCreditDays	35	varchar	20	NULL	NULL	NULL	NULL
+PSJ_Court_Canonical	Sentence	ConfinementComponent	TreatmentCreditWeeks	36	varchar	20	NULL	NULL	NULL	NULL
+PSJ_Court_Canonical	Sentence	ConfinementComponent	AdditionalCreditTypeDescription	37	varchar	20	NULL	NULL	NULL	NULL
+PSJ_Court_Canonical	Sentence	ConfinementComponent	AdditionalCreditYears	38	varchar	20	NULL	NULL	NULL	NULL
+PSJ_Court_Canonical	Sentence	ConfinementComponent	AdditionalCreditMonths	39	varchar	20	NULL	NULL	NULL	NULL
+PSJ_Court_Canonical	Sentence	ConfinementComponent	AdditionalCreditDays	40	varchar	20	NULL	NULL	NULL	NULL
+PSJ_Court_Canonical	Sentence	ConfinementComponent	AdditionalCreditWeeks	41	varchar	20	NULL	NULL	NULL	NULL
+PSJ_Court_Canonical	Sentence	ConfinementComponent	PostSentenceCreditYears	42	varchar	20	NULL	NULL	NULL	NULL
+PSJ_Court_Canonical	Sentence	ConfinementComponent	PostSentenceCreditMonths	43	varchar	20	NULL	NULL	NULL	NULL
+PSJ_Court_Canonical	Sentence	ConfinementComponent	PostSentenceCreditDays	44	varchar	20	NULL	NULL	NULL	NULL
+PSJ_Court_Canonical	Sentence	ConfinementComponent	PostSentenceCreditWeeks	45	varchar	20	NULL	NULL	NULL	NULL
+PSJ_Court_Canonical	Sentence	ConfinementComponent	MandatorySupervisedReleaseCreditYears	46	varchar	20	NULL	NULL	NULL	NULL
+PSJ_Court_Canonical	Sentence	ConfinementComponent	MandatorySupervisedReleaseCreditMonths	47	varchar	20	NULL	NULL	NULL	NULL
+PSJ_Court_Canonical	Sentence	ConfinementComponent	MandatorySupervisedReleaseCreditDays	48	varchar	20	NULL	NULL	NULL	NULL
+PSJ_Court_Canonical	Sentence	ConfinementComponent	MandatorySupervisedReleaseCreditWeeks	49	varchar	20	NULL	NULL	NULL	NULL
+PSJ_Court_Canonical	Sentence	ConfinementComponent	PayFineInLieuOfJailTime	50	varchar	20	NULL	NULL	NULL	NULL
+PSJ_Court_Canonical	Sentence	ConfinementComponent	FineAmount	51	money	NULL	NULL	NULL	NULL	NULL
+PSJ_Court_Canonical	Sentence	ConfinementComponent	FineSuspendedAmount	52	money	NULL	NULL	NULL	NULL	NULL
+PSJ_Court_Canonical	Sentence	ConfinementComponent	PayFine	53	varchar	20	NULL	NULL	NULL	NULL
+PSJ_Court_Canonical	Sentence	ConfinementComponent	PaySuspendedFine	54	varchar	20	NULL	NULL	NULL	NULL
+PSJ_Court_Canonical	Sentence	ConfinementComponent	StayedReason	55	varchar	20	NULL	NULL	NULL	NULL
+PSJ_Court_Canonical	Sentence	ConfinementComponent	LifeParoleEligible	56	varchar	20	NULL	NULL	NULL	NULL
+PSJ_Court_Canonical	Sentence	ConfinementComponent	YearsToLifeParoleEligible	57	varchar	20	NULL	NULL	NULL	NULL
+PSJ_Court_Canonical	Sentence	ConfinementComponent	FineLengthInLieuOfYears	58	varchar	20	NULL	NULL	NULL	NULL
+PSJ_Court_Canonical	Sentence	ConfinementComponent	FineLengthInLieuOfMonths	59	varchar	20	NULL	NULL	NULL	NULL
+PSJ_Court_Canonical	Sentence	ConfinementComponent	FineLengthInLieuOfDays	60	varchar	20	NULL	NULL	NULL	NULL
+PSJ_Court_Canonical	Sentence	ConfinementComponent	FineLengthInLieuOfWeeks	61	varchar	20	NULL	NULL	NULL	NULL
+PSJ_Court_Canonical	Sentence	ConfinementComponent	FineSuspendedYears	62	varchar	20	NULL	NULL	NULL	NULL
+PSJ_Court_Canonical	Sentence	ConfinementComponent	FineSuspendedMonths	63	varchar	20	NULL	NULL	NULL	NULL
+PSJ_Court_Canonical	Sentence	ConfinementComponent	FineSuspendedDays	64	varchar	20	NULL	NULL	NULL	NULL
+PSJ_Court_Canonical	Sentence	ConfinementComponent	FineSuspendedWeeks	65	varchar	20	NULL	NULL	NULL	NULL
+PSJ_Court_Canonical	Sentence	ConfinementComponent	TotalCreditSuspendedYears	66	varchar	20	NULL	NULL	NULL	NULL
+PSJ_Court_Canonical	Sentence	ConfinementComponent	TotalCreditSuspendedMonths	67	varchar	20	NULL	NULL	NULL	NULL
+PSJ_Court_Canonical	Sentence	ConfinementComponent	TotalCreditSuspendedDays	68	varchar	20	NULL	NULL	NULL	NULL
+PSJ_Court_Canonical	Sentence	ConfinementComponent	TotalCreditSuspendedWeeks	69	varchar	20	NULL	NULL	NULL	NULL
+PSJ_Court_Canonical	Sentence	ConfinementComponent	TermYearsToLife	70	varchar	20	NULL	NULL	NULL	NULL
+PSJ_Court_Canonical	Sentence	ConfinementComponent	AdultConfinementComments	71	varchar	20	NULL	NULL	NULL	NULL
+PSJ_Court_Canonical	Sentence	ConfinementComponent	InLieuOfComments	72	varchar	256	NULL	NULL	NULL	NULL
+PSJ_Court_Canonical	Sentence	ConfinementComponent	FineSuspendedAmountInLieuOf	73	varchar	20	NULL	NULL	NULL	NULL
+PSJ_Court_Canonical	Sentence	ConfinementComponent	SessionID	74	varchar	40	NULL	NULL	NULL	NULL
+PSJ_Court_Canonical	Sentence	ConfinementComponent	TenantID	75	varchar	20	NULL	NULL	NULL	NULL
+PSJ_Court_Canonical	Sentence	ConfinementComponent	DataOwnerID	76	varchar	20	NULL	NULL	NULL	NULL
+PSJ_Court_Canonical	Sentence	ConfinementComponent	DataSourceID	77	varchar	20	NULL	NULL	NULL	NULL
+PSJ_Court_Canonical	Sentence	ConfinementComponent	CreatedDateTime	78	datetimeoffset	NULL	NULL	NULL	NULL	NULL
+PSJ_Court_Canonical	Sentence	ConfinementComponent	UpdatedDateTime	79	datetimeoffset	NULL	NULL	NULL	NULL	NULL
+PSJ_Court_Canonical	Sentence	ConfinementComponent	RecordStatusCodeID	80	char	1	NULL	NULL	NULL	NULL
+PSJ_Court_Canonical	Sentence	ConfinementComponent	RecordStatusDateTime	81	datetimeoffset	NULL	NULL	NULL	NULL	NULL
+PSJ_Court_Canonical	Sentence	ConfinementType	TypeID	1	varchar	20	PRIMARY KEY	NULL	NULL	NULL
+PSJ_Court_Canonical	Sentence	ConfinementType	Description	2	varchar	128	NULL	NULL	NULL	NULL
+PSJ_Court_Canonical	Sentence	ConfinementType	SessionID	3	varchar	40	NULL	NULL	NULL	NULL
+PSJ_Court_Canonical	Sentence	ConfinementType	TenantID	4	varchar	20	NULL	NULL	NULL	NULL
+PSJ_Court_Canonical	Sentence	ConfinementType	DataOwnerID	5	varchar	20	NULL	NULL	NULL	NULL
+PSJ_Court_Canonical	Sentence	ConfinementType	DataSourceID	6	varchar	20	NULL	NULL	NULL	NULL
+PSJ_Court_Canonical	Sentence	ConfinementType	CreatedDateTime	7	datetimeoffset	NULL	NULL	NULL	NULL	NULL
+PSJ_Court_Canonical	Sentence	ConfinementType	UpdatedDateTime	8	datetimeoffset	NULL	NULL	NULL	NULL	NULL
+PSJ_Court_Canonical	Sentence	ConfinementType	RecordStatusCodeID	9	char	1	NULL	NULL	NULL	NULL
+PSJ_Court_Canonical	Sentence	ConfinementType	RecordStatusDateTime	10	datetimeoffset	NULL	NULL	NULL	NULL	NULL
+PSJ_Court_Canonical	Sentence	DriverLicenseCondition	DriverLicenseConditionNo	1	bigint	NULL	PRIMARY KEY	NULL	NULL	NULL
+PSJ_Court_Canonical	Sentence	DriverLicenseCondition	ChargeNo	2	bigint	NULL	FOREIGN KEY	Charge	ChargeDetail	ChargeNo
+PSJ_Court_Canonical	Sentence	DriverLicenseCondition	SentenceNo	3	bigint	NULL	FOREIGN KEY	Sentence	SentenceDetail	SentenceDetailNo
+PSJ_Court_Canonical	Sentence	DriverLicenseCondition	ConditionID	4	varchar	20	NULL	NULL	NULL	NULL
+PSJ_Court_Canonical	Sentence	DriverLicenseCondition	TypeID	5	varchar	20	FOREIGN KEY	Sentence	DriverLicenseConditionType	TypeID
+PSJ_Court_Canonical	Sentence	DriverLicenseCondition	SuspensionTerm	6	varchar	20	NULL	NULL	NULL	NULL
+PSJ_Court_Canonical	Sentence	DriverLicenseCondition	RevocationTerm	7	varchar	20	NULL	NULL	NULL	NULL
+PSJ_Court_Canonical	Sentence	DriverLicenseCondition	Delay	8	varchar	20	NULL	NULL	NULL	NULL
+PSJ_Court_Canonical	Sentence	DriverLicenseCondition	TermYears	9	varchar	20	NULL	NULL	NULL	NULL
+PSJ_Court_Canonical	Sentence	DriverLicenseCondition	TermMonths	10	varchar	20	NULL	NULL	NULL	NULL
+PSJ_Court_Canonical	Sentence	DriverLicenseCondition	TermDays	11	varchar	20	NULL	NULL	NULL	NULL
+PSJ_Court_Canonical	Sentence	DriverLicenseCondition	TermWeeks	12	varchar	20	NULL	NULL	NULL	NULL
+PSJ_Court_Canonical	Sentence	DriverLicenseCondition	PursuantToVehicleCodeID	13	varchar	20	NULL	NULL	NULL	NULL
+PSJ_Court_Canonical	Sentence	DriverLicenseCondition	HabitualOffender	14	bit	NULL	NULL	NULL	NULL	NULL
+PSJ_Court_Canonical	Sentence	DriverLicenseCondition	BACDrugs	15	varchar	20	NULL	NULL	NULL	NULL
+PSJ_Court_Canonical	Sentence	DriverLicenseCondition	BACLevel	16	varchar	20	NULL	NULL	NULL	NULL
+PSJ_Court_Canonical	Sentence	DriverLicenseCondition	SessionID	17	varchar	40	NULL	NULL	NULL	NULL
+PSJ_Court_Canonical	Sentence	DriverLicenseCondition	TenantID	18	varchar	20	NULL	NULL	NULL	NULL
+PSJ_Court_Canonical	Sentence	DriverLicenseCondition	DataOwnerID	19	varchar	20	NULL	NULL	NULL	NULL
+PSJ_Court_Canonical	Sentence	DriverLicenseCondition	DataSourceID	20	varchar	20	NULL	NULL	NULL	NULL
+PSJ_Court_Canonical	Sentence	DriverLicenseCondition	CreatedDateTime	21	datetimeoffset	NULL	NULL	NULL	NULL	NULL
+PSJ_Court_Canonical	Sentence	DriverLicenseCondition	UpdatedDateTime	22	datetimeoffset	NULL	NULL	NULL	NULL	NULL
+PSJ_Court_Canonical	Sentence	DriverLicenseCondition	RecordStatusCodeID	23	char	1	NULL	NULL	NULL	NULL
+PSJ_Court_Canonical	Sentence	DriverLicenseCondition	RecordStatusDateTime	24	datetimeoffset	NULL	NULL	NULL	NULL	NULL
+PSJ_Court_Canonical	Sentence	DriverLicenseConditionType	TypeID	1	varchar	20	PRIMARY KEY	NULL	NULL	NULL
+PSJ_Court_Canonical	Sentence	DriverLicenseConditionType	Description	2	varchar	128	NULL	NULL	NULL	NULL
+PSJ_Court_Canonical	Sentence	DriverLicenseConditionType	SessionID	3	varchar	40	NULL	NULL	NULL	NULL
+PSJ_Court_Canonical	Sentence	DriverLicenseConditionType	TenantID	4	varchar	20	NULL	NULL	NULL	NULL
+PSJ_Court_Canonical	Sentence	DriverLicenseConditionType	DataOwnerID	5	varchar	20	NULL	NULL	NULL	NULL
+PSJ_Court_Canonical	Sentence	DriverLicenseConditionType	DataSourceID	6	varchar	20	NULL	NULL	NULL	NULL
+PSJ_Court_Canonical	Sentence	DriverLicenseConditionType	CreatedDateTime	7	datetimeoffset	NULL	NULL	NULL	NULL	NULL
+PSJ_Court_Canonical	Sentence	DriverLicenseConditionType	UpdatedDateTime	8	datetimeoffset	NULL	NULL	NULL	NULL	NULL
+PSJ_Court_Canonical	Sentence	DriverLicenseConditionType	RecordStatusCodeID	9	char	1	NULL	NULL	NULL	NULL
+PSJ_Court_Canonical	Sentence	DriverLicenseConditionType	RecordStatusDateTime	10	datetimeoffset	NULL	NULL	NULL	NULL	NULL
+PSJ_Court_Canonical	Sentence	DriverLicenseRestriction	DriverLicenseRestrictionNo	1	bigint	NULL	PRIMARY KEY	NULL	NULL	NULL
+PSJ_Court_Canonical	Sentence	DriverLicenseRestriction	ChargeNo	2	bigint	NULL	FOREIGN KEY	Charge	ChargeDetail	ChargeNo
+PSJ_Court_Canonical	Sentence	DriverLicenseRestriction	SentenceNo	3	bigint	NULL	FOREIGN KEY	Sentence	SentenceDetail	SentenceDetailNo
+PSJ_Court_Canonical	Sentence	DriverLicenseRestriction	ConditionNo	4	bigint	NULL	FOREIGN KEY	Sentence	DriverLicenseCondition	DriverLicenseConditionNo
+PSJ_Court_Canonical	Sentence	DriverLicenseRestriction	RestrictionID	5	varchar	20	NULL	NULL	NULL	NULL
+PSJ_Court_Canonical	Sentence	DriverLicenseRestriction	TypeID	6	varchar	20	FOREIGN KEY	Sentence	DriverLicenseRestrictionType	TypeID
+PSJ_Court_Canonical	Sentence	DriverLicenseRestriction	StartDate	7	date	NULL	NULL	NULL	NULL	NULL
+PSJ_Court_Canonical	Sentence	DriverLicenseRestriction	TermYears	8	varchar	20	NULL	NULL	NULL	NULL
+PSJ_Court_Canonical	Sentence	DriverLicenseRestriction	TermMonths	9	varchar	20	NULL	NULL	NULL	NULL
+PSJ_Court_Canonical	Sentence	DriverLicenseRestriction	TermDays	10	varchar	20	NULL	NULL	NULL	NULL
+PSJ_Court_Canonical	Sentence	DriverLicenseRestriction	TermWeeks	11	varchar	20	NULL	NULL	NULL	NULL
+PSJ_Court_Canonical	Sentence	DriverLicenseRestriction	Comment	12	varchar	256	NULL	NULL	NULL	NULL
+PSJ_Court_Canonical	Sentence	DriverLicenseRestriction	SessionID	13	varchar	40	NULL	NULL	NULL	NULL
+PSJ_Court_Canonical	Sentence	DriverLicenseRestriction	TenantID	14	varchar	20	NULL	NULL	NULL	NULL
+PSJ_Court_Canonical	Sentence	DriverLicenseRestriction	DataOwnerID	15	varchar	20	NULL	NULL	NULL	NULL
+PSJ_Court_Canonical	Sentence	DriverLicenseRestriction	DataSourceID	16	varchar	20	NULL	NULL	NULL	NULL
+PSJ_Court_Canonical	Sentence	DriverLicenseRestriction	CreatedDateTime	17	datetimeoffset	NULL	NULL	NULL	NULL	NULL
+PSJ_Court_Canonical	Sentence	DriverLicenseRestriction	UpdatedDateTime	18	datetimeoffset	NULL	NULL	NULL	NULL	NULL
+PSJ_Court_Canonical	Sentence	DriverLicenseRestriction	RecordStatusCodeID	19	char	1	NULL	NULL	NULL	NULL
+PSJ_Court_Canonical	Sentence	DriverLicenseRestriction	RecordStatusDateTime	20	datetimeoffset	NULL	NULL	NULL	NULL	NULL
+PSJ_Court_Canonical	Sentence	DriverLicenseRestrictionType	TypeID	1	varchar	20	PRIMARY KEY	NULL	NULL	NULL
+PSJ_Court_Canonical	Sentence	DriverLicenseRestrictionType	Description	2	varchar	128	NULL	NULL	NULL	NULL
+PSJ_Court_Canonical	Sentence	DriverLicenseRestrictionType	SessionID	3	varchar	40	NULL	NULL	NULL	NULL
+PSJ_Court_Canonical	Sentence	DriverLicenseRestrictionType	TenantID	4	varchar	20	NULL	NULL	NULL	NULL
+PSJ_Court_Canonical	Sentence	DriverLicenseRestrictionType	DataOwnerID	5	varchar	20	NULL	NULL	NULL	NULL
+PSJ_Court_Canonical	Sentence	DriverLicenseRestrictionType	DataSourceID	6	varchar	20	NULL	NULL	NULL	NULL
+PSJ_Court_Canonical	Sentence	DriverLicenseRestrictionType	CreatedDateTime	7	datetimeoffset	NULL	NULL	NULL	NULL	NULL
+PSJ_Court_Canonical	Sentence	DriverLicenseRestrictionType	UpdatedDateTime	8	datetimeoffset	NULL	NULL	NULL	NULL	NULL
+PSJ_Court_Canonical	Sentence	DriverLicenseRestrictionType	RecordStatusCodeID	9	char	1	NULL	NULL	NULL	NULL
+PSJ_Court_Canonical	Sentence	DriverLicenseRestrictionType	RecordStatusDateTime	10	datetimeoffset	NULL	NULL	NULL	NULL	NULL
+PSJ_Court_Canonical	Sentence	ProbationComponent	ProbationComponentNo	1	bigint	NULL	PRIMARY KEY	NULL	NULL	NULL
+PSJ_Court_Canonical	Sentence	ProbationComponent	ChargeNo	2	bigint	NULL	FOREIGN KEY	Charge	ChargeDetail	ChargeNo
+PSJ_Court_Canonical	Sentence	ProbationComponent	SentenceNo	3	bigint	NULL	FOREIGN KEY	Sentence	SentenceDetail	SentenceDetailNo
+PSJ_Court_Canonical	Sentence	ProbationComponent	ComponentID	4	varchar	20	NULL	NULL	NULL	NULL
+PSJ_Court_Canonical	Sentence	ProbationComponent	TypeID	5	varchar	20	NULL	NULL	NULL	NULL
+PSJ_Court_Canonical	Sentence	ProbationComponent	StartDate	6	date	NULL	NULL	NULL	NULL	NULL
+PSJ_Court_Canonical	Sentence	ProbationComponent	EndDate	7	date	NULL	NULL	NULL	NULL	NULL
+PSJ_Court_Canonical	Sentence	ProbationComponent	TermYears	8	varchar	20	NULL	NULL	NULL	NULL
+PSJ_Court_Canonical	Sentence	ProbationComponent	TermMonths	9	varchar	20	NULL	NULL	NULL	NULL
+PSJ_Court_Canonical	Sentence	ProbationComponent	TermDays	10	varchar	20	NULL	NULL	NULL	NULL
+PSJ_Court_Canonical	Sentence	ProbationComponent	TermWeeks	11	varchar	20	NULL	NULL	NULL	NULL
+PSJ_Court_Canonical	Sentence	ProbationComponent	Manual	12	varchar	20	NULL	NULL	NULL	NULL
+PSJ_Court_Canonical	Sentence	ProbationComponent	ImpositionOfSentenceSuspended	13	bit	NULL	NULL	NULL	NULL	NULL
+PSJ_Court_Canonical	Sentence	ProbationComponent	Comment	14	varchar	256	NULL	NULL	NULL	NULL
+PSJ_Court_Canonical	Sentence	ProbationComponent	SessionID	15	varchar	40	NULL	NULL	NULL	NULL
+PSJ_Court_Canonical	Sentence	ProbationComponent	TenantID	16	varchar	20	NULL	NULL	NULL	NULL
+PSJ_Court_Canonical	Sentence	ProbationComponent	DataOwnerID	17	varchar	20	NULL	NULL	NULL	NULL
+PSJ_Court_Canonical	Sentence	ProbationComponent	DataSourceID	18	varchar	20	NULL	NULL	NULL	NULL
+PSJ_Court_Canonical	Sentence	ProbationComponent	CreatedDateTime	19	datetimeoffset	NULL	NULL	NULL	NULL	NULL
+PSJ_Court_Canonical	Sentence	ProbationComponent	UpdatedDateTime	20	datetimeoffset	NULL	NULL	NULL	NULL	NULL
+PSJ_Court_Canonical	Sentence	ProbationComponent	RecordStatusCodeID	21	char	1	NULL	NULL	NULL	NULL
+PSJ_Court_Canonical	Sentence	ProbationComponent	RecordStatusDateTime	22	datetimeoffset	NULL	NULL	NULL	NULL	NULL
+PSJ_Court_Canonical	Sentence	ProbationCondition	ProbationConditionNo	1	bigint	NULL	PRIMARY KEY	NULL	NULL	NULL
+PSJ_Court_Canonical	Sentence	ProbationCondition	ProbationComponentNo	2	bigint	NULL	FOREIGN KEY	Sentence	ProbationComponent	ProbationComponentNo
+PSJ_Court_Canonical	Sentence	ProbationCondition	ChargeNo	3	bigint	NULL	FOREIGN KEY	Charge	ChargeDetail	ChargeNo
+PSJ_Court_Canonical	Sentence	ProbationCondition	SentenceNo	4	bigint	NULL	FOREIGN KEY	Sentence	SentenceDetail	SentenceDetailNo
+PSJ_Court_Canonical	Sentence	ProbationCondition	ConditionID	5	varchar	20	NULL	NULL	NULL	NULL
+PSJ_Court_Canonical	Sentence	ProbationCondition	ComponentID	6	varchar	20	NULL	NULL	NULL	NULL
+PSJ_Court_Canonical	Sentence	ProbationCondition	TypeID	7	varchar	20	FOREIGN KEY	Sentence	ProbationConditionType	TypeID
+PSJ_Court_Canonical	Sentence	ProbationCondition	EffectiveDate	8	date	NULL	NULL	NULL	NULL	NULL
+PSJ_Court_Canonical	Sentence	ProbationCondition	StatusCodeID	9	varchar	20	NULL	NULL	NULL	NULL
+PSJ_Court_Canonical	Sentence	ProbationCondition	StatusDate	10	date	NULL	NULL	NULL	NULL	NULL
+PSJ_Court_Canonical	Sentence	ProbationCondition	SessionID	11	varchar	40	NULL	NULL	NULL	NULL
+PSJ_Court_Canonical	Sentence	ProbationCondition	TenantID	12	varchar	20	NULL	NULL	NULL	NULL
+PSJ_Court_Canonical	Sentence	ProbationCondition	DataOwnerID	13	varchar	20	NULL	NULL	NULL	NULL
+PSJ_Court_Canonical	Sentence	ProbationCondition	DataSourceID	14	varchar	20	NULL	NULL	NULL	NULL
+PSJ_Court_Canonical	Sentence	ProbationCondition	CreatedDateTime	15	datetimeoffset	NULL	NULL	NULL	NULL	NULL
+PSJ_Court_Canonical	Sentence	ProbationCondition	UpdatedDateTime	16	datetimeoffset	NULL	NULL	NULL	NULL	NULL
+PSJ_Court_Canonical	Sentence	ProbationCondition	RecordStatusCodeID	17	char	1	NULL	NULL	NULL	NULL
+PSJ_Court_Canonical	Sentence	ProbationCondition	RecordStatusDateTime	18	datetimeoffset	NULL	NULL	NULL	NULL	NULL
+PSJ_Court_Canonical	Sentence	ProbationConditionType	TypeID	1	varchar	20	PRIMARY KEY	NULL	NULL	NULL
+PSJ_Court_Canonical	Sentence	ProbationConditionType	Description	2	varchar	128	NULL	NULL	NULL	NULL
+PSJ_Court_Canonical	Sentence	ProbationConditionType	SessionID	3	varchar	40	NULL	NULL	NULL	NULL
+PSJ_Court_Canonical	Sentence	ProbationConditionType	TenantID	4	varchar	20	NULL	NULL	NULL	NULL
+PSJ_Court_Canonical	Sentence	ProbationConditionType	DataOwnerID	5	varchar	20	NULL	NULL	NULL	NULL
+PSJ_Court_Canonical	Sentence	ProbationConditionType	DataSourceID	6	varchar	20	NULL	NULL	NULL	NULL
+PSJ_Court_Canonical	Sentence	ProbationConditionType	CreatedDateTime	7	datetimeoffset	NULL	NULL	NULL	NULL	NULL
+PSJ_Court_Canonical	Sentence	ProbationConditionType	UpdatedDateTime	8	datetimeoffset	NULL	NULL	NULL	NULL	NULL
+PSJ_Court_Canonical	Sentence	ProbationConditionType	RecordStatusCodeID	9	char	1	NULL	NULL	NULL	NULL
+PSJ_Court_Canonical	Sentence	ProbationConditionType	RecordStatusDateTime	10	datetimeoffset	NULL	NULL	NULL	NULL	NULL
+PSJ_Court_Canonical	Sentence	ProbationStatus	ProbationStatusNo	1	bigint	NULL	PRIMARY KEY	NULL	NULL	NULL
+PSJ_Court_Canonical	Sentence	ProbationStatus	ProbationStatusID	2	varchar	20	NULL	NULL	NULL	NULL
+PSJ_Court_Canonical	Sentence	ProbationStatus	ChargeNo	3	bigint	NULL	FOREIGN KEY	Charge	ChargeDetail	ChargeNo
+PSJ_Court_Canonical	Sentence	ProbationStatus	SentenceNo	4	bigint	NULL	FOREIGN KEY	Sentence	SentenceDetail	SentenceDetailNo
+PSJ_Court_Canonical	Sentence	ProbationStatus	ConditionNo	5	bigint	NULL	FOREIGN KEY	Sentence	ProbationCondition	ProbationConditionNo
+PSJ_Court_Canonical	Sentence	ProbationStatus	ComponentNo	6	bigint	NULL	FOREIGN KEY	Sentence	ProbationComponent	ProbationComponentNo
+PSJ_Court_Canonical	Sentence	ProbationStatus	StatusCodeID	7	varchar	20	NULL	NULL	NULL	NULL
+PSJ_Court_Canonical	Sentence	ProbationStatus	StatusDate	8	varchar	20	NULL	NULL	NULL	NULL
+PSJ_Court_Canonical	Sentence	ProbationStatus	SessionID	9	varchar	40	NULL	NULL	NULL	NULL
+PSJ_Court_Canonical	Sentence	ProbationStatus	TenantID	10	varchar	20	NULL	NULL	NULL	NULL
+PSJ_Court_Canonical	Sentence	ProbationStatus	DataOwnerID	11	varchar	20	NULL	NULL	NULL	NULL
+PSJ_Court_Canonical	Sentence	ProbationStatus	DataSourceID	12	varchar	20	NULL	NULL	NULL	NULL
+PSJ_Court_Canonical	Sentence	ProbationStatus	CreatedDateTime	13	datetimeoffset	NULL	NULL	NULL	NULL	NULL
+PSJ_Court_Canonical	Sentence	ProbationStatus	UpdatedDateTime	14	datetimeoffset	NULL	NULL	NULL	NULL	NULL
+PSJ_Court_Canonical	Sentence	ProbationStatus	RecordStatusCodeID	15	char	1	NULL	NULL	NULL	NULL
+PSJ_Court_Canonical	Sentence	ProbationStatus	RecordStatusDateTime	16	datetimeoffset	NULL	NULL	NULL	NULL	NULL
+PSJ_Court_Canonical	Sentence	ProgramComponent	ProgramComponentNo	1	bigint	NULL	PRIMARY KEY	NULL	NULL	NULL
+PSJ_Court_Canonical	Sentence	ProgramComponent	ChargeNo	2	bigint	NULL	FOREIGN KEY	Charge	ChargeDetail	ChargeNo
+PSJ_Court_Canonical	Sentence	ProgramComponent	SentenceNo	3	bigint	NULL	FOREIGN KEY	Sentence	SentenceDetail	SentenceDetailNo
+PSJ_Court_Canonical	Sentence	ProgramComponent	ComponentID	4	varchar	20	NULL	NULL	NULL	NULL
+PSJ_Court_Canonical	Sentence	ProgramComponent	TypeID	5	varchar	20	FOREIGN KEY	Sentence	ProgramType	TypeID
+PSJ_Court_Canonical	Sentence	ProgramComponent	Ordered	6	bit	NULL	NULL	NULL	NULL	NULL
+PSJ_Court_Canonical	Sentence	ProgramComponent	Recommended	7	bit	NULL	NULL	NULL	NULL	NULL
+PSJ_Court_Canonical	Sentence	ProgramComponent	OrderDate	8	date	NULL	NULL	NULL	NULL	NULL
+PSJ_Court_Canonical	Sentence	ProgramComponent	CompleteBy	9	date	NULL	NULL	NULL	NULL	NULL
+PSJ_Court_Canonical	Sentence	ProgramComponent	InLieuOf	10	varchar	20	NULL	NULL	NULL	NULL
+PSJ_Court_Canonical	Sentence	ProgramComponent	TermYears	11	varchar	20	NULL	NULL	NULL	NULL
+PSJ_Court_Canonical	Sentence	ProgramComponent	TermMonths	12	varchar	20	NULL	NULL	NULL	NULL
+PSJ_Court_Canonical	Sentence	ProgramComponent	TermDays	13	varchar	20	NULL	NULL	NULL	NULL
+PSJ_Court_Canonical	Sentence	ProgramComponent	TermWeeks	14	varchar	20	NULL	NULL	NULL	NULL
+PSJ_Court_Canonical	Sentence	ProgramComponent	Comment	15	varchar	256	NULL	NULL	NULL	NULL
+PSJ_Court_Canonical	Sentence	ProgramComponent	SessionID	16	varchar	40	NULL	NULL	NULL	NULL
+PSJ_Court_Canonical	Sentence	ProgramComponent	TenantID	17	varchar	20	NULL	NULL	NULL	NULL
+PSJ_Court_Canonical	Sentence	ProgramComponent	DataOwnerID	18	varchar	20	NULL	NULL	NULL	NULL
+PSJ_Court_Canonical	Sentence	ProgramComponent	DataSourceID	19	varchar	20	NULL	NULL	NULL	NULL
+PSJ_Court_Canonical	Sentence	ProgramComponent	CreatedDateTime	20	datetimeoffset	NULL	NULL	NULL	NULL	NULL
+PSJ_Court_Canonical	Sentence	ProgramComponent	UpdatedDateTime	21	datetimeoffset	NULL	NULL	NULL	NULL	NULL
+PSJ_Court_Canonical	Sentence	ProgramComponent	RecordStatusCodeID	22	char	1	NULL	NULL	NULL	NULL
+PSJ_Court_Canonical	Sentence	ProgramComponent	RecordStatusDateTime	23	datetimeoffset	NULL	NULL	NULL	NULL	NULL
+PSJ_Court_Canonical	Sentence	ProgramType	TypeID	1	varchar	20	PRIMARY KEY	NULL	NULL	NULL
+PSJ_Court_Canonical	Sentence	ProgramType	Description	2	varchar	128	NULL	NULL	NULL	NULL
+PSJ_Court_Canonical	Sentence	ProgramType	SessionID	3	varchar	40	NULL	NULL	NULL	NULL
+PSJ_Court_Canonical	Sentence	ProgramType	TenantID	4	varchar	20	NULL	NULL	NULL	NULL
+PSJ_Court_Canonical	Sentence	ProgramType	DataOwnerID	5	varchar	20	NULL	NULL	NULL	NULL
+PSJ_Court_Canonical	Sentence	ProgramType	DataSourceID	6	varchar	20	NULL	NULL	NULL	NULL
+PSJ_Court_Canonical	Sentence	ProgramType	CreatedDateTime	7	datetimeoffset	NULL	NULL	NULL	NULL	NULL
+PSJ_Court_Canonical	Sentence	ProgramType	UpdatedDateTime	8	datetimeoffset	NULL	NULL	NULL	NULL	NULL
+PSJ_Court_Canonical	Sentence	ProgramType	RecordStatusCodeID	9	char	1	NULL	NULL	NULL	NULL
+PSJ_Court_Canonical	Sentence	ProgramType	RecordStatusDateTime	10	datetimeoffset	NULL	NULL	NULL	NULL	NULL
+PSJ_Court_Canonical	Sentence	SentenceDetail	SentenceDetailNo	1	bigint	NULL	PRIMARY KEY	NULL	NULL	NULL
+PSJ_Court_Canonical	Sentence	SentenceDetail	CaseNo	2	bigint	NULL	FOREIGN KEY	Case	CaseDetail	CaseNo
+PSJ_Court_Canonical	Sentence	SentenceDetail	SentenceEventID	3	varchar	20	NULL	NULL	NULL	NULL
+PSJ_Court_Canonical	Sentence	SentenceDetail	SentenceID	4	varchar	20	NULL	NULL	NULL	NULL
+PSJ_Court_Canonical	Sentence	SentenceDetail	ChargeNo	5	bigint	NULL	FOREIGN KEY	Charge	ChargeDetail	ChargeNo
+PSJ_Court_Canonical	Sentence	SentenceDetail	SessionID	6	varchar	40	NULL	NULL	NULL	NULL
+PSJ_Court_Canonical	Sentence	SentenceDetail	TenantID	7	varchar	20	NULL	NULL	NULL	NULL
+PSJ_Court_Canonical	Sentence	SentenceDetail	DataOwnerID	8	varchar	20	NULL	NULL	NULL	NULL
+PSJ_Court_Canonical	Sentence	SentenceDetail	DataSourceID	9	varchar	20	NULL	NULL	NULL	NULL
+PSJ_Court_Canonical	Sentence	SentenceDetail	CreatedDateTime	10	datetimeoffset	NULL	NULL	NULL	NULL	NULL
+PSJ_Court_Canonical	Sentence	SentenceDetail	UpdatedDateTime	11	datetimeoffset	NULL	NULL	NULL	NULL	NULL
+PSJ_Court_Canonical	Sentence	SentenceDetail	RecordStatusCodeID	12	char	1	NULL	NULL	NULL	NULL
+PSJ_Court_Canonical	Sentence	SentenceDetail	RecordStatusDateTime	13	datetimeoffset	NULL	NULL	NULL	NULL	NULL
+PSJ_Court_Canonical	Sentence	SentenceEvent	SentenceEventNo	1	bigint	NULL	PRIMARY KEY	NULL	NULL	NULL
+PSJ_Court_Canonical	Sentence	SentenceEvent	CaseNo	2	bigint	NULL	FOREIGN KEY	Case	CaseDetail	CaseNo
+PSJ_Court_Canonical	Sentence	SentenceEvent	SentenceEventID	3	varchar	20	NULL	NULL	NULL	NULL
+PSJ_Court_Canonical	Sentence	SentenceEvent	AuthorityNo	4	bigint	NULL	FOREIGN KEY	Entity	Organization	OrganizationNo
+PSJ_Court_Canonical	Sentence	SentenceEvent	SentenceTypeID	5	varchar	20	FOREIGN KEY	Sentence	SentenceType	TypeID
+PSJ_Court_Canonical	Sentence	SentenceEvent	SentenceDate	6	date	NULL	NULL	NULL	NULL	NULL
+PSJ_Court_Canonical	Sentence	SentenceEvent	SessionID	7	varchar	40	NULL	NULL	NULL	NULL
+PSJ_Court_Canonical	Sentence	SentenceEvent	TenantID	8	varchar	20	NULL	NULL	NULL	NULL
+PSJ_Court_Canonical	Sentence	SentenceEvent	DataOwnerID	9	varchar	20	NULL	NULL	NULL	NULL
+PSJ_Court_Canonical	Sentence	SentenceEvent	DataSourceID	10	varchar	20	NULL	NULL	NULL	NULL
+PSJ_Court_Canonical	Sentence	SentenceEvent	CreatedDateTime	11	datetimeoffset	NULL	NULL	NULL	NULL	NULL
+PSJ_Court_Canonical	Sentence	SentenceEvent	UpdatedDateTime	12	datetimeoffset	NULL	NULL	NULL	NULL	NULL
+PSJ_Court_Canonical	Sentence	SentenceEvent	RecordStatusCodeID	13	char	1	NULL	NULL	NULL	NULL
+PSJ_Court_Canonical	Sentence	SentenceEvent	RecordStatusDateTime	14	datetimeoffset	NULL	NULL	NULL	NULL	NULL
+PSJ_Court_Canonical	Sentence	SentenceType	TypeID	1	varchar	20	PRIMARY KEY	NULL	NULL	NULL
+PSJ_Court_Canonical	Sentence	SentenceType	Description	2	varchar	128	NULL	NULL	NULL	NULL
+PSJ_Court_Canonical	Sentence	SentenceType	SessionID	3	varchar	40	NULL	NULL	NULL	NULL
+PSJ_Court_Canonical	Sentence	SentenceType	TenantID	4	varchar	20	NULL	NULL	NULL	NULL
+PSJ_Court_Canonical	Sentence	SentenceType	DataOwnerID	5	varchar	20	NULL	NULL	NULL	NULL
+PSJ_Court_Canonical	Sentence	SentenceType	DataSourceID	6	varchar	20	NULL	NULL	NULL	NULL
+PSJ_Court_Canonical	Sentence	SentenceType	CreatedDateTime	7	datetimeoffset	NULL	NULL	NULL	NULL	NULL
+PSJ_Court_Canonical	Sentence	SentenceType	UpdatedDateTime	8	datetimeoffset	NULL	NULL	NULL	NULL	NULL
+PSJ_Court_Canonical	Sentence	SentenceType	RecordStatusCodeID	9	char	1	NULL	NULL	NULL	NULL
+PSJ_Court_Canonical	Sentence	SentenceType	RecordStatusDateTime	10	datetimeoffset	NULL	NULL	NULL	NULL	NULL
+PSJ_Court_Canonical	Sentence	SuspendedReasonCode	CodeID	1	varchar	20	PRIMARY KEY	NULL	NULL	NULL
+PSJ_Court_Canonical	Sentence	SuspendedReasonCode	Description	2	varchar	20	NULL	NULL	NULL	NULL
+PSJ_Court_Canonical	Sentence	SuspendedReasonCode	SessionID	3	varchar	40	NULL	NULL	NULL	NULL
+PSJ_Court_Canonical	Sentence	SuspendedReasonCode	TenantID	4	varchar	20	NULL	NULL	NULL	NULL
+PSJ_Court_Canonical	Sentence	SuspendedReasonCode	DataOwnerID	5	varchar	20	NULL	NULL	NULL	NULL
+PSJ_Court_Canonical	Sentence	SuspendedReasonCode	DataSourceID	6	varchar	20	NULL	NULL	NULL	NULL
+PSJ_Court_Canonical	Sentence	SuspendedReasonCode	CreatedDateTime	7	datetimeoffset	NULL	NULL	NULL	NULL	NULL
+PSJ_Court_Canonical	Sentence	SuspendedReasonCode	UpdatedDateTime	8	datetimeoffset	NULL	NULL	NULL	NULL	NULL
+PSJ_Court_Canonical	Sentence	SuspendedReasonCode	RecordStatusCodeID	9	char	1	NULL	NULL	NULL	NULL
+PSJ_Court_Canonical	Sentence	SuspendedReasonCode	RecordStatusDateTime	10	datetimeoffset	NULL	NULL	NULL	NULL	NULL
+PSJ_Court_Canonical	Warrant	WarrantCondition	WarrantConditionNo	1	bigint	NULL	PRIMARY KEY	NULL	NULL	NULL
+PSJ_Court_Canonical	Warrant	WarrantCondition	WarrantNo	2	bigint	NULL	FOREIGN KEY	Warrant	WarrantDetail	WarrantNo
+PSJ_Court_Canonical	Warrant	WarrantCondition	CodeID	3	varchar	20	FOREIGN KEY	Warrant	WarrantConditionCode	CodeID
+PSJ_Court_Canonical	Warrant	WarrantCondition	Comment	4	varchar	256	NULL	NULL	NULL	NULL
+PSJ_Court_Canonical	Warrant	WarrantCondition	SessionID	5	varchar	40	NULL	NULL	NULL	NULL
+PSJ_Court_Canonical	Warrant	WarrantCondition	TenantID	6	varchar	20	NULL	NULL	NULL	NULL
+PSJ_Court_Canonical	Warrant	WarrantCondition	DataOwnerID	7	varchar	20	NULL	NULL	NULL	NULL
+PSJ_Court_Canonical	Warrant	WarrantCondition	DataSourceID	8	varchar	20	NULL	NULL	NULL	NULL
+PSJ_Court_Canonical	Warrant	WarrantCondition	CreatedDateTime	9	datetimeoffset	NULL	NULL	NULL	NULL	NULL
+PSJ_Court_Canonical	Warrant	WarrantCondition	UpdatedDateTime	10	datetimeoffset	NULL	NULL	NULL	NULL	NULL
+PSJ_Court_Canonical	Warrant	WarrantCondition	RecordStatusCodeID	11	char	1	NULL	NULL	NULL	NULL
+PSJ_Court_Canonical	Warrant	WarrantCondition	RecordStatusDateTime	12	datetimeoffset	NULL	NULL	NULL	NULL	NULL
+PSJ_Court_Canonical	Warrant	WarrantConditionCode	CodeID	1	varchar	20	PRIMARY KEY	NULL	NULL	NULL
+PSJ_Court_Canonical	Warrant	WarrantConditionCode	Description	2	varchar	128	NULL	NULL	NULL	NULL
+PSJ_Court_Canonical	Warrant	WarrantConditionCode	SessionID	3	varchar	40	NULL	NULL	NULL	NULL
+PSJ_Court_Canonical	Warrant	WarrantConditionCode	TenantID	4	varchar	20	NULL	NULL	NULL	NULL
+PSJ_Court_Canonical	Warrant	WarrantConditionCode	DataOwnerID	5	varchar	20	NULL	NULL	NULL	NULL
+PSJ_Court_Canonical	Warrant	WarrantConditionCode	DataSourceID	6	varchar	20	NULL	NULL	NULL	NULL
+PSJ_Court_Canonical	Warrant	WarrantConditionCode	CreatedDateTime	7	datetimeoffset	NULL	NULL	NULL	NULL	NULL
+PSJ_Court_Canonical	Warrant	WarrantConditionCode	UpdatedDateTime	8	datetimeoffset	NULL	NULL	NULL	NULL	NULL
+PSJ_Court_Canonical	Warrant	WarrantConditionCode	RecordStatusCodeID	9	char	1	NULL	NULL	NULL	NULL
+PSJ_Court_Canonical	Warrant	WarrantConditionCode	RecordStatusDateTime	10	datetimeoffset	NULL	NULL	NULL	NULL	NULL
+PSJ_Court_Canonical	Warrant	WarrantDetail	WarrantNo	1	bigint	NULL	PRIMARY KEY	NULL	NULL	NULL
+PSJ_Court_Canonical	Warrant	WarrantDetail	WarrantID	2	varchar	20	NULL	NULL	NULL	NULL
+PSJ_Court_Canonical	Warrant	WarrantDetail	WarrantNumber	3	varchar	20	NULL	NULL	NULL	NULL
+PSJ_Court_Canonical	Warrant	WarrantDetail	CaseNo	4	bigint	NULL	FOREIGN KEY	Case	CaseDetail	CaseNo
+PSJ_Court_Canonical	Warrant	WarrantDetail	CaseNumber	5	varchar	20	NULL	NULL	NULL	NULL
+PSJ_Court_Canonical	Warrant	WarrantDetail	BookingNumber	6	varchar	20	NULL	NULL	NULL	NULL
+PSJ_Court_Canonical	Warrant	WarrantDetail	BailSettingType	7	varchar	20	NULL	NULL	NULL	NULL
+PSJ_Court_Canonical	Warrant	WarrantDetail	BailAmount	8	money	NULL	NULL	NULL	NULL	NULL
+PSJ_Court_Canonical	Warrant	WarrantDetail	ExpirationDate	9	date	NULL	NULL	NULL	NULL	NULL
+PSJ_Court_Canonical	Warrant	WarrantDetail	PartyNo	10	bigint	NULL	FOREIGN KEY	Party	PartyDetail	PartyNo
+PSJ_Court_Canonical	Warrant	WarrantDetail	SessionID	11	varchar	40	NULL	NULL	NULL	NULL
+PSJ_Court_Canonical	Warrant	WarrantDetail	TenantID	12	varchar	20	NULL	NULL	NULL	NULL
+PSJ_Court_Canonical	Warrant	WarrantDetail	DataOwnerID	13	varchar	20	NULL	NULL	NULL	NULL
+PSJ_Court_Canonical	Warrant	WarrantDetail	DataSourceID	14	varchar	20	NULL	NULL	NULL	NULL
+PSJ_Court_Canonical	Warrant	WarrantDetail	CreatedDateTime	15	datetimeoffset	NULL	NULL	NULL	NULL	NULL
+PSJ_Court_Canonical	Warrant	WarrantDetail	UpdatedDateTime	16	datetimeoffset	NULL	NULL	NULL	NULL	NULL
+PSJ_Court_Canonical	Warrant	WarrantDetail	RecordStatusCodeID	17	char	1	NULL	NULL	NULL	NULL
+PSJ_Court_Canonical	Warrant	WarrantDetail	RecordStatusDateTime	18	datetimeoffset	NULL	NULL	NULL	NULL	NULL
+PSJ_Court_Canonical	Warrant	WarrantStatus	WarrantStatusNo	1	bigint	NULL	PRIMARY KEY	NULL	NULL	NULL
+PSJ_Court_Canonical	Warrant	WarrantStatus	WarrantNo	2	bigint	NULL	FOREIGN KEY	Warrant	WarrantDetail	WarrantNo
+PSJ_Court_Canonical	Warrant	WarrantStatus	WarrantStatusID	3	varchar	20	NULL	NULL	NULL	NULL
+PSJ_Court_Canonical	Warrant	WarrantStatus	CodeID	4	varchar	20	FOREIGN KEY	Warrant	WarrantStatusCode	CodeID
+PSJ_Court_Canonical	Warrant	WarrantStatus	StatusDate	5	date	NULL	NULL	NULL	NULL	NULL
+PSJ_Court_Canonical	Warrant	WarrantStatus	Comment	6	varchar	20	NULL	NULL	NULL	NULL
+PSJ_Court_Canonical	Warrant	WarrantStatus	WarrantLocation	7	varchar	20	NULL	NULL	NULL	NULL
+PSJ_Court_Canonical	Warrant	WarrantStatus	SessionID	8	varchar	40	NULL	NULL	NULL	NULL
+PSJ_Court_Canonical	Warrant	WarrantStatus	TenantID	9	varchar	20	NULL	NULL	NULL	NULL
+PSJ_Court_Canonical	Warrant	WarrantStatus	DataOwnerID	10	varchar	20	NULL	NULL	NULL	NULL
+PSJ_Court_Canonical	Warrant	WarrantStatus	DataSourceID	11	varchar	20	NULL	NULL	NULL	NULL
+PSJ_Court_Canonical	Warrant	WarrantStatus	CreatedDateTime	12	datetimeoffset	NULL	NULL	NULL	NULL	NULL
+PSJ_Court_Canonical	Warrant	WarrantStatus	UpdatedDateTime	13	datetimeoffset	NULL	NULL	NULL	NULL	NULL
+PSJ_Court_Canonical	Warrant	WarrantStatus	RecordStatusCodeID	14	char	1	NULL	NULL	NULL	NULL
+PSJ_Court_Canonical	Warrant	WarrantStatus	RecordStatusDateTime	15	datetimeoffset	NULL	NULL	NULL	NULL	NULL
+PSJ_Court_Canonical	Warrant	WarrantStatusCode	CodeID	1	varchar	20	PRIMARY KEY	NULL	NULL	NULL
+PSJ_Court_Canonical	Warrant	WarrantStatusCode	Description	2	varchar	128	NULL	NULL	NULL	NULL
+PSJ_Court_Canonical	Warrant	WarrantStatusCode	SessionID	3	varchar	40	NULL	NULL	NULL	NULL
+PSJ_Court_Canonical	Warrant	WarrantStatusCode	TenantID	4	varchar	20	NULL	NULL	NULL	NULL
+PSJ_Court_Canonical	Warrant	WarrantStatusCode	DataOwnerID	5	varchar	20	NULL	NULL	NULL	NULL
+PSJ_Court_Canonical	Warrant	WarrantStatusCode	DataSourceID	6	varchar	20	NULL	NULL	NULL	NULL
+PSJ_Court_Canonical	Warrant	WarrantStatusCode	CreatedDateTime	7	datetimeoffset	NULL	NULL	NULL	NULL	NULL
+PSJ_Court_Canonical	Warrant	WarrantStatusCode	UpdatedDateTime	8	datetimeoffset	NULL	NULL	NULL	NULL	NULL
+PSJ_Court_Canonical	Warrant	WarrantStatusCode	RecordStatusCodeID	9	char	1	NULL	NULL	NULL	NULL
+PSJ_Court_Canonical	Warrant	WarrantStatusCode	RecordStatusDateTime	10	datetimeoffset	NULL	NULL	NULL	NULL	NULL

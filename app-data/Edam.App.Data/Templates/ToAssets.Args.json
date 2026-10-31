@@ -1,6 +1,10 @@
-﻿{
+{
    "@context": {
       "am": "http://www.datovy.com/am/arguments"
+   },
+   "Domain": {
+      "DomainId": "Edam.Sample",
+      "Description": "The asset domain of the starter project."
    },
    "Namespace": {
       "OrganizationDomainId": "cjust.ise",

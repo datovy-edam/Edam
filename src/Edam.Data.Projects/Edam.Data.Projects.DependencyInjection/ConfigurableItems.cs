@@ -1,3 +1,4 @@
+using Edam.Settings.Contracts;
 using Microsoft.Extensions.Configuration;
 
 namespace Edam.Data.Projects.DependencyInjection;
@@ -48,6 +49,14 @@ public enum ConfigurationStorage
 /// When set, whether the item applies to the configuration at hand at all — a <b>catalog container</b> is
 /// only meaningful when a catalog is configured, so it must not be asked for a file-system installation.
 /// </param>
+/// <param name="Group">
+/// The section a settings surface files it under (ADR-0016). Held here so a section is stated <b>once</b> for
+/// every host instead of being re-decided by each surface.
+/// </param>
+/// <param name="Kind">How to present the editor (text, choice, switch, read-only).</param>
+/// <param name="Tier">Whether this is the person's value, a deployment fact, or recorded evidence.</param>
+/// <param name="ApplyScope">When a change takes effect — so a surface never implies a value is live.</param>
+/// <param name="Choices">The permitted values, when <paramref name="Kind"/> is a choice.</param>
 public sealed record ConfigurableItemInfo(
    string Id,
    string Key,
@@ -59,7 +68,12 @@ public sealed record ConfigurableItemInfo(
    ConfigurationStorage Storage = ConfigurationStorage.AppDataOverlay,
    Func<string?, string?>? Validate = null,
    string? CompletedByKey = null,
-   Func<IConfiguration, bool>? Applies = null)
+   Func<IConfiguration, bool>? Applies = null,
+   string? Group = null,
+   SettingsKind Kind = SettingsKind.Text,
+   SettingsTier Tier = SettingsTier.UserValue,
+   SettingsApplyScope ApplyScope = SettingsApplyScope.NextUse,
+   IReadOnlyList<String>? Choices = null)
 {
    /// <summary>True when this item may be put in front of the user.</summary>
    public bool IsAskable => Policy != ConfigurationPolicy.SilentDefault;
@@ -148,6 +162,30 @@ public static class ConfigurableItems
    public const string DEFAULT_ARGUMENTS_SCHEMA = "app:templates/Arguments.schema.json";
 
    /// <summary>
+   /// The <b>asset domain</b> an arguments document names (§2.3 step 2). A <b>silent default</b>, like the
+   /// template: a sane value ships with the application, so it is documented and overridable and never asked.
+   /// </summary>
+   public const string DOMAIN_ID_KEY = "Edam:Arguments:Domain:DomainId";
+
+   /// <summary>The domain's description, written beside the id (optional — an empty one is a stated value).</summary>
+   public const string DOMAIN_DESCRIPTION_KEY = "Edam:Arguments:Domain:Description";
+
+   /// <summary>
+   /// What is offered when nothing is stated: organization-first and dotted, like the starter project
+   /// (ADR-0013 decision 11), so the starter arguments name a coherent domain without a question.
+   /// </summary>
+   public const String DEFAULT_DOMAIN_ID = "Edam.Sample";
+
+   /// <summary>What the starter arguments state as the domain's description.</summary>
+   public const String DEFAULT_DOMAIN_DESCRIPTION = "The asset domain of the starter project.";
+
+   /// <summary>Longest accepted domain id (it becomes a domain key in the EDAM database).</summary>
+   public const Int32 DOMAIN_ID_MAX_LENGTH = 128;
+
+   /// <summary>Longest accepted domain description (it is read by people, not by a parser).</summary>
+   public const Int32 DOMAIN_DESCRIPTION_MAX_LENGTH = 512;
+
+   /// <summary>
    /// The catalog's <b>connection string</b> — the binding the deployment states (ADR-0014 decision 1), which a
    /// person may now <b>deliberately override</b> from the container manager. An override is an ordinary answer
    /// (the per-user overlay) and is always <b>reported as the source</b>, so a value can never look like it came
@@ -185,7 +223,10 @@ public static class ConfigurableItems
             Default: DEFAULT_PROJECT_NAME,
             Storage: ConfigurationStorage.AppDataOverlay,
             Validate: ValidateProjectName,
-            CompletedByKey: DEFAULT_PROJECT_MARKER_KEY),
+            CompletedByKey: DEFAULT_PROJECT_MARKER_KEY,
+            Group: SettingsGroups.Projects,
+            Tier: SettingsTier.UserValue,
+            ApplyScope: SettingsApplyScope.NextUse),
 
          new(
             Id: DEFAULT_TEMPLATE_KEY,
@@ -198,7 +239,10 @@ public static class ConfigurableItems
             Policy: ConfigurationPolicy.SilentDefault,
             Default: DEFAULT_TEMPLATE,
             Storage: ConfigurationStorage.AppDataOverlay,
-            Validate: null),
+            Validate: null,
+            Group: SettingsGroups.Arguments,
+            Tier: SettingsTier.UserValue,
+            ApplyScope: SettingsApplyScope.NextUse),
 
          // the ARGUMENTS-file schema (the Projects specification §2.3): a silent default, like the template —
          // a sane value ships beside the templates, it is documented and overridable, and it never has to ask
@@ -213,7 +257,46 @@ public static class ConfigurableItems
             Policy: ConfigurationPolicy.SilentDefault,
             Default: DEFAULT_ARGUMENTS_SCHEMA,
             Storage: ConfigurationStorage.AppDataOverlay,
-            Validate: null),
+            Validate: null,
+            Group: SettingsGroups.Arguments,
+            Tier: SettingsTier.UserValue,
+            ApplyScope: SettingsApplyScope.NextUse),
+
+         // the DOMAIN an arguments document names (§2.3 step 2). Two items rather than one object because the
+         // per-user overlay stores key/value pairs and each field keeps its own validator (ADR-0016). A silent
+         // default, like the template: the starter arguments ship stating exactly these values, so the project a
+         // new installation creates validates with no warning — it used to warn about its own missing domain.
+         new(
+            Id: DOMAIN_ID_KEY,
+            Key: DOMAIN_ID_KEY,
+            Title: "Arguments domain",
+            WhatItIs: "The asset domain (DomainId) an arguments document names.",
+            WhatItAffects: "It identifies the domain the arguments belong to: the application looks for it " +
+               "when a document is selected and adds the domain to the EDAM database when it is missing. It " +
+               "is the value the shipped starter arguments state, so a new project's first document " +
+               "validates without a warning.",
+            Policy: ConfigurationPolicy.SilentDefault,
+            Default: DEFAULT_DOMAIN_ID,
+            Storage: ConfigurationStorage.AppDataOverlay,
+            Validate: ValidateDomainId,
+            Group: SettingsGroups.Arguments,
+            Tier: SettingsTier.UserValue,
+            ApplyScope: SettingsApplyScope.NextUse),
+
+         new(
+            Id: DOMAIN_DESCRIPTION_KEY,
+            Key: DOMAIN_DESCRIPTION_KEY,
+            Title: "Arguments domain description",
+            WhatItIs: "A short description of the asset domain an arguments document names.",
+            WhatItAffects: "It is written beside the domain id and is what a person reads when they look at " +
+               "the domain later. Optional: an empty description is a stated value and is respected.",
+            Policy: ConfigurationPolicy.SilentDefault,
+            Default: DEFAULT_DOMAIN_DESCRIPTION,
+            Storage: ConfigurationStorage.AppDataOverlay,
+            Validate: ValidateDomainDescription,
+            Group: SettingsGroups.Arguments,
+            Tier: SettingsTier.UserValue,
+            ApplyScope: SettingsApplyScope.NextUse),
 
          // ADR-0014 (amended): the binding is a deployment fact, and a person may override it — deliberately and
          // visibly. Silent default, so it is never ASKED (a connection string is not a first-run question); it
@@ -228,7 +311,12 @@ public static class ConfigurableItems
             Policy: ConfigurationPolicy.SilentDefault,
             Default: null,
             Storage: ConfigurationStorage.AppDataOverlay,
-            Validate: ValidateConnectionString),
+            Validate: ValidateConnectionString,
+            Group: SettingsGroups.Catalog,
+            Tier: SettingsTier.UserValue,
+
+            // the storage is rebuilt the moment this changes, so the override is live (BL-7.4 ResetStorage)
+            ApplyScope: SettingsApplyScope.Immediate),
 
          // ADR-0014 decision 1: the container is the ONE part of the storage binding a person states. It is
          // asked only when a catalog is configured (Applies), it is asked until the container really EXISTS
@@ -249,6 +337,9 @@ public static class ConfigurableItems
             Storage: ConfigurationStorage.AppDataOverlay,
             Validate: ValidateContainerName,
             CompletedByKey: CONTAINER_READY_KEY,
+            Group: SettingsGroups.Catalog,
+            Tier: SettingsTier.UserValue,
+            ApplyScope: SettingsApplyScope.NextUse,
             Applies: configuration =>
                String.Equals((configuration[ProjectSettings.TARGET_KEY] ?? String.Empty).Trim(),
                   "catalog", StringComparison.OrdinalIgnoreCase) ||
@@ -264,7 +355,11 @@ public static class ConfigurableItems
             Policy: ConfigurationPolicy.SilentDefault,
             Default: null,
             Storage: ConfigurationStorage.PackagedSettings,
-            Validate: null),
+            Validate: null,
+            Group: SettingsGroups.Recorded,
+            Kind: SettingsKind.ReadOnly,
+            Tier: SettingsTier.RecordedState,
+            ApplyScope: SettingsApplyScope.NextUse),
 
          // the proof of the CONTAINER action (ADR-0014): never asked — it records that the container the
          // person named really exists, which is what stops the container question being asked again
@@ -278,7 +373,11 @@ public static class ConfigurableItems
             Policy: ConfigurationPolicy.SilentDefault,
             Default: null,
             Storage: ConfigurationStorage.PackagedSettings,
-            Validate: null)
+            Validate: null,
+            Group: SettingsGroups.Recorded,
+            Kind: SettingsKind.ReadOnly,
+            Tier: SettingsTier.RecordedState,
+            ApplyScope: SettingsApplyScope.NextUse)
       };
 
    /// <summary>The registry entry for an id, or null.</summary>
@@ -471,6 +570,68 @@ public static class ConfigurableItems
       if (raw.StartsWith('.') || raw.EndsWith('.'))
       {
          return "a container name may not start or end with a dot";
+      }
+
+      return null;
+   }
+
+   /// <summary>
+   /// The rules an <b>arguments domain id</b> must satisfy (§2.3 step 2). A domain id is a dotted identifier —
+   /// the repository's own examples are <c>Datovy.HC.CD</c> and <c>edam.sample</c> — so it follows the same
+   /// character discipline as a container name: no separators, nothing that could describe a location.
+   /// </summary>
+   /// <returns>Why the value is unusable, or null when it is fine.</returns>
+   public static string? ValidateDomainId(string? name)
+   {
+      var raw = name ?? String.Empty;
+
+      if (raw.Length == 0)
+      {
+         return "a domain id is required";
+      }
+
+      if (raw != raw.Trim())
+      {
+         return "a domain id may not start or end with a space";
+      }
+
+      if (raw.Length > DOMAIN_ID_MAX_LENGTH)
+      {
+         return $"a domain id may be at most {DOMAIN_ID_MAX_LENGTH} characters";
+      }
+
+      if (!Char.IsLetter(raw[0]))
+      {
+         return "a domain id must start with a letter";
+      }
+
+      if (raw.Any(c => !(Char.IsLetterOrDigit(c) || c == '.' || c == '-' || c == '_')))
+      {
+         return "a domain id may contain only letters, digits, '.', '-' and '_' " +
+            "(a dotted identifier such as 'Edam.Sample')";
+      }
+
+      if (raw.StartsWith('.') || raw.EndsWith('.'))
+      {
+         return "a domain id may not start or end with a dot";
+      }
+
+      return null;
+   }
+
+   /// <summary>
+   /// The rules a domain <b>description</b> must satisfy: it is prose a person reads, so it is bounded — and it
+   /// may legitimately be <b>empty</b>, because an empty description is a <i>stated</i> value (CF-1: empty is
+   /// not unset) and clearing it must not be mistaken for "nothing was ever said".
+   /// </summary>
+   /// <returns>Why the value is unusable, or null when it is fine.</returns>
+   public static string? ValidateDomainDescription(string? value)
+   {
+      var raw = value ?? String.Empty;
+
+      if (raw.Length > DOMAIN_DESCRIPTION_MAX_LENGTH)
+      {
+         return $"a domain description may be at most {DOMAIN_DESCRIPTION_MAX_LENGTH} characters";
       }
 
       return null;

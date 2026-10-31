@@ -85,10 +85,21 @@
     </Content>
     <!-- LM-0(b) / ADR-0010: the packaged settings seed. `ApplicationHelper.InitializeApplication`
          copies `<installed>/ApplicationData/Edam.Studio` into a WRITABLE per-user app-data root on
-         first run, so the seed must ship at that layout. The source of record is the repo's
-         `app-data/` folder — the project-local `ApplicationData/` folder it replaced no longer
-         exists, so this include was previously vacuous and a clean build packaged NO seed. -->
-    <Content Include="..\..\..\app-data\Edam.App.Data\**" Link="ApplicationData\Edam.Studio\Edam.App.Data\%(RecursiveDir)%(Filename)%(Extension)">
+         first run, so the seed must ship at that layout. Only application defaults are packaged:
+         `Projects` is developer/user workspace data and must not be embedded in the MSIX. Including
+         it recursively made Release packaging fail on nested files beyond MAX_PATH and would have
+         shipped one developer's projects to every installation. -->
+    <Content Include="..\..\..\app-data\Edam.App.Data\Templates\**"
+             Exclude="..\..\..\app-data\Edam.App.Data\Templates\.vs\**"
+             Link="ApplicationData\Edam.Studio\Edam.App.Data\Templates\%(RecursiveDir)%(Filename)%(Extension)">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+      <CopyToPublishDirectory>PreserveNewest</CopyToPublishDirectory>
+    </Content>
+    <Content Include="..\..\..\app-data\Edam.App.Data\TextMaps\**" Link="ApplicationData\Edam.Studio\Edam.App.Data\TextMaps\%(RecursiveDir)%(Filename)%(Extension)">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+      <CopyToPublishDirectory>PreserveNewest</CopyToPublishDirectory>
+    </Content>
+    <Content Include="..\..\..\app-data\Edam.App.Data\Samples\**" Link="ApplicationData\Edam.Studio\Edam.App.Data\Samples\%(RecursiveDir)%(Filename)%(Extension)">
       <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
       <CopyToPublishDirectory>PreserveNewest</CopyToPublishDirectory>
     </Content>
@@ -212,5 +223,33 @@
   <ItemGroup>
     <Content Remove="..\..\..\app-data\Edam.App.Data\TextMaps\EditorLanguageTextMap.json" />
   </ItemGroup>
+
+  <!--
+    Unpackaged hosting: copy the compiled XAML (.xbf) of every referenced project next to the executable,
+    keeping each file's relative path.
+
+    A PACKAGED app resolves 'ms-appx:///Controls/…/Foo.xaml' through the package's merged resource index.
+    An UNPACKAGED one resolves it against loose .xbf files relative to the application folder — the SDK only
+    copies the app project's own .xbf there, so the first control reached from a referenced assembly fails with
+    "Cannot locate resource from 'ms-appx:///Controls/Navigation/NavigationControl.xaml'". Copying the referenced
+    projects' intermediate .xbf files into the output is what makes an unpackaged run work; it changes nothing
+    for the packaged layout, so it is scoped to WindowsPackageType=None.
+  -->
+  <Target Name="CopyUnpackagedXamlResources"
+          AfterTargets="Build"
+          Condition="'$(WindowsPackageType)' == 'None'">
+    <ItemGroup>
+      <_UnpackagedXamlSource Include="%(ProjectReference.RootDir)%(ProjectReference.Directory)obj\$(Configuration)\$(TargetFramework)\**\*.xbf" />
+      <_UnpackagedXamlSource Include="%(ProjectReference.RootDir)%(ProjectReference.Directory)obj\$(Platform)\$(Configuration)\$(TargetFramework)\**\*.xbf" />
+      <_UnpackagedXamlSource Remove="@(_UnpackagedXamlSource)" Condition="$([System.String]::Copy('%(FullPath)').Contains('\embed\'))" />
+    </ItemGroup>
+
+    <Copy SourceFiles="@(_UnpackagedXamlSource)"
+          DestinationFiles="@(_UnpackagedXamlSource->'$(OutDir)%(RecursiveDir)%(Filename)%(Extension)')"
+          SkipUnchangedFiles="true" />
+
+    <Message Importance="normal"
+             Text="Unpackaged XAML resources: @(_UnpackagedXamlSource->Count()) .xbf file(s) copied next to the executable." />
+  </Target>
 </Project>
 

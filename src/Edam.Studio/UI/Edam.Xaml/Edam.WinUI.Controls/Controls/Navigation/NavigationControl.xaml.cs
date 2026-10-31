@@ -225,11 +225,40 @@ namespace Edam.WinUI.Controls.Navigation
          return m_MenuController.Find(option);
       }
 
+      /// <summary>
+      /// <b>The settings surface</b> (ST-4 / ADR-0016). The NavigationView's built-in Settings item is the natural home:
+      /// it is where a Windows application's settings live, it is already visible in the shell, and until now it did
+      /// nothing at all.
+      /// <para>
+      /// WinUI reports the Settings item through <see cref="NavigationViewItemInvokedEventArgs.IsSettingsInvoked"/> on
+      /// the ordinary invoked event (there is no separate settings event), which is also why a plain menu item is never
+      /// mistaken for it.
+      /// </para>
+      /// <para>
+      /// Nothing is known here about <i>which</i> settings exist — the view renders the catalog, so a new setting is a
+      /// registry entry rather than a change to this handler.
+      /// </para>
+      /// </summary>
+      private void PageNavigation_ItemInvoked(
+         NavigationView sender, NavigationViewItemInvokedEventArgs args)
+      {
+         if (!args.IsSettingsInvoked)
+         {
+            return;
+         }
+
+         m_ViewModel.SelectedItem = null;
+         PanelContent.Content = new Edam.WinUI.Controls.Settings.SettingsControl();
+
+         Edam.WinUI.Controls.Logging.AppDiagnostics.Write(
+            "Navigation: the settings surface was opened.",
+            Microsoft.Extensions.Logging.LogLevel.Information, "Edam.Studio.Navigation");
+      }
+
       private void PageNavigation_SelectionChanged(NavigationView sender,
          NavigationViewSelectionChangedEventArgs args)
       {
          m_ViewModel.SelectedItem = args.SelectedItem as MenuItem;
-
          var item = args.SelectedItem as MenuItem;
          if (item == null)
             return;

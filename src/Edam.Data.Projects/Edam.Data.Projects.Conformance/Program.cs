@@ -320,6 +320,13 @@ try
    // ---- 10i. the answers: overlay + marker + the ask loop (CF-3, ADR-0013) --------------------
    all["state (CF-3)"] = StateScenario.Run(Path.Combine(temp, "state"));
 
+   // ---- 10i-2. the settings SURFACE: catalog, provenance, editor and apply (ST-1…ST-3, ADR-0016) ---
+   //      The half a user interface must be able to rely on without re-implementing: what exists, where each
+   //      value came from, and whether a change really takes effect.
+   all["settings catalog (ST-1)"] = SettingsSurfaceScenario.RunCatalog(Path.Combine(temp, "st1"));
+   all["settings provenance (ST-2)"] = SettingsSurfaceScenario.RunProvenance(Path.Combine(temp, "st2"));
+   all["settings apply (ST-3)"] = await SettingsSurfaceScenario.RunApplyAsync(Path.Combine(temp, "st3"));
+
    // ---- 10j. the gated default project: gates, the name, and the marker as proof (DP-3) ----------
    all["default project (DP-3)"] = await DefaultProjectScenario.Run(Path.Combine(temp, "dp3"));
 
@@ -431,7 +438,7 @@ var cwdUnchanged = cwdBefore == cwdAfter;
 Console.WriteLine($"  [{(cwdUnchanged ? "PASS" : "FAIL")}] No process current-directory change: '{cwdBefore}' -> '{cwdAfter}'");
 if (!cwdUnchanged) failed++;
 
-Console.WriteLine($"result: projects conformance (PE-2\u2026PE-5c / LM / CF / DP) {(failed == 0 ? "ALL CONFORM" : $"{failed} FAILED")}");
+Console.WriteLine($"result: projects conformance (PE-2\u2026PE-5c / LM / CF / DP / ST) {(failed == 0 ? "ALL CONFORM" : $"{failed} FAILED")}");
 
 // ---------------------------------------------------------------------------------------------
 

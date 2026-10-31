@@ -18,6 +18,7 @@ Use a sanitized `ApplicationData/Edam.Studio` tree inside the MSIX as the read-o
 ## Consequences
 
 - Settings, project data, and generated app data are writable and package-scoped without depending on Documents/OneDrive.
+- The MSIX seed contains only application defaults (`Templates`, `TextMaps`, `Samples`, and `Edam.Settings.json`). User/developer workspace data under `app-data/Edam.App.Data/Projects` is deliberately excluded from deployment.
 - Package updates can add new default files without destroying user changes.
 - Existing settings in the former Documents location are not migrated automatically; migration can be added later as an explicit, separately validated feature.
 - The sanitized seed must not contain machine-specific absolute paths or secrets.
@@ -26,4 +27,5 @@ Use a sanitized `ApplicationData/Edam.Studio` tree inside the MSIX as the read-o
 
 - `Edam.System` 1.0.1 built and was republished to the local feed.
 - `Edam.Studio.sln` Debug build completed with zero errors after restore.
-- Release Publish completed with zero errors; the signed x64 MSIX contains `ApplicationData/Edam.Studio/Edam.App.Data/Edam.Settings.json` and signature verification succeeded.
+- Release Publish completed with zero errors; the clean x64 MSIX contains `ApplicationData/Edam.Studio/Edam.App.Data/Edam.Settings.json`, 22 template entries, 7 text-map entries and 1 sample, with no `Projects` or `.vs` entries. The package has no overlong entry names and signature verification succeeded with `signtool`.
+- The generated development certificate was imported successfully into the machine-level `TrustedPeople` store. After removing the same-identity unpackaged/development registration, the signed MSIX installed and launched successfully; the package reports `IsDevelopmentMode=False` and its `LocalState` is writable.

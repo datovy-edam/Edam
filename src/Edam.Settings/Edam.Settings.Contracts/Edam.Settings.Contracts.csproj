@@ -1,0 +1,14 @@
+<Project Sdk="Microsoft.NET.Sdk">
+
+  <PropertyGroup>
+    <TargetFramework>net10.0</TargetFramework>
+    <ImplicitUsings>enable</ImplicitUsings>
+    <Nullable>enable</Nullable>
+  </PropertyGroup>
+
+  <!-- Deliberately dependency-free (ADR-0006 purity, ADR-0016): the settings surface must be
+       reachable by every host — WinUI, WebApi, CLI, MCP — so it references no configuration provider,
+       no storage technology, no UI framework and no project/catalog type. A host supplies the
+       implementation; this assembly only states what a setting IS and what a host may do to it. -->
+
+</Project>

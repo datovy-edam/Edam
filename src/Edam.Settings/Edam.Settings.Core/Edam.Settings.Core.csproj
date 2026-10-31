@@ -1,0 +1,15 @@
+<Project Sdk="Microsoft.NET.Sdk">
+
+  <PropertyGroup>
+    <TargetFramework>net10.0</TargetFramework>
+    <ImplicitUsings>enable</ImplicitUsings>
+    <Nullable>enable</Nullable>
+  </PropertyGroup>
+
+  <ItemGroup>
+    <!-- The behavior of a setting — read, change, apply — with no knowledge of where settings live. The
+         catalog and the editor are supplied by whichever module owns the values (ADR-0016). -->
+    <ProjectReference Include="..\Edam.Settings.Contracts\Edam.Settings.Contracts.csproj" />
+  </ItemGroup>
+
+</Project>

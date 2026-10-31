@@ -61,12 +61,6 @@ namespace Edam.WinUI.Controls.Projects
             Foreground = new SolidColorBrush(Colors.DimGray),
          };
 
-         var connectionBox = new TextBox
-         {
-            Header = "Catalog connection string (Integrated Security only — a password is refused)",
-            TextWrapping = TextWrapping.Wrap,
-         };
-
          var status = new TextBlock
          {
             TextWrapping = TextWrapping.Wrap,
@@ -95,16 +89,10 @@ namespace Edam.WinUI.Controls.Projects
             },
          };
 
-         var connectionRow = new StackPanel { Orientation = Orientation.Horizontal, Spacing = 6 };
-         var saveConnection = new Button { Content = "Use my value" };
-         var clearConnection = new Button { Content = "Use the deployment's value" };
-         connectionRow.Children.Add(saveConnection);
-         connectionRow.Children.Add(clearConnection);
-
          var storageContent = new StackPanel
          {
             Spacing = 10,
-            Children = { storageShared, storageContainer, storageNote, connectionBox, connectionRow },
+            Children = { storageShared, storageContainer, storageNote },
          };
 
          var storageTab = new TabViewItem
@@ -196,18 +184,18 @@ namespace Edam.WinUI.Controls.Projects
                  KindOf(selected.Type) + "  ·  " + selected.Items + " item(s).";
 
             // a connection string belongs to a catalog that IS reached by one — not to a file-system root
-            // or a service URI, and never to a container
+            // or a service URI, and never to a container. It is not EDITABLE here: the one place a value is
+            // changed is the settings surface (ADR-0016), so this tab STATES the storage and points there
+            // instead of owning a second editor for the same key.
             var connectionBacked = ProjectServicesHelper.CatalogIsConnectionStringBacked;
-            connectionBox.Visibility = connectionBacked ? Visibility.Visible : Visibility.Collapsed;
-            connectionRow.Visibility = connectionBacked ? Visibility.Visible : Visibility.Collapsed;
-
-            connectionBox.Text = ProjectServicesHelper.CatalogConnectionText;
 
             storageNote.Text = connectionBacked
-               ? "The connection string is the catalog's, not a container's. Keeping your own value overrides " +
-                 "the deployment's, and 'Use the deployment's value' gives it back."
+               ? "The connection string is the catalog's, not a container's: " +
+                 ProjectServicesHelper.CatalogConnectionText + "  (stated by " +
+                 ProjectServicesHelper.CatalogConnectionSource + "). To use your own value, or to give the " +
+                 "deployment's value back, open Settings (the gear in the navigation pane) → Catalog."
                : "This catalog is not managed by a connection string: its storage is " +
-                 ProjectServicesHelper.StorageKind + ", stated by the deployment. Nothing to edit here.";
+                 ProjectServicesHelper.StorageKind + ", stated by the deployment. Nothing to change here.";
          }
 
          void RenderEmpty()
@@ -420,22 +408,6 @@ namespace Edam.WinUI.Controls.Projects
             {
                RenderDetail(summary);
             }
-         };
-
-         saveConnection.Click += async (_, _) =>
-         {
-            var problem = await ProjectServicesHelper.SetCatalogConnectionAsync(connectionBox.Text);
-            Report(problem ?? "Saved: the application now uses your connection string.", problem is not null);
-            await ReloadAsync();
-            await refresh();
-         };
-
-         clearConnection.Click += async (_, _) =>
-         {
-            var problem = await ProjectServicesHelper.SetCatalogConnectionAsync(null);
-            Report(problem ?? "Cleared: the deployment's connection string applies again.", problem is not null);
-            await ReloadAsync();
-            await refresh();
          };
 
          await ReloadAsync();

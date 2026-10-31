@@ -997,41 +997,6 @@ namespace Edam.WinUI.Controls.DataModels
       }
 
       /// <summary>
-      /// Keep the person's <b>own</b> catalog connection string — a deliberate, visible override of the
-      /// deployment's binding (ADR-0014, amended) — or clear it (<paramref name="connectionString"/> null/blank)
-      /// so the deployment's value applies again. The storage is rebuilt immediately, so the change is real.
-      /// </summary>
-      /// <returns>Why it was refused (a password is never accepted), or null on success.</returns>
-      public static Task<String?> SetCatalogConnectionAsync(
-         String? connectionString, CancellationToken ct = default)
-      {
-         var item = ConfigurableItems.Find(ConfigurableItems.CATALOG_CONNECTION_KEY);
-         if (item is null)
-         {
-            return Task.FromResult<String?>("the connection string is not a configurable item");
-         }
-
-         var value = String.IsNullOrWhiteSpace(connectionString) ? null : connectionString!.Trim();
-
-         // validated where it is entered (ADR-0013 decision 7): a refused value is never stored
-         var refused = UserConfiguration.Answer(item, value);
-         if (refused is not null)
-         {
-            return Task.FromResult<String?>(refused);
-         }
-
-         ResetStorage();
-
-         Edam.WinUI.Controls.Logging.AppDiagnostics.Write(
-            value is null
-               ? "Projects storage: the connection override was CLEARED — the deployment's value applies again."
-               : "Projects storage: your own connection string was saved — it OVERRIDES the deployment's value.",
-            Microsoft.Extensions.Logging.LogLevel.Information, StorageCategory);
-
-         return Task.FromResult<String?>(null);
-      }
-
-      /// <summary>
       /// Make sure the configured <b>collection</b> (container) exists before it is browsed: a catalog has
       /// to hold a location before it can hold projects, and enlistment is <b>idempotent</b> (an existing
       /// container is returned, never rewritten — a seed can never change a binding, ADR-0011).

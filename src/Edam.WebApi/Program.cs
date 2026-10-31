@@ -110,4 +110,30 @@ app.MapGet("/audit", (IAuditLog audit) => new
     Entries = audit.Read()
 });
 
+// ADR-0016: the SETTINGS surface, UI-agnostic. It renders the SAME catalog and drives the SAME service as the
+// WinUI page, so a web host, a CLI and an MCP tool cannot drift into three different answers about "what is
+// configured, and where did that value come from?".
+//
+// Read-only here, deliberately: this API has no authenticated caller yet, and a settings WRITE without an
+// identity would let any reachable client rewrite the deployment's answers. Writes are exercised through the
+// CLI and the desktop, both of which have a person behind them; a secured write surface is a tracked follow-up
+// (ST-6) rather than a hole opened today.
+{
+    var settings = Edam.Data.Projects.DependencyInjection.ProjectSettingsComposition.Create(app.Configuration);
+
+    app.MapGet("/settings", () => new
+    {
+        Groups = settings.Catalog.Groups,
+        Items = settings.Catalog.Items
+    });
+
+    app.MapGet("/settings/{id}", (string id) =>
+    {
+        var item = settings.Catalog.Find(id);
+        return item is null
+            ? Results.NotFound(new { Id = id, Found = false })
+            : Results.Ok(item);
+    });
+}
+
 app.Run();

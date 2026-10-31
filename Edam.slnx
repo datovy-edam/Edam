@@ -7,6 +7,10 @@
     <Project Path="src/Edam.Services/Edam.Services.Contracts/Edam.Services.Contracts.csproj" />
     <Project Path="src/Edam.Services/Edam.Services.Core/Edam.Services.Core.csproj" />
   </Folder>
+  <Folder Name="/src/Edam.Settings/">
+    <Project Path="src/Edam.Settings/Edam.Settings.Contracts/Edam.Settings.Contracts.csproj" />
+    <Project Path="src/Edam.Settings/Edam.Settings.Core/Edam.Settings.Core.csproj" />
+  </Folder>
   <Folder Name="/src/Edam.Data.Catalog/">
     <Project Path="src\Edam.Data.Catalog\Edam.Data.CatalogService\Edam.Data.CatalogService.csproj" />
   </Folder>

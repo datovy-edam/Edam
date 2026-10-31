@@ -261,13 +261,29 @@ namespace Edam.WinUI.Controls.Application
 
       /// <summary>
       /// Get the Application Installed Location.
+      /// <para>
+      /// A <b>packaged</b> host answers from its package. An <b>unpackaged</b> host has no package at all, and
+      /// asking for one throws (<c>0x80073D54</c>) — which used to end the launch, because startup immediately
+      /// needs this location to seed the application data. The executable's own directory <b>is</b> the installed
+      /// location in that case, so that is what is answered: the host decides, the callers do not care.
+      /// </para>
       /// </summary>
       /// <returns>Installed location is returned</returns>
       public static string GetApplicationInstalledLocation()
       {
-         StorageFolder localFolder = 
-            Windows.ApplicationModel.Package.Current.InstalledLocation;
-         return localFolder.Path;
+         try
+         {
+            Windows.Storage.StorageFolder localFolder =
+               Windows.ApplicationModel.Package.Current.InstalledLocation;
+            return localFolder.Path;
+         }
+         catch (Exception)
+         {
+            // unpackaged: there is no package, and the executable's folder is the installed location
+            return AppContext.BaseDirectory.TrimEnd(
+               System.IO.Path.DirectorySeparatorChar,
+               System.IO.Path.AltDirectorySeparatorChar);
+         }
       }
 
       public static string GetLocalFolder()

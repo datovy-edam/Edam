@@ -15,6 +15,13 @@
     <ProjectReference Include="..\Edam.Data.Projects.Runner\Edam.Data.Projects.Runner.csproj" />
     <!-- For the catalog target the catalog composition root supplies ICatalogStore/IContentStore. -->
     <ProjectReference Include="..\..\Edam.Data.Catalog\Edam.Data.Catalog.DependencyInjection\Edam.Data.Catalog.DependencyInjection.csproj" />
+    <!-- The settings vocabulary (tier · kind · apply scope · section) the registry declares per item, so a
+         settings surface is generated from the registry instead of being hardcoded (ADR-0016). Contract-only:
+         no behavior, no UI, no storage. -->
+    <ProjectReference Include="..\..\Edam.Settings\Edam.Settings.Contracts\Edam.Settings.Contracts.csproj" />
+    <!-- The one settings service (read → change → apply) that every host drives, so no surface re-implements
+         "store it and make it real" (ADR-0016). -->
+    <ProjectReference Include="..\..\Edam.Settings\Edam.Settings.Core\Edam.Settings.Core.csproj" />
   </ItemGroup>
 
   <ItemGroup>
