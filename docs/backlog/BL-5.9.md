@@ -191,9 +191,10 @@ later on 2026-10-25 (see **Resolution** below and `docs/HANDOFF.md` item 153). T
 paragraph became the working one; only the loose Visual Studio registration remains broken, by design.
 
 ## Related
-`docs/HANDOFF.md` items 147–155 (investigation, the signed-MSIX resolution, the documentation reconciliation);
+`docs/HANDOFF.md` items 147–158 (investigation, the signed-MSIX resolution, the documentation reconciliation, the
+loose-deployment fallback and the two follow-up fixes); **ADR-0017** (the loose development data root);
 ST-2 (its runtime verification was blocked by this and is now open — the installed package is the way to run the
-checks); ADR-0010 / ADR-0013 (the packaged app-data root this affects).
+checks); ADR-0010 / ADR-0013 (the packaged app-data root and the packaged-state/overlay split this affects).
 
 ## Packaging validation update (2026-10-25)
 
@@ -233,6 +234,18 @@ because they were not part of the procedure when it ran. They are recorded here 
   step 2 now requires the inventory to be captured before any removal.
 
 ## Decisions
+- **ADR-0017 records the loose-deployment data root**: packaged `LocalFolder` → `EDAM_STUDIO_DATA_ROOT` →
+  `<deployment folder>\.local-data` (loose Visual Studio layout only, detected by an installed location whose last
+  segment is `AppX`) → `%LOCALAPPDATA%` → `%TEMP%` → visible refusal. A signed MSIX never takes the development
+  branch, so packaged `LocalState` behavior is unchanged.
+- **Packaged markers follow that root.** `PackagedStateStore` uses `LocalSettings` when it works and otherwise keeps
+  the once-per-installation markers in `Edam.PackagedState.json` under the resolved root — a file separate from the
+  overlay, so a reset of the answers still cannot clear a marker (ADR-0012 decision 4). Before this, the loose
+  deployment logged `Could not write packaged state 'Edam:Catalog:ContainerReady': Access is denied` and no marker
+  persisted there.
+- **The configuration ask is single-flight** (`ConfigurationPrompt.ShowIfNeededAsync`): two callers arriving within
+  270 ms used to produce `Only a single ContentDialog can be open at any time`, which left both questions deferred.
+  The later caller now yields to the dialog already on screen.
 - **Unpackaged hosting is a development fallback, never a deployment path.** The shipped path is the signed MSIX
   (§5A). `run-unpackaged.cmd`, `EDAM_STUDIO_DATA_ROOT`, the `CopyUnpackagedXamlResources` target and the VS launch
   profile remain for local development only; the profile is labelled

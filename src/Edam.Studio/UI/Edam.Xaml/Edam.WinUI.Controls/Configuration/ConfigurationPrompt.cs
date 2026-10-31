@@ -1,6 +1,7 @@
 using System;
 using System.Collections.Generic;
 using System.Linq;
+using System.Threading;
 using System.Threading.Tasks;
 using Edam.Data.Projects.DependencyInjection;
 using Edam.WinUI.Controls.Logging;
@@ -27,12 +28,22 @@ public static class ConfigurationPrompt
 {
    private const string Category = "Edam.WinUI.Controls.Configuration";
 
+   /// <summary>1 while a dialog is on screen; the gate that keeps WinUI's one-dialog rule intact.</summary>
+   private static int m_AskInFlight;
+
    /// <summary>The item's value boxes, so Save can validate and store exactly what was typed.</summary>
    private sealed record Entry(ConfigurableAsk Ask, TextBox Box);
 
    /// <summary>
    /// Ask about everything that still needs the user's input. Returns true when at least one answer was
    /// saved.
+   /// <para>
+   /// <b>One ask at a time.</b> Two callers reach this within milliseconds of each other — the
+   /// signed-in poll and the shell's own check — and WinUI cannot open a second <c>ContentDialog</c> while
+   /// the first is open: it answers <i>"An async operation was not properly started"</i>, which consumed
+   /// the attempt and left the question unanswered (observed 2026-10-25 17:06:35). A later caller now
+   /// <b>yields</b> to the dialog already on screen instead of failing it.
+   /// </para>
    /// </summary>
    /// <param name="xamlRoot">The shell's XAML root (the dialog cannot be shown without one).</param>
    /// <param name="user">The answers service (registry + overlay + packaged marker).</param>
@@ -51,6 +62,29 @@ public static class ConfigurationPrompt
          return false;
       }
 
+      if (Interlocked.CompareExchange(ref m_AskInFlight, 1, 0) != 0)
+      {
+         AppDiagnostics.Write(
+            "Configuration ask: already in progress — this caller yields to the dialog on screen.",
+            LogLevel.Information, Category);
+         return false;
+      }
+
+      try
+      {
+         return await ShowCoreAsync(xamlRoot, user, completeAction);
+      }
+      finally
+      {
+         Interlocked.Exchange(ref m_AskInFlight, 0);
+      }
+   }
+
+   /// <summary>The dialog itself — reached by <b>one</b> caller at a time; see <see cref="ShowIfNeededAsync"/>.</summary>
+   private static async Task<bool> ShowCoreAsync(
+      XamlRoot xamlRoot, UserConfiguration user,
+      Func<ConfigurableItemInfo, string, Task<string?>>? completeAction)
+   {
       var asks = user.ToAsk();
       if (asks.Count == 0)
       {
